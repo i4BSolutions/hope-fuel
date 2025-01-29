@@ -1,23 +1,22 @@
 ---
 name: Test case template
 about: template for test case
-title: "[test-case]: "
+title: " "
 labels: ''
 assignees: ''
 
 ---
 
-**Precondition:**
+Precondition:
 
 
-**Steps:**
+Steps:
 
 
-**Expected Result:**
+Expected Result:
 
 
-**Actual Result:**
-
+Actual Result:
 
 
 
