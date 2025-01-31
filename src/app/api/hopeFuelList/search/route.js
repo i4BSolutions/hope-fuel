@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import db from "../../utilites/db";
+import db from "../../../utilites/db";
+
 
 async function searchHopeFuelList(searchText) {
   const query = `
@@ -41,19 +42,19 @@ LEFT JOIN (
 ) current_fs ON t.TransactionID = current_fs.TransactionID
 LEFT JOIN TransactionStatus ts ON current_fs.TransactionStatusID = ts.TransactionStatusID
 WHERE
-    t.HopeFuelID LIKE '%${searchText}%' OR
-    c.Name LIKE '%${searchText}%' OR
-    c.Email LIKE '%${searchText}%' OR
-    c.CardID LIKE '%${searchText}%' OR
-    t.TransactionDate LIKE '%${searchText}%' OR
-    t.Amount LIKE '%${searchText}%'  OR
-    curr.CurrencyCode LIKE '%${searchText}%' OR
-    t.Month LIKE '%${searchText}%' OR
-	ss.ScreenShotLink LIKE '%${searchText}%' OR
-	c.ManyChatId LIKE '%${searchText}%' OR
-	a.AwsId LIKE '%${searchText}%' OR
-    ts.TransactionStatus LIKE '%${searchText}%' OR
-    n.Note LIKE '%${searchText}%
+    t.HopeFuelID LIKE ? OR
+    c.Name LIKE ? OR
+    c.Email LIKE ? OR
+    c.CardID LIKE ? OR
+    t.TransactionDate LIKE ? OR
+    t.Amount LIKE ?  OR
+    curr.CurrencyCode LIKE ? OR
+    t.Month LIKE ? OR
+	ss.ScreenShotLink LIKE ? OR
+	c.ManyChatId LIKE ? OR
+	a.AwsId LIKE ? OR
+    ts.TransactionStatus LIKE ? OR
+    n.Note LIKE ?
 GROUP BY
     t.TransactionID,
     t.HopeFuelID,
@@ -69,8 +70,10 @@ GROUP BY
     n.Note
 
 `;
+  const searchPattern = `%${searchText}%`;
+  const params = Array(13).fill(searchPattern);
   try {
-    const result = await db(query, [searchText]);
+    const result = await db(query, params);
     return result;
   } catch (error) {
     console.error("Error searching in Hope Fuel List", error);
@@ -78,3 +81,30 @@ GROUP BY
   }
 }
 
+export async function GET(req){
+    const {searchParams} = new URL(req.url);
+    const searchText = searchParams.get('q').trim();
+
+ if (!searchText) {
+   return NextResponse.json(
+     { message: "Missing search query parameter" },
+     { status: 400 }
+   );
+ }
+
+    try {
+    const result = await searchHopeFuelList(searchText);
+    return NextResponse.json({
+        status: 200,
+        message: "Successfully searched in Hope Fuel List",
+        data: result,
+    });
+    } catch (error) {
+    return NextResponse.json(
+        { error: "Failed to search in Hope Fuel List" },
+        { status: 500 }
+    );
+    }
+
+
+}
