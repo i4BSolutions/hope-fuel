@@ -74,7 +74,10 @@ GROUP BY
   const params = Array(13).fill(searchPattern);
   try {
     const result = await db(query, params);
-    return result;
+     return result.map(row => ({
+      ...row,
+      ScreenShot: row.ScreenShot ? row.ScreenShot.split(', ') : [],
+    }));
   } catch (error) {
     console.error("Error searching in Hope Fuel List", error);
     throw new Error("Failed to search in Hope Fuel List");
