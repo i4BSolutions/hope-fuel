@@ -106,7 +106,7 @@ export async function GET(req,{ params}) {
                CreateTime: data[0].TransactionDate,
                Amount: data[0].Amount,
                CurrencyCode: data[0].CurrencyCode,
-               Month: data[0].Month,
+               TimeLineInMonth: data[0].Month,
                ScreenShot: data[0].ScreenShot,
                ManyChatId: data[0].ManyChatId,
                FormFilledPerson: data[0].FormFilledPerson,
