@@ -14,27 +14,14 @@ import HopeFuelIDListDetails from "./components/HopeFuelIDListDetails";
 import { useDebounce } from "use-debounce";
 import DetailModal from "../UI/Components/Modal";
 
-const HOPEFUEL_ID_LISTS_DETAILS = [
-  {
-    hopeId: "HOPEID-12345",
-    name: "Maung Maung",
-    email: "maungmaung@gmail.com",
-    cardId: "12345678",
-    createTime: "28-11-2024 09:55:00",
-    month: 3,
-    amount: 600000,
-    currency: "MMK",
-    formFillingPerson: "AWS-183746ag-8760-27374ytu-hfg888-dhj86879-688",
-    manychatId: "77777777",
-    images: ["1", "2"],
-  },
-];
+
 
 const PAGE_SIZE = 10;
 
 const HopeFuelIdListPage = () => {
   const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
+  const [selectedDetail, setSelectedDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -94,6 +81,27 @@ const HopeFuelIdListPage = () => {
     fetchData(true);
   }, [debouncedSearch]);
 
+  //Fetching the HopeFuel ID Details from API
+  const fetchDetails = async (hopeFuelId) => {
+    //console.log("Fetching details for HopeFuelID:", hopeFuelId);
+    try {
+      const response = await fetch(`api/hopeFuelList/details/${hopeFuelId}`);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to fetch data (${response.status})`
+        );
+      }
+
+      const detailData = await response.json();
+      setSelectedDetail(detailData.data);
+    } catch (error) {
+      console.error(error);
+      setSelectedDetail({});
+    }
+  };
+ 
+
   const handleScroll = useCallback(() => {
     if (
       window.innerHeight + window.scrollY >=
@@ -122,8 +130,10 @@ const HopeFuelIdListPage = () => {
     </Box>;
   }
 
-  const handleOpen = () => {
+  const handleOpen = async (hopeFuelId) => {
+   // console.log("Opening modal for HopeFuelID:", hopeFuelId);
     setOpenModal((prev) => !prev);
+    await fetchDetails(hopeFuelId);
   };
 
   const handleClose = () => {
@@ -209,7 +219,7 @@ const HopeFuelIdListPage = () => {
             borderBottomLeftRadius: 20,
           }}
         >
-          <HopeFuelIDListDetails data={HOPEFUEL_ID_LISTS_DETAILS} />
+          <HopeFuelIDListDetails data={selectedDetail} />
         </Paper>
       </DetailModal>
     </>
