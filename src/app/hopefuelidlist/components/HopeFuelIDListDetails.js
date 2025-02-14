@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
+import { formatDate } from "../../utilites/FormatDate";
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -169,7 +170,7 @@ const HopeFuelIDListDetails = ({ data }) => {
               fontWeight: 600,
             }}
           >
-            {data.CreateTime}
+            {formatDate(data.CreateTime)}
           </Value>
         </InfoRow>
         <InfoRow>
