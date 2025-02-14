@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 import React from "react";
 
 const HopeFuelIDListItem = ({ data, onClick }) => {
+  console.log("Data from list item", data);
   const getStatusByColor = (status) => {
     switch (status) {
       case "ငွေစစ်ဆေးပြီး":
@@ -24,7 +25,7 @@ const HopeFuelIDListItem = ({ data, onClick }) => {
         data.map((item, index) => (
           <>
             <Card
-              onClick={() => onClick && onClick()}
+              onClick={() => onClick && onClick(item.HopeFuelID)}
               key={index}
               sx={{
                 backgroundColor: "#FFFFFF",
