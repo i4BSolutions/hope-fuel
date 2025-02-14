@@ -62,7 +62,7 @@ const HopeFuelIDListDetails = ({ data }) => {
    // console.log("Data from details", data);
 
    if (!data) {
-     return <Typography>No details available</Typography>;
+     return <Typography>Loading...</Typography>;
    }
 
   return (
