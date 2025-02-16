@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import { formatDate } from "../../utilites/FormatDate";
+import moment from "moment-timezone";
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -170,7 +171,7 @@ const HopeFuelIDListDetails = ({ data }) => {
               fontWeight: 600,
             }}
           >
-            {formatDate(data.CreateTime)}
+            {moment(data.CreateTime).format("MM-DD-YYYY HH:mm:ss")}
           </Value>
         </InfoRow>
         <InfoRow>
