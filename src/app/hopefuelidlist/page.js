@@ -83,6 +83,7 @@ const HopeFuelIdListPage = () => {
 
   //Fetching the HopeFuel ID Details from API
   const fetchDetails = async (hopeFuelId) => {
+    setLoading(true);
     //console.log("Fetching details for HopeFuelID:", hopeFuelId);
     try {
       const response = await fetch(`api/hopeFuelList/details/${hopeFuelId}`);
@@ -98,6 +99,8 @@ const HopeFuelIdListPage = () => {
     } catch (error) {
       console.error(error);
       setSelectedDetail({});
+    } finally {
+      setLoading(false);
     }
   };
  
@@ -219,7 +222,20 @@ const HopeFuelIdListPage = () => {
             borderBottomLeftRadius: 20,
           }}
         >
-          <HopeFuelIDListDetails data={selectedDetail} />
+          {loading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : (
+            <HopeFuelIDListDetails data={selectedDetail} />
+          )}
         </Paper>
       </DetailModal>
     </>
