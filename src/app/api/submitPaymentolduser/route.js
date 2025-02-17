@@ -178,6 +178,8 @@ import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import exp from "constants";
 import moment from "moment-timezone";
 
+import { submitPaymentSchema } from "/validation/validation.js";
+
 async function InsertCustomer(
   customerName,
   customerEmail,
@@ -293,6 +295,8 @@ export async function POST(req) {
   try {
     let json = await req.json();
 
+    const validatedData = submitPaymentSchema.parse(json);
+
     let {
       customerName,
       customerEmail,
@@ -307,9 +311,9 @@ export async function POST(req) {
       screenShot,
       expireDate,
       cardId,
-    } = json;
+    } = validatedData;
     month = parseInt(month);
-    console.log(json);
+ 
 
     if (expireDate) {
       expireDate = new Date(expireDate);
