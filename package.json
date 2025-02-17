@@ -33,7 +33,8 @@
     "react-dom": "latest",
     "react-dropzone": "^14.2.3",
     "use-debounce": "^10.0.4",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@mui/icons-material": "^6.4.2",
