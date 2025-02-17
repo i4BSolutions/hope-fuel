@@ -21,15 +21,18 @@ import filehandler from "../utilites/createForm/fileHandler";
 import { useUser } from "../context/UserContext";
 import { useAgent } from "../context/AgentContext";
 
+import { CreateFormSchema } from "../validation/validation";
+
 const CreateForm = ({ userInfo, setloading }) => {
   //console.log("UserInfo from createForm: ", userInfo);
   const user = useUser();
   const agent = useAgent();
- // console.log("User from CreateForm: ", user);
- // console.log("Agent from CreateForm: ", agent);
+  // console.log("User from CreateForm: ", user);
+  // console.log("Agent from CreateForm: ", agent);
 
   const formFillingPerson = user?.Name || "Unknown User";
 
+  // Form Fields
   const [walletId, setWalletId] = useState(null);
   const [wallets, setWallets] = useState([]);
   const [currency, setCurrency] = useState("");
@@ -38,20 +41,23 @@ const CreateForm = ({ userInfo, setloading }) => {
   const [currencies, setCurrencies] = useState([]);
   const [files, setFiles] = useState([]);
 
+  const [amount, setAmount] = useState("");
+  const [month, setMonth] = useState("");
+  const [manyChatId, setManyChatId] = useState("");
+  const [contactLink, setContactLink] = useState("");
+  const [notes, setNotes] = useState("");
+
+
+
   //checking validation
-  const [amountValidate, setAmountValidate] = useState(false);
-  const [monthValidate, setMonthValidate] = useState(false);
-  const [manyChatValidate, setManyChatValidate] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const [fileExist, setFileExist] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form Fields
-  const [contactLink, setContactLink] = useState("");
-  const [notes, setNotes] = useState("");
-  const [manyChatId, setManyChatId] = useState("");
+
 
   // Load Wallets by Currency
   useEffect(() => {
@@ -94,35 +100,96 @@ const CreateForm = ({ userInfo, setloading }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
+    const formData = {
+       amount,
+      month,
+      manyChatId,
+      contactLink,
+      notes,
+      screenShot: files,
+      walletId,
+      supportRegion,
+      currency,
+    };
+
     if (files.length === 0) {
       setFileExist(false);
       return;
     }
-   
+    try {
+      // Validate Form Data
+      const validatedData = CreateFormSchema.parse(formData);
+      console.log("Validated Data:", validatedData);
 
-    createFormSubmit(
-      event,
-      currency,
-      supportRegion,
-      files,
-      userInfo,
-      setloading,
-      formFillingPerson,
-      setAmountValidate,
-      setMonthValidate,
-      setManyChatValidate,
-      fileExist,
-      setFileExist,
-      agent,
-      contactLink,
-      notes,
-      manyChatId,
-      walletId
-    );
+      setErrors({}); // Clear errors if valid
+      createFormSubmit(validatedData);
 
-    setFiles([]);
-    setSubmitted(true);
-  };
+      setFiles([]);
+      setSubmitted(true);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const formattedErrors = error.errors.reduce((acc, err) => {
+          acc[err.path[0]] = err.message;
+          return acc;
+        }, {});
+        setErrors(formattedErrors);
+      }
+    }
+
+  //   createFormSubmit(
+  //     event,
+  //     currency,
+  //     supportRegion,
+  //     files,
+  //     userInfo,
+  //     setloading,
+  //     formFillingPerson,
+  //     setAmountValidate,
+  //     setMonthValidate,
+  //     setManyChatValidate,
+  //     fileExist,
+  //     setFileExist,
+  //     agent,
+  //     contactLink,
+  //     notes,
+  //     manyChatId,
+  //     walletId
+  //   );
+
+  //   setFiles([]);
+  //   setSubmitted(true);
+  // };
+  }
+  const handleChange = (field, value) => {
+  // Update state
+  if (field === "amount") setAmount(value);
+  if (field === "month") setMonth(value);
+  if (field === "manyChatId") setManyChatId(value);
+  if (field === "contactLink") setContactLink(value);
+  if (field === "notes") setNotes(value);
+  if (field === "walletId") setWalletId(value);
+  if (field === "supportRegion") setSupportRegion(value);
+  if (field === "currency") setCurrency(value);
+
+ 
+  const singleFieldSchema = CreateFormSchema.shape[field]; 
+
+  if (singleFieldSchema) {
+    const result = singleFieldSchema.safeParse(value);
+    if (!result.success) {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: result.error.errors[0].message, 
+      }));
+    } else {
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [field]: undefined, 
+      }));
+    }
+  }
+};
+  
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -137,19 +204,11 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="amount"
         label="Amount"
         type="number"
-        id="amount"
         margin="normal"
-        error={amountValidate}
-        helperText={amountValidate && "Please enter a valid amount"}
-        inputProps={{ min: "0", step: "0.01" }}
-        onChange={(e) => {
-          const value = e.target.value;
-          if (!/^\d+(\.\d{0,2})?$/.test(value) || value < 0) {
-            setAmountValidate(true); // Custom state to show error
-          } else {
-            setAmountValidate(false);
-          }
-        }}
+        value={amount}
+        error={!!errors.amount}
+        helperText={errors.amount}
+        onChange={(e) => handleChange("amount", e.target.value)}
       />
 
       {/* Month Input */}
@@ -161,14 +220,10 @@ const CreateForm = ({ userInfo, setloading }) => {
         type="number"
         id="month"
         margin="normal"
-        error={monthValidate}
-        helperText={monthValidate && "Please enter a valid month"}
+        error={!!errors.month}
+        helperText={errors.month}
         onChange={(e) => {
-          if (e.target.value < 1 || e.target.value > 12) {
-            setMonthValidate(true);
-          } else {
-            setMonthValidate(false);
-          }
+          handleChange("month", e.target.value);
         }}
       />
 
@@ -177,7 +232,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       <RadioGroup
         row
         value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
+        onChange={(e) => handleChange("currency", e.target.value)}
       >
         {currencies.map((item) => (
           <FormControlLabel
@@ -212,7 +267,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         disablePortal
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
-        onChange={(e, value) => setSupportRegion(value)}
+        onChange={(e)=>handleChange("supportRegion", e.target.value)}
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
         )}
@@ -225,10 +280,10 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="manyChat"
         label="ManyChat ID"
         value={manyChatId}
-        onChange={(e) => setManyChatId(e.target.value)}
+        onChange={(e) => handleChange("manyChatId", e.target.value)}
         margin="normal"
-        error={manyChatValidate}
-        helperText={manyChatValidate && "Please enter a valid ManyChat ID"}
+        error={!!errors.manyChatId}
+        helperText={errors.manyChatId}
       />
 
       {/* Contact Link Input */}
@@ -237,7 +292,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="contactLink"
         label="Contact Person Link"
         value={contactLink}
-        onChange={(e) => setContactLink(e.target.value)}
+        onChange={(e) => handleChange("contactLink", e.target.value)}
         margin="normal"
       />
 
@@ -247,7 +302,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="notes"
         label="Notes"
         value={notes}
-        onChange={(e) => setNotes(e.target.value)}
+        onChange={(e) => handleChange("notes", e.target.value)}
         margin="normal"
       />
 
@@ -288,6 +343,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       </Button>
     </Box>
   );
-};
+}
+;
 
 export default CreateForm;
