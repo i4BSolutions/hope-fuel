@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 import calculateExpireDate from "../../utilites/calculateExpireDate";
-import { max } from "date-fns";
+import {submitPaymentSchema} from "../../validation/validation";
 import moment from "moment-timezone";
 //Insert Into Customer Table
 async function InsertCustomer(
@@ -61,12 +61,12 @@ async function createScreenShot(screenShot, transactionsID) {
     throw new Error("You need to provide a screenshot");
   }
 
-  console.log(
-    "From createScreenshotDB: with TransactionID" +
-      transactionsID +
-      " and  screenshot" +
-      screenShot
-  );
+  // console.log(
+  //   "From createScreenshotDB: with TransactionID" +
+  //     transactionsID +
+  //     " and  screenshot" +
+  //     screenShot
+  // );
 
   let screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
@@ -98,7 +98,7 @@ async function InsertTransactionLog(transactionId, agentId) {
   const values = [transactionId, agentId, transactionDateWithThailandTimeZone];
   try {
     const result = await db(query, values);
-    console.log("result " + result);
+   // console.log("result " + result);
     return result.insertId;
   } catch (error) {
     console.error("Error inserting log", error);
@@ -135,7 +135,10 @@ export async function POST(req) {
       );
     }
     let json = await req.json();
-    console.log(json);
+   // console.log(json);
+
+   const validatedData = submitPaymentSchema.parse(json);
+   console.log("validatedData", validatedData);
 
     let {
       customerName,
@@ -149,7 +152,7 @@ export async function POST(req) {
       note,
       walletId,
       screenShot,
-    } = json;
+    } = validatedData;
 
     month = parseInt(month);
 
@@ -180,7 +183,7 @@ export async function POST(req) {
     );
 
     let nextHopeFuelID = await maxHopeFuelID();
-    console.log("nextHopeFuelID", nextHopeFuelID);
+    //console.log("nextHopeFuelID", nextHopeFuelID);
 
     if (nextHopeFuelID === null) {
       nextHopeFuelID = 0;
