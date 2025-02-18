@@ -273,7 +273,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
         onChange={(e, value) =>
-          handleChange("SupportRegionId", value ? value.SupportRegionID: "")
+          handleChange("SupportRegionId", value ? value.SupportRegionID : "")
         }
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
@@ -329,7 +329,7 @@ const CreateForm = ({ userInfo, setloading }) => {
             <p>
               {uploadProgress || "Drag & drop files here, or click to select"}
             </p>
-            {isUploading ? <CircularProgress sx={{ mt: 2 }} />: null}
+            {isUploading ? <CircularProgress sx={{ mt: 2 }} /> : null}
           </div>
         )}
       </Dropzone>
@@ -339,7 +339,12 @@ const CreateForm = ({ userInfo, setloading }) => {
         <ImageList cols={3} rowHeight={164} sx={{ mt: 2 }}>
           {files.map((file, index) => (
             <ImageListItem key={index}>
-              <img src={file.href} alt={file.name} loading="lazy" />
+              <img
+                src={typeof file === "string" ? file : file.url || file.href}
+                alt={`Uploaded file ${index + 1}`}
+                loading="lazy"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+              />
             </ImageListItem>
           ))}
         </ImageList>
