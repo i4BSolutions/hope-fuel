@@ -102,6 +102,11 @@ const CreateForm = ({ userInfo, setloading }) => {
        setUploadProgress
      );
     const uploadedUrls = uploadedFiles.map((file) => file.href || file); 
+      if (!uploadedFiles) {
+        console.error("Error: filehandler did not return uploaded files.");
+        setIsUploading(false);
+        return;
+      }
     setFiles(uploadedUrls);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
@@ -150,30 +155,12 @@ const CreateForm = ({ userInfo, setloading }) => {
       }
     }
 
-  //   createFormSubmit(
-  //     event,
-  //     currency,
-  //     supportRegion,
-  //     files,
-  //     userInfo,
-  //     setloading,
-  //     formFillingPerson,
-  //     setAmountValidate,
-  //     setMonthValidate,
-  //     setManyChatValidate,
-  //     fileExist,
-  //     setFileExist,
-  //     agent,
-  //     contactLink,
-  //     notes,
-  //     manyChatId,
-  //     walletId
-  //   );
 
-  //   setFiles([]);
-  //   setSubmitted(true);
-  // };
-  }
+
+    setFiles([]);
+    //setSubmitted(true);
+  };
+  
   const handleChange = (field, value) => {
   // Update state
   if (field === "amount") setAmount(value);
@@ -219,8 +206,8 @@ const CreateForm = ({ userInfo, setloading }) => {
         type="number"
         margin="normal"
         value={amount}
-        error={!!errors.amount}
-        helperText={errors.amount}
+        error={!!errors.Amount}
+        helperText={errors.Amount}
         onChange={(e) => handleChange("amount", e.target.value)}
       />
 
@@ -233,8 +220,8 @@ const CreateForm = ({ userInfo, setloading }) => {
         type="number"
         id="month"
         margin="normal"
-        error={!!errors.month}
-        helperText={errors.month}
+        error={!!errors.Month}
+        helperText={errors.Month}
         onChange={(e) => {
           handleChange("month", e.target.value);
         }}
@@ -286,7 +273,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
         onChange={(e, value) =>
-          handleChange("supportRegion",  value.SupportRegionID )
+          handleChange("supportRegion", value.SupportRegionID)
         }
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
@@ -302,8 +289,8 @@ const CreateForm = ({ userInfo, setloading }) => {
         value={manyChatId}
         onChange={(e) => handleChange("manyChatId", e.target.value)}
         margin="normal"
-        error={!!errors.manyChatId}
-        helperText={errors.manyChatId}
+        error={!!errors.ManyChatId}
+        helperText={errors.ManyChatId}
       />
 
       {/* Contact Link Input */}
@@ -342,7 +329,7 @@ const CreateForm = ({ userInfo, setloading }) => {
             <p>
               {uploadProgress || "Drag & drop files here, or click to select"}
             </p>
-            {isUploading && <CircularProgress sx={{ mt: 2 }} />}
+            {isUploading ? <CircularProgress sx={{ mt: 2 }} />: null}
           </div>
         )}
       </Dropzone>
