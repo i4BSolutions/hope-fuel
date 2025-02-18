@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
-import createFormSubmit from "../utilites/createForm/createformSubmit";
+import createFormSubmit from "../utilites/createForm/createformSubmit2";
 import filehandler from "../utilites/createForm/fileHandler";
 import { useUser } from "../context/UserContext";
 import { useAgent } from "../context/AgentContext";
@@ -29,7 +29,7 @@ const CreateForm = ({ userInfo, setloading }) => {
   const user = useUser();
   const agent = useAgent();
   // console.log("User from CreateForm: ", user);
-  // console.log("Agent from CreateForm: ", agent);
+  //console.log("Agent from CreateForm: ", agent);
 
   const formFillingPerson = user?.Name || "Unknown User";
 
@@ -77,7 +77,9 @@ const CreateForm = ({ userInfo, setloading }) => {
   useEffect(() => {
     fetch("/api/loadSupportRegion")
       .then((response) => response.json())
-      .then((data) => setSupportRegions(data))
+      .then((data) =>{ 
+        console.log("Support Regions after fetch DB:", data);
+        setSupportRegions(data)})
       .catch((error) =>
         console.error("Error fetching support regions:", error)
       );
@@ -102,15 +104,16 @@ const CreateForm = ({ userInfo, setloading }) => {
     event.preventDefault();
 
     const formData = {
-       amount,
-      month,
-      manyChatId,
-      contactLink,
-      notes,
-      screenShot: files,
-      walletId,
-      supportRegion,
-      currency,
+      AgentId: agent,
+      Amount: amount,
+      Month: month,
+      ManyChatId: manyChatId,
+      ContactLink: contactLink,
+      Notes: notes,
+      ScreenShots: files,
+      WalletId: walletId,
+      SupportRegionId: supportRegion,
+      CurrencyCode: currency,
     };
     console.log("Form Data:", formData);
 
@@ -120,6 +123,7 @@ const CreateForm = ({ userInfo, setloading }) => {
     }
     try {
       // Validate Form Data
+      console.log("To validate.......");
       const validatedData = CreateFormSchema.parse(formData);
       console.log("Validated Data:", validatedData);
 
@@ -130,6 +134,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       setSubmitted(true);
     } catch (error) {
       if (error instanceof z.ZodError) {
+        console.error("Validation Error:", error.errors);
         const formattedErrors = error.errors.reduce((acc, err) => {
           acc[err.path[0]] = err.message;
           return acc;
@@ -274,7 +279,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
         onChange={(e, value) =>
-          handleChange("supportRegion", value ? value.Region : "")
+          handleChange("supportRegion",  value.SupportRegionID )
         }
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
