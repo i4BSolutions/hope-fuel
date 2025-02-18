@@ -66,7 +66,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       fetch(`/api/loadWalletByCurrency?currencyCode=${currency}`)
         .then((response) => response.json())
         .then((data) => {
-          console.log("wallets", data);
+         // console.log("wallets", data);
           setWallets(data);
         })
         .catch((error) => console.error("Error fetching wallets:", error));
@@ -169,11 +169,9 @@ const CreateForm = ({ userInfo, setloading }) => {
   if (field === "manyChatId") setManyChatId(value);
   if (field === "contactLink") setContactLink(value);
   if (field === "notes") setNotes(value);
-  if (field === "walletId") setWalletId(value);
+  if (field === "walletId") setWalletId(Number(value));
   if (field === "supportRegion") setSupportRegion(value);
   if (field === "currency") setCurrency(value);
-
-  console.log("Support Region", supportRegion);
  
   const singleFieldSchema = CreateFormSchema.shape[field]; 
 
@@ -249,7 +247,12 @@ const CreateForm = ({ userInfo, setloading }) => {
       {/* wallet selection*/}
       <FormLabel id="wallets">Wallets</FormLabel>
       {wallets && wallets.length > 0 ? (
-        <RadioGroup aria-labelledby="wallets-group-label" name="wallets">
+        <RadioGroup
+          aria-labelledby="wallets-group-label"
+          name="wallets"
+          value={walletId}
+          onChange={(e) => handleChange("walletId", e.target.value)}
+        >
           {wallets.map((wallet) => (
             <FormControlLabel
               value={wallet.WalletID}
@@ -270,7 +273,9 @@ const CreateForm = ({ userInfo, setloading }) => {
         disablePortal
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
-        onChange={(e,value)=>handleChange("supportRegion", value? value.Region : "")}
+        onChange={(e, value) =>
+          handleChange("supportRegion", value ? value.Region : "")
+        }
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
         )}
