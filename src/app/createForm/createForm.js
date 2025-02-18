@@ -95,7 +95,14 @@ const CreateForm = ({ userInfo, setloading }) => {
 
   const handleDrop = async (acceptedFiles) => {
     setIsUploading(true);
-    await filehandler(acceptedFiles, setFiles, files, setUploadProgress);
+     const uploadedFiles = await filehandler(
+       acceptedFiles,
+       setFiles,
+       files,
+       setUploadProgress
+     );
+    const uploadedUrls = uploadedFiles.map((file) => file.href || file); 
+    setFiles(uploadedUrls);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
   };
@@ -110,12 +117,12 @@ const CreateForm = ({ userInfo, setloading }) => {
       ManyChatId: manyChatId,
       ContactLink: contactLink,
       Notes: notes,
-      ScreenShots: files,
+      ScreenShots: files.map(file => typeof file === "string" ? file : file.href),
       WalletId: walletId,
       SupportRegionId: supportRegion,
       CurrencyCode: currency,
     };
-    console.log("Form Data:", formData);
+    //console.log("Form Data:", formData);
 
     if (files.length === 0) {
       setFileExist(false);
