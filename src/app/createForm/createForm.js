@@ -21,6 +21,7 @@ import filehandler from "../utilites/createForm/fileHandler";
 import { useUser } from "../context/UserContext";
 import { useAgent } from "../context/AgentContext";
 
+import { z } from "zod";
 import { CreateFormSchema } from "../validation/validation";
 
 const CreateForm = ({ userInfo, setloading }) => {
@@ -111,6 +112,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       supportRegion,
       currency,
     };
+    console.log("Form Data:", formData);
 
     if (files.length === 0) {
       setFileExist(false);
@@ -171,6 +173,7 @@ const CreateForm = ({ userInfo, setloading }) => {
   if (field === "supportRegion") setSupportRegion(value);
   if (field === "currency") setCurrency(value);
 
+  console.log("Support Region", supportRegion);
  
   const singleFieldSchema = CreateFormSchema.shape[field]; 
 
@@ -267,7 +270,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         disablePortal
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
-        onChange={(e)=>handleChange("supportRegion", e.target.value)}
+        onChange={(e,value)=>handleChange("supportRegion", value? value.Region : "")}
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
         )}
