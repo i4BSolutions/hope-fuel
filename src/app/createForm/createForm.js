@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
-import createFormSubmit from "../utilites/createForm/createFormSubmit";
+import createFormSubmit from "../utilites/createForm/createformSubmit";
 import filehandler from "../utilites/createForm/fileHandler";
 import { useUser } from "../context/UserContext";
 import { useAgent } from "../context/AgentContext";
@@ -163,14 +163,14 @@ const CreateForm = ({ userInfo, setloading }) => {
   
   const handleChange = (field, value) => {
   // Update state
-  if (field === "amount") setAmount(value);
-  if (field === "month") setMonth(value);
-  if (field === "manyChatId") setManyChatId(value);
-  if (field === "contactLink") setContactLink(value);
-  if (field === "notes") setNotes(value);
-  if (field === "walletId") setWalletId(Number(value));
-  if (field === "supportRegion") setSupportRegion(value);
-  if (field === "currency") setCurrency(value);
+  if (field === "Amount") setAmount(value);
+  if (field === "Month") setMonth(value);
+  if (field === "ManyChatId") setManyChatId(value);
+  if (field === "ContactLink") setContactLink(value);
+  if (field === "Notes") setNotes(value);
+  if (field === "WalletId") setWalletId(Number(value));
+  if (field === "SupportRegionId") setSupportRegion(Number(value));
+  if (field === "Currency") setCurrency(value);
  
   const singleFieldSchema = CreateFormSchema.shape[field]; 
 
@@ -208,7 +208,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         value={amount}
         error={!!errors.Amount}
         helperText={errors.Amount}
-        onChange={(e) => handleChange("amount", e.target.value)}
+        onChange={(e) => handleChange("Amount", e.target.value)}
       />
 
       {/* Month Input */}
@@ -223,7 +223,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         error={!!errors.Month}
         helperText={errors.Month}
         onChange={(e) => {
-          handleChange("month", e.target.value);
+          handleChange("Month", e.target.value);
         }}
       />
 
@@ -232,7 +232,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       <RadioGroup
         row
         value={currency}
-        onChange={(e) => handleChange("currency", e.target.value)}
+        onChange={(e) => handleChange("Currency", e.target.value)}
       >
         {currencies.map((item) => (
           <FormControlLabel
@@ -250,7 +250,7 @@ const CreateForm = ({ userInfo, setloading }) => {
           aria-labelledby="wallets-group-label"
           name="wallets"
           value={walletId}
-          onChange={(e) => handleChange("walletId", e.target.value)}
+          onChange={(e) => handleChange("WalletId", e.target.value)}
         >
           {wallets.map((wallet) => (
             <FormControlLabel
@@ -273,7 +273,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         options={supportRegions}
         getOptionLabel={(option) => option.Region || ""}
         onChange={(e, value) =>
-          handleChange("supportRegion", value.SupportRegionID)
+          handleChange("SupportRegionId", value ? value.SupportRegionID: "")
         }
         renderInput={(params) => (
           <TextField {...params} label="Support Region" required />
@@ -287,7 +287,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="manyChat"
         label="ManyChat ID"
         value={manyChatId}
-        onChange={(e) => handleChange("manyChatId", e.target.value)}
+        onChange={(e) => handleChange("ManyChatId", e.target.value)}
         margin="normal"
         error={!!errors.ManyChatId}
         helperText={errors.ManyChatId}
@@ -299,7 +299,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="contactLink"
         label="Contact Person Link"
         value={contactLink}
-        onChange={(e) => handleChange("contactLink", e.target.value)}
+        onChange={(e) => handleChange("ContactLink", e.target.value)}
         margin="normal"
       />
 
@@ -309,7 +309,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         name="notes"
         label="Notes"
         value={notes}
-        onChange={(e) => handleChange("notes", e.target.value)}
+        onChange={(e) => handleChange("Notes", e.target.value)}
         margin="normal"
       />
 
