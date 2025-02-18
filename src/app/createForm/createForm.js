@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import {
   Autocomplete,
   Box,
@@ -112,7 +113,8 @@ const CreateForm = ({ userInfo, setloading }) => {
     setIsUploading(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit =async (event) => {
+    const router = useRouter();
     event.preventDefault();
 
     const formData = {
@@ -141,7 +143,12 @@ const CreateForm = ({ userInfo, setloading }) => {
       const validatedData = CreateFormSchema.parse(formData);
 
       setErrors({}); // Clear errors if valid
-      createFormSubmit(validatedData);
+       const response = await createFormSubmit(validatedData);
+       if(response){
+        router.push("/");
+       }else {
+        console.log("/hopefuelidlist");
+       }
 
       setFiles([]);
       setSubmitted(true);
@@ -155,11 +162,9 @@ const CreateForm = ({ userInfo, setloading }) => {
         setErrors(formattedErrors);
       }
     }
-
-
-
-    setFiles([]);
+    //setFiles([]);
     //setSubmitted(true);
+   
   };
   
   const handleChange = (field, value) => {
