@@ -135,48 +135,47 @@ export async function POST(req) {
       );
     }
     let json = await req.json();
-    console.log(json);
+    console.log("ReqBody:",json);
 
     let {
-      customerName,
-      customerEmail,
-      agentId,
-      supportRegionId,
-      manyChatId,
-      contactLink,
-      amount,
-      month,
-      note,
-      walletId,
-      screenShot,
+      CustomerName,
+      CustomerEmail,
+      AgentId,
+      SupportRegionId,
+      ManyChatId,
+      ContactLink,
+      Amount,
+      Month,
+      Notes,
+      WalletId,
+      ScreenShots,
     } = json;
 
-    month = parseInt(month);
+  
 
-    if (!screenShot || screenShot.length === 0) {
+    if (!ScreenShots || ScreenShots.length === 0) {
       return NextResponse.json(
         { error: "You need to provide a screenshot" },
         { status: 400 }
       );
     }
-
-    if (contactLink.trim() === "") {
-      contactLink = null;
+    if (ContactLink.trim() === "") {
+      ContactLink = null;
     }
 
     let noteId = null;
-    if (note && note !== "") {
-      noteId = await createNote(note, agentId);
+    if (Notes && Notes !== "") {
+      noteId = await createNote(Notes, AgentId);
       console.log("noteId: ", noteId);
     }
 
     const customerId = await InsertCustomer(
-      customerName,
-      customerEmail,
-      agentId,
-      manyChatId,
-      contactLink,
-      month
+      CustomerName,
+      CustomerEmail,
+      AgentId,
+      ManyChatId,
+      ContactLink,
+      Month
     );
 
     let nextHopeFuelID = await maxHopeFuelID();
@@ -201,12 +200,12 @@ export async function POST(req) {
     `;
     const values = [
       customerId,
-      amount,
-      supportRegionId,
-      walletId,
+      Amount,
+      SupportRegionId,
+      WalletId,
       transactionDateWithThailandTimeZone,
       noteId,
-      month,
+      Month,
       nextHopeFuelID,
     ];
     const result = await db(query, values);
@@ -215,8 +214,8 @@ export async function POST(req) {
     //console.log("Transaction ID " + transactionId);
     const formStatusId = await InsertFormStatus(transactionId);
 
-    const screenShotIds = await createScreenShot(screenShot, transactionId);
-    const logId = await InsertTransactionLog(transactionId, agentId);
+    const screenShotIds = await createScreenShot(ScreenShots, transactionId);
+    const logId = await InsertTransactionLog(transactionId, AgentId);
     // console.log("Screenshot ids are: " + screenShotIds)
     console.log("Transaction Result: ", result);
     return NextResponse.json({
