@@ -1,5 +1,5 @@
 export default async function createFormSubmit(FormData){
-    console.log("Validated Data:", FormData);
+    console.log("Form Data to submit", FormData);
     
   let requestOptions = {
     method: "POST",
@@ -11,10 +11,17 @@ export default async function createFormSubmit(FormData){
   };
   try{
     console.log("trying into submitPaymentAPI ......");
-let answ = await fetch("/api/submitPayment/", requestOptions);
+   let response = await fetch("/api/submitPayment/", requestOptions);
+   let res = await response.json();
+  console.log("Response from submitPaymentAPI: ", res);
+ if (!response.ok) {
+   const errorData = await response.json().catch(() => ({}));
+   throw new Error(
+     errorData.message || `Failed to fetch data (${response.status})`
+   );
+ }
 
-  let res = await answ.json();
-  console.log("I submitted createForm : " + res);
+
   }catch (error) {
     console.error("Error fetching support regions:", error);
   }

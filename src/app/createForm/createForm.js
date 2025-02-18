@@ -116,6 +116,8 @@ const CreateForm = ({ userInfo, setloading }) => {
     event.preventDefault();
 
     const formData = {
+      CustomerName: userInfo.name,
+      CustomerEmail: userInfo.email,
       AgentId: agent,
       Amount: amount,
       Month: month,
@@ -127,7 +129,7 @@ const CreateForm = ({ userInfo, setloading }) => {
       SupportRegionId: supportRegion,
       CurrencyCode: currency,
     };
-    //console.log("Form Data:", formData);
+    console.log("Form Data:", formData);
 
     if (files.length === 0) {
       setFileExist(false);
@@ -137,7 +139,6 @@ const CreateForm = ({ userInfo, setloading }) => {
       // Validate Form Data
       console.log("To validate.......");
       const validatedData = CreateFormSchema.parse(formData);
-      console.log("Validated Data:", validatedData);
 
       setErrors({}); // Clear errors if valid
       createFormSubmit(validatedData);
