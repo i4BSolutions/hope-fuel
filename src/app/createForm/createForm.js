@@ -107,7 +107,7 @@ const CreateForm = ({ userInfo, setloading }) => {
         setIsUploading(false);
         return;
       }
-    setFiles(uploadedUrls);
+    setFiles([...files, ...uploadedUrls]);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
   };
