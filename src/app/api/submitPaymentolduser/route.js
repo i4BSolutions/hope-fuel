@@ -350,8 +350,8 @@ export async function POST(req) {
       .format("YYYY-MM-DD HH:mm:ss");
     const query = `
      INSERT INTO Transactions   
-    (CustomerID, Amount, SupportRegionID, WalletID, TransactionDate, NoteID, Month, PaymentCheck, HopeFuelID) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (CustomerID, Amount, SupportRegionID, WalletID, TransactionDate, NoteID, Month, PaymentCheck, HopeFuelID,ManyChatID) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?)
 
     `;
     const values = [
@@ -364,6 +364,7 @@ export async function POST(req) {
       month,
       false,
       nextHopeFuelID,
+      manyChatId
     ];
     const result = await db(query, values);
 

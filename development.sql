@@ -109,6 +109,7 @@ CREATE TABLE Transactions (
     PaymentDenied BOOLEAN,
     Month INT,
     HopeFuelID INT,
+    ManyChatID INT,
     FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerId),
     FOREIGN KEY (SupportRegionID) REFERENCES SupportRegion(SupportRegionID),
     FOREIGN KEY (WalletID) REFERENCES Wallet(WalletId),
