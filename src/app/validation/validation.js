@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const CreateFormSchema = z.object({
-
+  CustomerName : z.string().min(1, { message: "Customer Name is required" }),
+  CustomerEmail: z.string().email({ message: "Invalid email format" }),
   AgentId: z.number().min(1, { message: "Agent ID is required" }),
 
   SupportRegionId: z.number(),
