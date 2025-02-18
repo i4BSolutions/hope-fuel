@@ -26,11 +26,11 @@ import { z } from "zod";
 import { CreateFormSchema } from "../validation/validation";
 
 const CreateForm = ({ userInfo, setloading }) => {
-  //console.log("UserInfo from createForm: ", userInfo);
+
   const user = useUser();
   const agent = useAgent();
-  // console.log("User from CreateForm: ", user);
-  //console.log("Agent from CreateForm: ", agent);
+   const router = useRouter();
+
 
   const formFillingPerson = user?.Name || "Unknown User";
 
@@ -58,6 +58,8 @@ const CreateForm = ({ userInfo, setloading }) => {
   const [submitted, setSubmitted] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+ const [screenshotError, setScreenshotError] = useState("");
+
 
 
 
@@ -94,27 +96,40 @@ const CreateForm = ({ userInfo, setloading }) => {
 
   const handleDrop = async (acceptedFiles) => {
     setIsUploading(true);
-     const uploadedFiles = await filehandler(
-       acceptedFiles,
-       setFiles,
-       files,
-       setUploadProgress
-     );
-    const uploadedUrls = uploadedFiles.map((file) => file.href || file); 
-      if (!uploadedFiles) {
-        console.error("Error: filehandler did not return uploaded files.");
-        setIsUploading(false);
-        return;
-      }
+    const uploadedFiles = await filehandler(
+      acceptedFiles,
+      setFiles,
+      files,
+      setUploadProgress
+    );
+    const uploadedUrls = uploadedFiles.map((file) => file.href || file);
+    if (!uploadedFiles) {
+      console.error("Error: filehandler did not return uploaded files.");
+      setIsUploading(false);
+      return;
+    }
+
     setFiles([...files, ...uploadedUrls]);
     setFileExist(acceptedFiles.length > 0);
+    // Clear error if at least one file is uploaded
+    if (acceptedFiles.length > 0) {
+      setScreenshotError("");
+    }
     setIsUploading(false);
   };
 
   const handleSubmit =async (event) => {
-    const router = useRouter();
     event.preventDefault();
+    const fileURLs = files.map(file => (typeof file === "string" ? file : file.href));
 
+   // Check if there are uploaded files (screenshots)
+   if (fileURLs.length === 0) {
+     setScreenshotError("You need to provide a screenshot");
+    return;
+   } else {
+     setScreenshotError("");
+    } 
+  
     const formData = {
       CustomerName: userInfo.name,
       CustomerEmail: userInfo.email,
@@ -124,12 +139,11 @@ const CreateForm = ({ userInfo, setloading }) => {
       ManyChatId: manyChatId,
       ContactLink: contactLink,
       Notes: notes,
-      ScreenShots: files.map(file => typeof file === "string" ? file : file.href),
+      ScreenShots: fileURLs,
       WalletId: walletId,
       SupportRegionId: supportRegion,
       CurrencyCode: currency,
     };
-    console.log("Form Data:", formData);
 
     if (files.length === 0) {
       setFileExist(false);
@@ -330,11 +344,16 @@ const CreateForm = ({ userInfo, setloading }) => {
             <p>
               {uploadProgress || "Drag & drop files here, or click to select"}
             </p>
-            {isUploading ? <CircularProgress sx={{ mt: 2 }} /> : null}
+            {isUploading ? <CircularProgress sx={{ mt: 2 }} /> : ""}
           </div>
         )}
       </Dropzone>
-
+      {/* Show Error Message if No Screenshot Provided */}
+      {screenshotError && (
+        <Typography color="error" sx={{ mt: 1 }}>
+          {screenshotError}
+        </Typography>
+      )}
       {/* Uploaded Images Preview */}
       {files.length > 0 && (
         <ImageList cols={3} rowHeight={164} sx={{ mt: 2 }}>

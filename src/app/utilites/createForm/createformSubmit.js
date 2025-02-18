@@ -12,10 +12,9 @@ export default async function createFormSubmit(FormData) {
     redirect: "follow",
   };
   try {
-   // console.log("trying into submitPaymentAPI ......");
     let response = await fetch("/api/submitPayment/", requestOptions);
     let res = await response.json();
-   // console.log("Response from submitPaymentAPI: ", res);
+  
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
