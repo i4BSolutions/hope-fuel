@@ -47,6 +47,7 @@ const HopeFuelIdListPage = () => {
     setError(null);
   }, [searchText]);
 
+  // Fetch data for hopefuel id lists
   const fetchData = useCallback(
     async (isNewSearch = false) => {
       if (!hasMore && !isNewSearch) return;
