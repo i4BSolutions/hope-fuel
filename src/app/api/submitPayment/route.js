@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 import calculateExpireDate from "../../utilites/calculateExpireDate";
-import { max } from "date-fns";
 import moment from "moment-timezone";
 //Insert Into Customer Table
 async function InsertCustomer(
@@ -27,10 +26,8 @@ async function InsertCustomer(
   ];
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId; // Retrieve the inserted customer ID
   } catch (error) {
-    console.error("Error inserting customer:", error);
     return NextResponse.json(
       { error: "Failed to insert customer" },
       { status: 500 }
@@ -44,10 +41,8 @@ async function createNote(note, agentID) {
   const values = [note, new Date(), agentID];
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId;
   } catch (error) {
-    console.error("Error inserting customer:", error);
     return NextResponse.json(
       { error: "Failed to insert customer" },
       { status: 500 }
@@ -60,13 +55,6 @@ async function createScreenShot(screenShot, transactionsID) {
   if (!screenShot || screenShot.length === 0) {
     throw new Error("You need to provide a screenshot");
   }
-
-  console.log(
-    "From createScreenshotDB: with TransactionID" +
-      transactionsID +
-      " and  screenshot" +
-      screenShot
-  );
 
   let screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
@@ -98,7 +86,6 @@ async function InsertTransactionLog(transactionId, agentId) {
   const values = [transactionId, agentId, transactionDateWithThailandTimeZone];
   try {
     const result = await db(query, values);
-    console.log("result " + result);
     return result.insertId;
   } catch (error) {
     console.error("Error inserting log", error);
@@ -121,8 +108,6 @@ async function InsertFormStatus(transactionId) {
 async function maxHopeFuelID() {
   const maxHopeFuelID_Query = `SELECT MAX(HopeFuelID) AS maxHopeFuelID FROM Transactions`;
   const result = await db(maxHopeFuelID_Query);
-
-  console.log(result);
   return result[0]["maxHopeFuelID"];
 }
 
@@ -135,7 +120,6 @@ export async function POST(req) {
       );
     }
     let json = await req.json();
-    console.log("ReqBody:",json);
 
     let {
       CustomerName,
@@ -166,7 +150,6 @@ export async function POST(req) {
     let noteId = null;
     if (Notes && Notes !== "") {
       noteId = await createNote(Notes, AgentId);
-      console.log("noteId: ", noteId);
     }
 
     const customerId = await InsertCustomer(
@@ -179,7 +162,6 @@ export async function POST(req) {
     );
 
     let nextHopeFuelID = await maxHopeFuelID();
-    console.log("nextHopeFuelID", nextHopeFuelID);
 
     if (nextHopeFuelID === null) {
       nextHopeFuelID = 0;
@@ -211,13 +193,10 @@ export async function POST(req) {
     const result = await db(query, values);
 
     const transactionId = result.insertId;
-    //console.log("Transaction ID " + transactionId);
     const formStatusId = await InsertFormStatus(transactionId);
 
     const screenShotIds = await createScreenShot(ScreenShots, transactionId);
-    const logId = await InsertTransactionLog(transactionId, AgentId);
-    // console.log("Screenshot ids are: " + screenShotIds)
-    console.log("Transaction Result: ", result);
+    await InsertTransactionLog(transactionId, AgentId);
     return NextResponse.json({
       status: "success",
       transactionId,

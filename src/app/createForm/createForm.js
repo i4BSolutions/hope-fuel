@@ -67,7 +67,6 @@ const CreateForm = ({ userInfo, setloading }) => {
       fetch(`/api/loadWalletByCurrency?currencyCode=${currency}`)
         .then((response) => response.json())
         .then((data) => {
-         // console.log("wallets", data);
           setWallets(data);
         })
         .catch((error) => console.error("Error fetching wallets:", error));
@@ -79,7 +78,6 @@ const CreateForm = ({ userInfo, setloading }) => {
     fetch("/api/loadSupportRegion")
       .then((response) => response.json())
       .then((data) =>{ 
-        console.log("Support Regions after fetch DB:", data);
         setSupportRegions(data)})
       .catch((error) =>
         console.error("Error fetching support regions:", error)
@@ -139,7 +137,6 @@ const CreateForm = ({ userInfo, setloading }) => {
     }
     try {
       // Validate Form Data
-      console.log("To validate.......");
       const validatedData = CreateFormSchema.parse(formData);
 
       setErrors({}); // Clear errors if valid
@@ -147,7 +144,7 @@ const CreateForm = ({ userInfo, setloading }) => {
        if(response){
         router.push("/");
        }else {
-        console.log("/hopefuelidlist");
+        router.push("/hopefuelidlist");
        }
 
       setFiles([]);
@@ -162,8 +159,6 @@ const CreateForm = ({ userInfo, setloading }) => {
         setErrors(formattedErrors);
       }
     }
-    //setFiles([]);
-    //setSubmitted(true);
    
   };
   
