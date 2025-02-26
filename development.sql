@@ -172,4 +172,11 @@ CREATE TABLE FormStatus (
 );
 
 
+CREATE TABLE FormVisibilityStatus (
+    VisibilityStatusId INT AUTO_INCREMENT PRIMARY KEY,
+    AgentId INT NOT NULL,
+    IsFormOpen BOOLEAN NOT NULL,
+    FormTimeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (AgentId) REFERENCES Agent(AgentId) ON DELETE CASCADE
+);
 
