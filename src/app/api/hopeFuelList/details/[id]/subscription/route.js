@@ -47,7 +47,7 @@ export async function GET(req, { params }) {
   try {
     const result = await SubscriptionMonthByHopeFuelId(id);
 
-    const history = result.flatMap((row) => {
+    const subscriptionHistory = result.flatMap((row) => {
       const transactionDate = new Date(row.TransactionDate);
       const totalMonths = row.Month;
       const amountPerMonth = row.Amount / totalMonths;
