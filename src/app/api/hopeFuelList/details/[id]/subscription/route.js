@@ -56,7 +56,7 @@ export async function GET(req, { params }) {
       let endDate = new Date(transactionDate);
 
       for (let i = 0; i < totalMonths; i++) {
-        let validThroughDate = new Date(validFromDate);
+        const endDate = new Date(startDate);
         validThroughDate.setMonth(validThroughDate.getMonth() + 1);
         validThroughDate.setDate(0);
 
