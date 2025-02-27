@@ -57,8 +57,8 @@ export async function GET(req, { params }) {
 
       for (let i = 0; i < totalMonths; i++) {
         const endDate = new Date(startDate);
-        validThroughDate.setMonth(validThroughDate.getMonth() + 1);
-        validThroughDate.setDate(0);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0); // Set to last day of the month
 
         validDates.push({
           HopeFuelID: row.HopeFuelID,
