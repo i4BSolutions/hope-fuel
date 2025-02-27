@@ -47,36 +47,38 @@ export async function GET(req, { params }) {
   try {
     const result = await SubscriptionMonthByHopeFuelId(id);
 
-    const subscriptionHistory = result.flatMap((row) => {
-      const transactionDate = new Date(row.TransactionDate);
-      const totalMonths = row.Month;
-      const amountPerMonth = row.Amount / totalMonths;
+  const subscriptionHistory = result.flatMap((row) => {
+    const startDate = new Date(row.TransactionDate); 
+    const totalMonths = row.Month;
+    const amountPerMonth = row.Amount / totalMonths;
 
-      let entries = [];
-      let endDate = new Date(transactionDate);
+    let entries = [];
 
-      for (let i = 0; i < totalMonths; i++) {
-        const endDate = new Date(startDate);
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0); // Set to last day of the month
+    let validFromDate= new Date(startDate); 
 
-        entries.push({
-          HopeFuelID: row.HopeFuelID,
-          TransactionAmount: row.Amount,
-          TimeLineInMonth: totalMonths,
-          MonthlyAmount: amountPerMonth,
-          CurrencyCode: row.CurrencyCode,
-          TransactionDate: moment(transactionDate).format("DD-MM-YYYY"),
-          ValidFromDate: moment(validFromDate).format("DD-MM-YYYY"),
-          ValidThroughDate: moment(validThroughDate).format("DD-MM-YYYY"),
-        });
+    for (let i = 0; i < totalMonths; i++) {
+      let endDate = new Date(validFromDate);
+      endDate.setMonth(endDate.getMonth() + 1);
+      endDate.setDate(0); //last day of the month
 
-        endDate.setMonth(endDate.getMonth() + 1);
-        endDate.setDate(0); // Set to last day of the month
-      }
+      entries.push({
+        HopeFuelID: row.HopeFuelID,
+        TransactionAmount: row.Amount,
+        TimeLineInMonth: totalMonths,
+        MonthlyAmount: amountPerMonth,
+        CurrencyCode: row.CurrencyCode,
+        TransactionDate: moment(startDate).format("DD-MM-YYYY"),
+        ValidFromDate: moment(validFromDate).format("DD-MM-YYYY"),
+        ValidThroughDate: moment(endDate).format("DD-MM-YYYY"),
+      });
 
-      return entries;
-    });
+      validFromDate.setMonth(endDate.getMonth() + 1);//start date of next month
+      validFromDate.setDate(1);//first day of the month
+    }
+
+    return entries;
+  });
+
 
     return NextResponse.json(
       {
