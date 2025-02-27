@@ -52,7 +52,7 @@ export async function GET(req, { params }) {
       const totalMonths = row.Month;
       const amountPerMonth = row.Amount / totalMonths;
 
-      let validDates = [];
+      let entries = [];
       let validFromDate = new Date(transactionDate);
 
       for (let i = 0; i < totalMonths; i++) {
