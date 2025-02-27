@@ -75,7 +75,7 @@ export async function GET(req, { params }) {
         endDate.setDate(0); // Set to last day of the month
       }
 
-      return validDates;
+      return entries;
     });
 
     return NextResponse.json(
