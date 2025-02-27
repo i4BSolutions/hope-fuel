@@ -53,7 +53,7 @@ export async function GET(req, { params }) {
       const amountPerMonth = row.Amount / totalMonths;
 
       let entries = [];
-      let validFromDate = new Date(transactionDate);
+      let endDate = new Date(transactionDate);
 
       for (let i = 0; i < totalMonths; i++) {
         let validThroughDate = new Date(validFromDate);
