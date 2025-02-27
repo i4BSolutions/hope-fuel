@@ -60,7 +60,7 @@ export async function GET(req, { params }) {
         endDate.setMonth(endDate.getMonth() + 1);
         endDate.setDate(0); // Set to last day of the month
 
-        validDates.push({
+        entries.push({
           HopeFuelID: row.HopeFuelID,
           TransactionAmount: row.Amount,
           TimeLineInMonth: totalMonths,
