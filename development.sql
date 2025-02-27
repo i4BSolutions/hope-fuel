@@ -180,3 +180,18 @@ CREATE TABLE FormVisibilityStatus (
     FOREIGN KEY (AgentId) REFERENCES Agent(AgentId) ON DELETE CASCADE
 );
 
+CREATE TABLE CustomerAuditLogs (
+    LogId INT AUTO_INCREMENT PRIMARY KEY,
+    AgentId INT NOT NULL,
+    FieldChanged ENUM('Name', 'Email', 'UserCountry') NOT NULL,
+    OldValue VARCHAR(255),
+    NewValue VARCHAR(255),
+    CustomerId INT NOT NULL,
+    ChangeDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign Key Constraints
+    CONSTRAINT fk_agent FOREIGN KEY (AgentId) REFERENCES Agent(AgentId) ON DELETE CASCADE,
+    CONSTRAINT fk_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
+);
+
+
