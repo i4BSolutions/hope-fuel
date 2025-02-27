@@ -71,8 +71,8 @@ export async function GET(req, { params }) {
           ValidThroughDate: moment(validThroughDate).format("DD-MM-YYYY"),
         });
 
-        validFromDate.setMonth(validFromDate.getMonth() + 1);
-        validFromDate.setDate(1);
+        endDate.setMonth(endDate.getMonth() + 1);
+        endDate.setDate(0); // Set to last day of the month
       }
 
       return validDates;
