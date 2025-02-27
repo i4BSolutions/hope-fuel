@@ -80,7 +80,7 @@ export async function GET(req, { params }) {
 
     return NextResponse.json(
       {
-        data: history,
+        data: subscriptionHistory,
       },
       { status: 200 }
     );
