@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import db from "../../../../../utilites/db";
 
+
+
+
 export async function EditHistoryByCustomerId(id) {
  const query = `
  SELECT 
@@ -52,4 +55,6 @@ export async function GET(req, { params }) {
     );
   }
 }
+
+
 
