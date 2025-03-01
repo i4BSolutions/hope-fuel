@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "../../../../utilites/db";
+import db from "../../../../../utilites/db";
 
 export async function EditHistoryByCustomerId(id) {
  const query = `
