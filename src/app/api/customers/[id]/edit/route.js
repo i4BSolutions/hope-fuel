@@ -29,12 +29,12 @@ export async function fetchCustomerValues(customerId) {
 }
 
 export async function UpdateCustomerField(customerId, field, newValue) {
-    const query = `
-    UPDATE Customer SET ${field} = ? WHERE CustomerId = ?
-    `;
-    const values = [newValue, customerId];
+ 
+const query = `UPDATE Customer SET ${field} = ? WHERE CustomerId = ?`;
+const values = [ newValue, customerId];
   try {
     await db(query, values);
+
   } catch (error) {
     console.error("[DB] Error updating customer field:", error);
     throw new Error("Failed to update customer field");
@@ -63,7 +63,16 @@ export async function POST(req, { params }) {
         let changesMade = false;
 
          for (const { field, newValue } of updates) {
-          const oldValue = currentCustomer[field];
+          const allowedFields = ["Name", "Email", "UserCountry"]; //allowed fields to be updated
+          if(!allowedFields.includes(field)){
+
+                return NextResponse.json(
+               { message: `Field not allowed to be updated for ${field}` },
+                { status: 400 }
+             );}
+
+          const oldValue = currentCustomer[field] ;
+          console.log("Current Customer Old Value: ", oldValue);
 
         
           if (oldValue !== newValue) {
