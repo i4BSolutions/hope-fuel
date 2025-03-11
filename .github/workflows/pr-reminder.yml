@@ -12,6 +12,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install GitHub CLI and jq
+        run: sudo apt-get install -y gh jq
+
       - name: Find PRs with pending review comments
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -22,7 +25,7 @@ jobs:
           for PR_NUMBER in $PRS; do
             echo "Checking PR #$PR_NUMBER"
 
-            REVIEW_COMMENTS=$(gh pr view $PR_NUMBER --json reviewComments --jq '.reviewComments | length')
+            REVIEW_COMMENTS=$(gh pr view $PR_NUMBER --json reviews --jq '.reviews | length')
 
             if [ "$REVIEW_COMMENTS" -gt 0 ]; then
               PR_AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
