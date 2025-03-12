@@ -100,7 +100,6 @@ const Sidebar = () => {
           },
         }}
       >
-        <Toolbar />
         <List sx={{ flexGrow: 1 }}>
           <ListItem disablePadding>
             <IconButton
@@ -108,9 +107,10 @@ const Sidebar = () => {
               sx={{
                 color: "white",
                 marginX: "auto",
+                marginTop: "8px",
                 marginBottom: "20px",
                 transition:
-                  "background-color 0.3s ease-in-out, transform 0.2s ease",
+                  "background-color 0.2s ease-in-out, transform 0.1s ease",
                 borderRadius: "50%",
                 "&:hover": {
                   backgroundColor: "#F59E0B",
@@ -144,9 +144,12 @@ const Sidebar = () => {
                   display: "flex",
                   justifyContent: "center",
                   borderRadius: "20px",
-                  transition: "background 0.1s ease-in-out",
+                  transition:
+                    "background-color 0.2s ease-in-out, transform 0.1s ease",
+                  borderRadius: "50px",
                   "&:hover": {
                     backgroundColor: "#F59E0B",
+                    transform: "scale(1.1)",
                   },
                 }}
               >
@@ -166,9 +169,12 @@ const Sidebar = () => {
                 display: "flex",
                 justifyContent: "center",
                 borderRadius: "20px",
-                transition: "background 0.1s ease-in-out",
+                transition:
+                  "background-color 0.2s ease-in-out, transform 0.1s ease",
+                borderRadius: "50px",
                 "&:hover": {
                   backgroundColor: "#F59E0B",
+                  transform: "scale(1.1)",
                 },
               }}
             >
@@ -218,8 +224,12 @@ const Sidebar = () => {
           >
             <MenuRoundedIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, color: "white" }}>
-            My Logo
+          <Typography variant="h5"
+           sx={{
+             flexGrow: 1, color: "white" , marginLeft:"13px",
+             fontWeight: "bold"
+            }}>
+            HopeFuel 
           </Typography>
         </Toolbar>
         <Divider
@@ -245,11 +255,12 @@ const Sidebar = () => {
                   marginX: "15px",
                   display: "flex",
                   justifyContent: "center",
-                  transition: "background 0.1s",
+                  transition:
+                    "background-color 0.3s ease-in-out, transform 0.2s ease",
                   borderRadius: "20px",
                   "&:hover": {
-                    width: "80%",
                     backgroundColor: "#F59E0B",
+                    transform: "scale(1.1)",
                   },
                 }}
               >
@@ -267,11 +278,12 @@ const Sidebar = () => {
                 marginX: "15px",
                 display: "flex",
                 justifyContent: "center",
-                transition: "background 0.1s",
+                transition:
+                  "background-color 0.3s ease-in-out, transform 0.2s ease",
                 borderRadius: "20px",
                 "&:hover": {
-                  width: "80%",
                   backgroundColor: "#F59E0B",
+                  transform: "scale(1.1)",
                 },
               }}
             >
