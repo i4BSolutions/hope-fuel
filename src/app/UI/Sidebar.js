@@ -105,7 +105,18 @@ const Sidebar = () => {
           <ListItem disablePadding>
             <IconButton
               onClick={() => setOpen(true)}
-              sx={{ color: "white", mx: "auto" }}
+              sx={{
+                color: "white",
+                marginX: "auto",
+                marginBottom: "20px",
+                transition:
+                  "background-color 0.3s ease-in-out, transform 0.2s ease",
+                borderRadius: "50%",
+                "&:hover": {
+                  backgroundColor: "#F59E0B",
+                  transform: "scale(1.1)",
+                },
+              }}
             >
               <MenuRoundedIcon />
             </IconButton>
@@ -146,7 +157,7 @@ const Sidebar = () => {
             </ListItem>
           ))}
         </List>
-        <Box sx={{ mt:"auto",mb: 2 }}>
+        <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
               onClick={() => alert("Logging out!")}
@@ -189,7 +200,22 @@ const Sidebar = () => {
         <Toolbar>
           {/* Logo & Title */}
 
-          <IconButton onClick={() => setOpen(false)} sx={{ color: "white" }}>
+          <IconButton
+            onClick={() => setOpen(false)}
+            sx={{
+              color: "white",
+              marginX: "auto",
+              marginTop: "20px",
+              marginBottom: "20px",
+              transition:
+                "background-color 0.3s ease-in-out, transform 0.2s ease",
+              borderRadius: "50%",
+              "&:hover": {
+                backgroundColor: "#F59E0B",
+                transform: "scale(1.1)",
+              },
+            }}
+          >
             <MenuRoundedIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1, color: "white" }}>
