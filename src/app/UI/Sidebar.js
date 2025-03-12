@@ -96,6 +96,7 @@ const Sidebar = () => {
             color: "white",
             display: "flex",
             flexDirection: "column",
+            justifyContent: "space-between",
           },
         }}
       >
@@ -144,28 +145,28 @@ const Sidebar = () => {
               </ListItemButton>
             </ListItem>
           ))}
-          <Box sx={{ mb: 2 }}>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => alert("Logging out!")}
-                sx={{
-                  marginX: "15px",
-                  display: "flex",
-                  justifyContent: "center",
-                  borderRadius: "20px",
-                  transition: "background 0.1s ease-in-out",
-                  "&:hover": {
-                    backgroundColor: "#F59E0B",
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: "white", marginLeft: "30px" }}>
-                  <LogoutIcon />
-                </ListItemIcon>
-              </ListItemButton>
-            </ListItem>
-          </Box>
         </List>
+        <Box sx={{ mt:"auto",mb: 2 }}>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => alert("Logging out!")}
+              sx={{
+                marginX: "15px",
+                display: "flex",
+                justifyContent: "center",
+                borderRadius: "20px",
+                transition: "background 0.1s ease-in-out",
+                "&:hover": {
+                  backgroundColor: "#F59E0B",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: "white", marginLeft: "30px" }}>
+                <LogoutIcon />
+              </ListItemIcon>
+            </ListItemButton>
+          </ListItem>
+        </Box>
       </Drawer>
 
       {/* Expandable Drawer (Opens on Hamburger Click) */}
@@ -179,6 +180,9 @@ const Sidebar = () => {
             boxSizing: "border-box",
             backgroundColor: "#b71c1c",
             color: "white",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
           },
         }}
       >
@@ -228,30 +232,30 @@ const Sidebar = () => {
               </ListItemButton>
             </ListItem>
           ))}
-          <List sx={{ mt: "auto", mb: 2 ,mx:"auto"}}>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => alert("Logging out!")}
-                sx={{
-                  marginX: "15px",
-                  display: "flex",
-                  justifyContent: "center",
-                  transition: "background 0.1s",
-                  borderRadius: "20px",
-                  "&:hover": {
-                    width: "80%",
-                    backgroundColor: "#F59E0B",
-                  },
-                }}
-              >
-                <ListItemIcon sx={{ color: "white",  }}>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </ListItem>
-          </List>
         </List>
+        <Box sx={{ mt: "auto", mb: 2 }}>
+          <ListItem disablePadding>
+            <ListItemButton
+              onClick={() => alert("Logging out!")}
+              sx={{
+                marginX: "15px",
+                display: "flex",
+                justifyContent: "center",
+                transition: "background 0.1s",
+                borderRadius: "20px",
+                "&:hover": {
+                  width: "80%",
+                  backgroundColor: "#F59E0B",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: "white" }}>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </ListItem>
+        </Box>
       </Drawer>
     </Box>
   );
