@@ -1,11 +1,16 @@
 "use client";
-import CreateButton from "../components/CreateButton";
+import CustomButton from "../../components/Button";
+import AddIcon from "@mui/icons-material/Add";
 
 export default function CreateFundraiserPage() {
   return (
     <div>
       <h1>Create Fundraiser</h1>
-      <CreateButton onClick={() => alert("Create new fundraiser")} />
+      <CustomButton
+        onClick={() => alert("Create new fundraiser")}
+        text="Create New"
+        icon={<AddIcon />}
+      />
     </div>
   );
 }
