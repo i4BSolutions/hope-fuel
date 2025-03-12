@@ -14,6 +14,8 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 Amplify.configure(awsconfig);
 
+import Sidebar from "./UI/Sidebar";
+
 function AppLayout({ children }) {
   // const router = useRouter();
   // const { currentUser } = useUser();
@@ -42,6 +44,7 @@ export default function RootLayout({ children }) {
               <AgentProvider>
                 <UserProvider>
                   <ResponsiveAppBar />
+                   <Sidebar /> 
                   {children}
                   {console.log(user)}
                 </UserProvider>
