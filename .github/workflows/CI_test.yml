@@ -17,21 +17,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Install dependencies
+        run: npm install
 
-  
-    - name: Install dependencies
-      run: npm install
+      - name: Run tests
+        run: npm run test
 
- 
-    - name: Run tests
-      run: npm run test
+      - name: Build Next.js app
+        run: npm run build
 
-  
-    - name:  Check code coverage
-      run: npm run test:coverage
-
- 
-
+      - name: Check code coverage
+        run: npm run test:coverage
