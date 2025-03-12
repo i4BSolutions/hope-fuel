@@ -7,10 +7,8 @@ async function CreateFundraiser(FundraiserName, FundraiserEmail, FundraiserLogo,
     
     try {
         const result = await db(query, values);
-       // console.log("result from DB when creating Fundraiser: ", result);
         return result;
     } catch (error) {
-      //  console.error("Error creating fundraiser:", error);
         throw new Error("[DB] Error creating fundraiser:");
     }
 }
@@ -28,6 +26,18 @@ async function CreateBaseCountryInFundraiser(BaseCountryName) {
     }
 
 }
+async function CheckExistingBaseCountry(BaseCountryName) {
+    const query = `SELECT BaseCountryID FROM BaseCountry WHERE BaseCountryName = ?`;
+    const values = [BaseCountryName];
+
+    try {
+        const result = await db(query, values);
+        return result;
+    } catch (error) {
+        console.error("Error checking existing BaseCountry:", error);
+        throw new Error("[DB] Error checking existing BaseCountry:");
+    }
+}
 
 export async function POST(req) {
     const { FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryName } = await req.json();
@@ -42,13 +52,25 @@ export async function POST(req) {
   }
 
     try {
-        const BaseCountryID = await CreateBaseCountryInFundraiser(BaseCountryName);
-        if(!BaseCountryID) {
-            return NextResponse.json({ 
-                status: 500,
-                message: "Internal Server Error in Creating BaseCountry" }
-                , { status: 500 });
+        let BaseCountryID = null;
+        const existingBaseCountry = await CheckExistingBaseCountry(BaseCountryName);
+        if(existingBaseCountry.length > 0) {
+            BaseCountryID = existingBaseCountry[0].BaseCountryID;
+        }else {
+             BaseCountryID = await CreateBaseCountryInFundraiser(BaseCountryName);
+         if (!BaseCountryID) {
+              return NextResponse.json(
+               {
+                 status: 500,
+                 message: "Internal Server Error in Creating BaseCountry",
+               },
+               { status: 500 }
+          );
+             }
         }
+
+
+      
         const fundraiser = await CreateFundraiser(FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryID);
         return NextResponse.json(
           {
