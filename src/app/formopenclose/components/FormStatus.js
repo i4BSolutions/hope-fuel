@@ -12,6 +12,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import moment from "moment-timezone";
 import React from "react";
 
 const CustomSwitch = styled(Switch)(({ theme }) => ({
@@ -55,7 +56,7 @@ const CustomSwitch = styled(Switch)(({ theme }) => ({
 }));
 
 const StatusBadge = ({ status }) => {
-  const isOpen = status === "Form Opened";
+  const isOpen = status === 1;
   return (
     <Box
       sx={{
@@ -71,12 +72,16 @@ const StatusBadge = ({ status }) => {
         lineHeight: "18px",
       }}
     >
-      {status}
+      {isOpen ? "Form Opened" : "Form Closed"}
     </Box>
   );
 };
 
 const FormStatus = ({ isFormOpen, setIsFormOpen, data }) => {
+  const handleToggle = (value) => {
+    setIsFormOpen(value);
+  };
+
   return (
     <Box
       sx={{
@@ -102,7 +107,7 @@ const FormStatus = ({ isFormOpen, setIsFormOpen, data }) => {
       </Typography>
       <CustomSwitch
         checked={isFormOpen}
-        onChange={(e) => setIsFormOpen(e.target.checked)}
+        onChange={(e) => handleToggle(e.target.checked)}
       />
       <Box
         sx={{
@@ -165,7 +170,7 @@ const FormStatus = ({ isFormOpen, setIsFormOpen, data }) => {
                           color: "#000000",
                         }}
                       >
-                        {row.name}
+                        {row.AgentId}
                       </Typography>
                     </TableCell>
                     <TableCell
@@ -185,10 +190,10 @@ const FormStatus = ({ isFormOpen, setIsFormOpen, data }) => {
                         }}
                       >
                         <Box sx={{ display: { xs: "block", sm: "none" } }}>
-                          {row.timestamp.split(" ")[0]}
+                          {row.FormTimeStamp.split(" ")[0]}
                         </Box>
                         <Box sx={{ display: { xs: "none", sm: "block" } }}>
-                          {row.timestamp}
+                          {moment(row.FormTimeStamp).format("DD-MM-YYYY HH:mm")}
                         </Box>
                       </Typography>
                     </TableCell>
@@ -201,7 +206,7 @@ const FormStatus = ({ isFormOpen, setIsFormOpen, data }) => {
                         width: { xs: "30%", sm: "25%" },
                       }}
                     >
-                      <StatusBadge status={row.status} />
+                      <StatusBadge status={row.IsFormOpen} />
                     </TableCell>
                   </TableRow>
                 ))}

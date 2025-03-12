@@ -4,6 +4,7 @@ import calculateExpireDate from "../../utilites/calculateExpireDate";
 import recentExpireDate from "../../utilites/recentExpireDate.js";
 import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import moment from "moment-timezone";
+import { NextResponse } from "next/server";
 async function createScreenShot(screenShot, transactionsID) {
   console.log(transactionsID + "  " + screenShot);
 
@@ -88,7 +89,7 @@ export async function POST(request) {
       obj["customerId"],
       obj["supportRegionId"],
       obj["walletId"],
-      parseInt(obj["amount"]),
+      obj["amount"],
       false,
       null,
       obj["noteId"],
@@ -114,11 +115,19 @@ export async function POST(request) {
   }
 
   // //update the expire date
-  const value = [nextExpireDate, obj["customerId"]];
+  const value = [
+    nextExpireDate,
+    obj["manyChatId"],
+    obj["agentId"],
+    obj["customerId"],
+  ];
   console.log("nextExpireDate is ");
   console.log(nextExpireDate);
 
-  const sql = `UPDATE Customer SET ExpireDate = ? WHERE CustomerID = ? LIMIT 1`;
+
+  const sql = `UPDATE Customer 
+                SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?
+                WHERE CustomerID = ?`;
   try {
     let result = await db(sql, value);
     // console.log("Result: ", result);
@@ -140,7 +149,7 @@ export async function POST(request) {
       obj["screenShot"],
       transactionId
     );
-    return Response.json(result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error inserting customer:", error);
     return NextResponse.json(

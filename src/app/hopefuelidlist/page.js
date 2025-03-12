@@ -15,22 +15,7 @@ import { useDebounce } from "use-debounce";
 import DetailModal from "../UI/Components/Modal";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import { SUBSCRIPTION_DATA } from "../variables/const";
-
-const HOPEFUEL_ID_LISTS_DETAILS = [
-  {
-    hopeId: "HOPEID-12345",
-    name: "Maung Maung",
-    email: "maungmaung@gmail.com",
-    cardId: "12345678",
-    createTime: "28-11-2024 09:55:00",
-    month: 3,
-    amount: 600000,
-    currency: "MMK",
-    formFillingPerson: "AWS-183746ag-8760-27374ytu-hfg888-dhj86879-688",
-    manychatId: "77777777",
-    images: ["1", "2"],
-  },
-];
+import ImageCarouselModal from "./components/ImageCarousel";
 
 const PAGE_SIZE = 10;
 
@@ -42,6 +27,10 @@ const HopeFuelIdListPage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [details, setDetails] = useState({});
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
+  const [screenshotsLists, setScreenshotsLists] = useState([]);
 
   const [debouncedSearch] = useDebounce(searchText, 100);
 
@@ -90,6 +79,39 @@ const HopeFuelIdListPage = () => {
     [debouncedSearch, page, hasMore, data]
   );
 
+  const fetchDetails = async (hopeId) => {
+    setLoadingDetails(true);
+    setDetails(null);
+
+    try {
+      const response = await fetch(`/api/hopeFuelList/details/${hopeId}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch details");
+      }
+
+      const result = await response.json();
+      setDetails(result.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleOpenScreenshots = (screenshots) => {
+    console.log(typeof screenshots);
+    if (!Array.isArray(screenshots)) {
+      screenshots = [screenshots];
+    }
+    setScreenshotsLists(screenshots);
+    setOpenScreenshotModal((prev) => !prev);
+  };
+
+  const handleCloseScreenshots = () => {
+    setOpenScreenshotModal((prev) => !prev);
+  };
+
   useEffect(() => {
     setPage(1);
     setHasMore(true);
@@ -118,19 +140,20 @@ const HopeFuelIdListPage = () => {
     }
   }, [page]);
 
-  if (loading) {
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-      <CircularProgress />
-    </Box>;
-  }
-
-  const handleOpen = () => {
+  const handleOpen = (hopeFuelId) => {
+    fetchDetails(hopeFuelId);
     setOpenModal((prev) => !prev);
   };
 
   const handleClose = () => {
     setOpenModal((prev) => !prev);
   };
+
+  if (loading) {
+    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+      <CircularProgress />
+    </Box>;
+  }
 
   return (
     <>
@@ -168,7 +191,11 @@ const HopeFuelIdListPage = () => {
       />
       {data.length > 0 ? (
         <>
-          <HopeFuelIDListItem data={data} onClick={handleOpen} />
+          <HopeFuelIDListItem
+            data={data}
+            onClick={handleOpen}
+            onClickScreenShot={handleOpenScreenshots}
+          />
           {loading && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <CircularProgress />
@@ -211,10 +238,39 @@ const HopeFuelIdListPage = () => {
             borderBottomLeftRadius: 20,
           }}
         >
-          <HopeFuelIDListDetails data={HOPEFUEL_ID_LISTS_DETAILS} />
-          <SubscriptionCard cards={SUBSCRIPTION_DATA} />
+          {loadingDetails ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : details ? (
+            <HopeFuelIDListDetails data={details} />
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography sx={{ textAlign: "center" }}>
+                No Details Found
+              </Typography>
+            </Box>
+          )}
+          {/* <SubscriptionCard cards={SUBSCRIPTION_DATA} /> */}
         </Paper>
       </DetailModal>
+      <ImageCarouselModal
+        open={openScreenshotModal}
+        onClose={handleCloseScreenshots}
+        screenshots={screenshotsLists}
+      />
     </>
   );
 };

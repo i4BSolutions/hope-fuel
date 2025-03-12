@@ -16,9 +16,9 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       t.Amount,
       curr.CurrencyCode,
       t.Month,
-      GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ', ') AS ScreenShot,
+      GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
       c.ManyChatId,
-      GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ', ') AS 'FormFilledPerson',
+      GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ',') AS 'FormFilledPerson',
       ts.TransactionStatus,
       n.Note AS Note
     FROM Transactions t
@@ -68,7 +68,13 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
      
     const result = await db(query, values);
     
-    return result;
+    return result.map((row) => ({
+      ...row,
+      ScreenShot:
+        typeof row.ScreenShot === "string" && row.ScreenShot
+          ? row.ScreenShot.split(",")
+          : [],
+    }));
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Error in retrieving data from the database.");

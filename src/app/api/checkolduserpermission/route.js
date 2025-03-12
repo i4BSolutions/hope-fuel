@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 import db from "../../utilites/db";
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   let json = await request.json();
@@ -27,7 +28,7 @@ export async function POST(request) {
     // if transacation hasn't been checked yet
     if (transaction.length > 0 && transaction[0]["PaymentDenied"] == 1) {
       console.log("hello world");
-      return Response.json(true);
+      return NextResponse.json(true);
     } else if (
       transaction.length > 0 &&
       (transaction[0]["PaymentDenied"] == null ||
@@ -47,14 +48,14 @@ export async function POST(request) {
         latestTransactionDate.getMonth() < currentMonth ||
         latestTransactionDate.getFullYear() < currentYear;
       console.log("answer", answer);
-      return Response.json(answer);
+      return NextResponse.json(answer);
     }
 
     let answer = await checkPermission(name, email);
-    return Response.json(answer);
+    return NextResponse.json(answer);
   } catch (error) {
     console.error("Error checking user:", error);
-    return Response.json({ message: "error checking user " }); // Return false in case of an error
+    return NextResponse.json({ message: "error checking user " }); // Return false in case of an error
   }
 }
 

@@ -14,12 +14,15 @@ export default async function extendUserSubmit(
   fileExist,
   setFileExist,
   wallets,
-  agentId
+  agentId,
 ) {
   event.preventDefault();
 
   // Extract form data
   const data = new FormData(event.currentTarget);
+
+
+  
   const amount = data.get("amount");
   const month = data.get("month");
   const manyChat = data.get("manyChat");
@@ -132,6 +135,7 @@ export default async function extendUserSubmit(
         month: month,
         screenShot: files.map((file) => ({ url: file.href })),
         cardId: cardId,
+        manyChatId: manyChat,
       });
 
       console.log("TransactionPayload is ");

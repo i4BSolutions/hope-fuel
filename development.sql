@@ -194,4 +194,16 @@ CREATE TABLE CustomerAuditLogs (
     CONSTRAINT fk_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
 );
 
+CREATE TABLE ManyChat (
+    ManyChatId INT AUTO_INCREMENT PRIMARY KEY,  
+    ConversationId VARCHAR(255) NOT NULL,       
+    CustomerId INT NOT NULL,                   
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+    
+    -- Define Foreign Key Constraint
+    CONSTRAINT fk_manychat_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
+);
+
+
 

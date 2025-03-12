@@ -1,17 +1,8 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Divider,
-  Grid,
-  ImageList,
-  ImageListItem,
-  styled,
-  Typography,
-} from "@mui/material";
+import { Box, Container, Divider, styled, Typography } from "@mui/material";
+import moment from "moment-timezone";
+import React, { useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
-import React from "react";
+import ImageCarouselModal from "../components/ImageCarousel";
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -60,226 +51,253 @@ const ImageItem = styled("img")({
 });
 
 const HopeFuelIDListDetails = ({ data }) => {
+  const [showModal, setShowModal] = useState(false);
+
   return (
-    <Container>
-      {data?.map((data, index) => (
-        <Box sx={{ maxWidth: 600, margin: "40px auto" }}>
-          <InfoRow>
-            <Typography
-              sx={{
-                fontSize: "28px",
-                lineHeight: "34px",
-                color: "#000000",
-                fontWeight: 700,
-              }}
-              variant="h4"
-              component="h1"
-            >
-              {data?.hopeId}
-            </Typography>
-            <Box
-              sx={{
-                backgroundColor: "#FFB800",
-                padding: "4px 12px",
-                borderRadius: "16px",
-              }}
-            >
+    <>
+      <div key={data.HopeFuelID}>
+        <Container>
+          <Box sx={{ maxWidth: 600, margin: "40px auto" }}>
+            <InfoRow>
               <Typography
                 sx={{
+                  fontSize: "28px",
+                  lineHeight: "34px",
                   color: "#000000",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  lineHeight: "18px",
+                  fontWeight: 700,
                 }}
-              >
-                ဝယ်ထားသည့်ပွိုင့်
-              </Typography>
-            </Box>
-          </InfoRow>
-
-          <Divider sx={{ my: 2 }} />
-
-          <InfoRow sx={{ mb: 3 }}>
-            <Box>
-              <Typography
                 variant="h4"
+                component="h1"
+              >
+                HOPEFUELID - {data?.HopeFuelID}
+              </Typography>
+              <Box
                 sx={{
-                  fontSize: "28px",
-                  lineHeight: "34px",
-                  color: "#000000",
-                  fontWeight: 700,
+                  backgroundColor: "#FFB800",
+                  padding: "4px 12px",
+                  borderRadius: "16px",
                 }}
               >
-                {data.name}
-              </Typography>
-              <Typography
+                <Typography
+                  sx={{
+                    color: "#000000",
+                    fontSize: "12px",
+                    fontWeight: 600,
+                    lineHeight: "18px",
+                  }}
+                >
+                  {data.TransactionStatus
+                    ? data.TransactionStatus
+                    : "ဝယ်ထားသည့်ပွိုင့်"}
+                </Typography>
+              </Box>
+            </InfoRow>
+
+            <Divider sx={{ my: 2 }} />
+
+            <InfoRow sx={{ mb: 3 }}>
+              <Box>
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontSize: "28px",
+                    lineHeight: "34px",
+                    color: "#000000",
+                    fontWeight: 700,
+                  }}
+                >
+                  {data.Name}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "#000000",
+                    fontWeight: 400,
+                    fontSize: "18px",
+                    lineHeight: "22px",
+                  }}
+                >
+                  {data.Email}
+                </Typography>
+              </Box>
+              <Box>
+                <Typography
+                  sx={{
+                    textAlign: "center",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    lineHeight: "22px",
+                  }}
+                >
+                  Card ID
+                </Typography>
+                <Typography
+                  sx={{
+                    textAlign: "center",
+                    fontSize: "28px",
+                    lineHeight: "34px",
+                    color: "#000000",
+                    fontWeight: 700,
+                  }}
+                >
+                  {data.CardID}
+                </Typography>
+              </Box>
+            </InfoRow>
+            <InfoRow>
+              <Label
                 sx={{
                   color: "#000000",
+                  fontSize: "14px",
                   fontWeight: 400,
-                  fontSize: "18px",
-                  lineHeight: "22px",
+                  lineHeight: "17px",
                 }}
               >
-                {data.email}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
+                Create Time
+              </Label>
+              <Value
                 sx={{
-                  textAlign: "center",
-                  fontSize: "18px",
-                  fontWeight: "bold",
-                  lineHeight: "22px",
-                }}
-              >
-                Card ID
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: "28px",
-                  lineHeight: "34px",
                   color: "#000000",
-                  fontWeight: 700,
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
                 }}
               >
-                12345678
-              </Typography>
+                {moment(data.CreateTime).format("DD-MM-YYYY HH:mm:ss")}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Month
+              </Label>
+              <Value
+                sx={{
+                  color: "#000000",
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
+                }}
+              >
+                {data.TimeLineInMonth}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Amount
+              </Label>
+              <Value
+                sx={{
+                  color: "#000000",
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
+                }}
+              >
+                {data.Amount}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Currency
+              </Label>
+              <Value
+                sx={{
+                  color: "#000000",
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
+                }}
+              >
+                {data.CurrencyCode}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Form Filling Person
+              </Label>
+              <Value
+                sx={{
+                  color: "#000000",
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
+                  maxWidth: "50%",
+                }}
+              >
+                {data.FormFilledPerson}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Manychat ID
+              </Label>
+              <CopyableText text={data.ManyChatId} />
+            </InfoRow>
+            <Box mt={3}>
+              <ScrollableImageContainer>
+                {data.ScreenShot?.map((image, idx) => (
+                  <>
+                    <ImageItem
+                      onClick={() => {
+                        setShowModal((prev) => !prev);
+                      }}
+                      key={idx}
+                      src={image}
+                      loading="lazy"
+                      sx={{
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                          cursor: "pointer",
+                        },
+                      }}
+                    />
+                  </>
+                ))}
+              </ScrollableImageContainer>
             </Box>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Create Time
-            </Label>
-            <Value
-              sx={{
-                color: "#000000",
-                fontSize: "18px",
-                lineHeight: "22px",
-                fontWeight: 600,
-              }}
-            >
-              {data.createTime}
-            </Value>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Month
-            </Label>
-            <Value
-              sx={{
-                color: "#000000",
-                fontSize: "18px",
-                lineHeight: "22px",
-                fontWeight: 600,
-              }}
-            >
-              {data.month}
-            </Value>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Amount
-            </Label>
-            <Value
-              sx={{
-                color: "#000000",
-                fontSize: "18px",
-                lineHeight: "22px",
-                fontWeight: 600,
-              }}
-            >{`${data.amount.toLocaleString()} `}</Value>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Currency
-            </Label>
-            <Value
-              sx={{
-                color: "#000000",
-                fontSize: "18px",
-                lineHeight: "22px",
-                fontWeight: 600,
-              }}
-            >
-              {data.currency}
-            </Value>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Form Filling Person
-            </Label>
-            <Value
-              sx={{
-                color: "#000000",
-                fontSize: "18px",
-                lineHeight: "22px",
-                fontWeight: 600,
-                maxWidth: "50%",
-              }}
-            >
-              {data.formFillingPerson}
-            </Value>
-          </InfoRow>
-          <InfoRow>
-            <Label
-              sx={{
-                color: "#000000",
-                fontSize: "14px",
-                fontWeight: 400,
-                lineHeight: "17px",
-              }}
-            >
-              Manychat ID
-            </Label>
-            <CopyableText text={data.manychatId} />
-          </InfoRow>
-          <Box mt={3}>
-            <ScrollableImageContainer>
-              {data.images?.map((image, idx) => (
-                <>
-                  <ImageItem key={idx} src={image} loading="lazy" />
-                </>
-              ))}
-            </ScrollableImageContainer>
           </Box>
-        </Box>
-      ))}
-    </Container>
+        </Container>
+      </div>
+      <ImageCarouselModal
+        open={showModal}
+        onClose={() => setShowModal((prev) => !prev)}
+        screenshots={data?.ScreenShot}
+      />
+    </>
   );
 };
 

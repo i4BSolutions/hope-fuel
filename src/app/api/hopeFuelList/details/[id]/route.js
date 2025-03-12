@@ -14,9 +14,9 @@ async function HopeFuelDetailsByHopeFuelId(id) {
             t.Amount,
             curr.CurrencyCode,
             t.Month,
-            GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ', ') AS ScreenShot,
+            GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
             c.ManyChatId ,
-            GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ', ') AS 'FormFilledPerson',
+            GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ',') AS 'FormFilledPerson',
             ts.TransactionStatus,
             n.Note AS Note
         FROM Transactions t
@@ -62,8 +62,11 @@ async function HopeFuelDetailsByHopeFuelId(id) {
     const result = await db(query, values);
     return result.map((row) => ({
       ...row,
-      ScreenShot: typeof(row.ScreenShot )=== 'string' && row.ScreenShot ? row.ScreenShot.split(", ") : [],
-    }));;
+      ScreenShot:
+        typeof row.ScreenShot === "string" && row.ScreenShot ? row.ScreenShot.split(",") : [],
+        
+    }));
+   
     }
     catch (error) {
         console.error("[DB] Error checking HopeFuelDetailsByHopeFuelId:", error);

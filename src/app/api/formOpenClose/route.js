@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db"; 
 
-export async function FormVisibility(AgentId, IsFormOpen) {
+ async function FormVisibility(AgentId, IsFormOpen) {
   const query = `INSERT INTO FormVisibilityStatus (AgentId, IsFormOpen, FormTimeStamp)
                  VALUES (?, ?, NOW());`;
   const values = [AgentId, IsFormOpen];
@@ -15,7 +15,7 @@ export async function FormVisibility(AgentId, IsFormOpen) {
 }
 
 
-export async function fetchFormVisibilityStatus() {
+ async function fetchFormVisibilityStatus() {
   const query = `SELECT * FROM FormVisibilityStatus ORDER BY FormTimeStamp DESC`;
 
   try {

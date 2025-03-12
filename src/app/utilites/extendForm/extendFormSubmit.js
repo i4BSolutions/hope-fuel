@@ -56,7 +56,7 @@ export default async function extendFormSubmit(
     expireDate: expireDate,
     cardID: cardId,
   };
-  console.log(tmp);
+
 
   // validate month and amount
   if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
@@ -121,7 +121,7 @@ export default async function extendFormSubmit(
 
     myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    console.log(ans);
+    //console.log(ans);
     raw = JSON.stringify({
       customerId: ans["CustomerId"],
       supportRegionId: supportRegionID,
@@ -135,6 +135,7 @@ export default async function extendFormSubmit(
         return { url: url.href };
       }),
       cardId: cardId,
+      manyChatId: manychat,
     });
 
     requestOptions = {
@@ -182,7 +183,7 @@ export default async function extendFormSubmit(
       expireDate: expireDate,
       cardId: cardId,
     });
-    console.log(JSON.parse(raw));
+    //console.log(JSON.parse(raw));
     requestOptions = {
       method: "POST",
       headers: myHeaders,
@@ -191,7 +192,7 @@ export default async function extendFormSubmit(
     };
     let answ = await fetch("/api/submitPaymentolduser/", requestOptions);
     let { status } = await answ.json();
-    console.log(status);
+    //console.log(status);
     location.reload();
   }
 }

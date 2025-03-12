@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import React from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 
-const HopeFuelIDListItem = ({ data, onClick }) => {
+const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
     switch (status) {
       case "ငွေစစ်ဆေးပြီး":
@@ -22,11 +22,11 @@ const HopeFuelIDListItem = ({ data, onClick }) => {
   return (
     <>
       {Array.isArray(data) &&
-        data.map((item, index) => (
+        data.map((item) => (
           <>
             <Card
-              onClick={() => onClick && onClick()}
-              key={index}
+              onClick={() => onClick && onClick(item.HopeFuelID)}
+              key={item.FormFilledPerson}
               sx={{
                 backgroundColor: "#FFFFFF",
                 borderRadius: "8px",
@@ -144,6 +144,10 @@ const HopeFuelIDListItem = ({ data, onClick }) => {
                   </Typography>
                 </Box>
                 <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClickScreenShot(item.ScreenShot);
+                  }}
                   variant="outlined"
                   sx={{
                     backgroundColor: "#B91C1C",
@@ -217,7 +221,7 @@ const HopeFuelIDListItem = ({ data, onClick }) => {
                     minWidth: "fit-content",
                   }}
                 >
-                  AWS-1837446g-8760-27274yn-f49888-ch98879-888
+                  {item.FormFilledPerson}
                 </Typography>
                 <Typography
                   sx={{

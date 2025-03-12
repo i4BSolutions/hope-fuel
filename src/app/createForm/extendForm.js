@@ -4,6 +4,8 @@ import {
   Box,
   Button,
   FormControlLabel,
+  FormHelperText,
+  FormControl,
   FormLabel,
   Radio,
   RadioGroup,
@@ -14,7 +16,7 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import Dropzone from "react-dropzone";
 import extendFormSubmit from "../utilites/extendForm/extendFormSubmit";
 import filehandler from "../utilites/createForm/fileHandler";
@@ -25,7 +27,7 @@ import { useAgent } from "../context/AgentContext";
 const ExtendForm = ({ userInfo, setloading }) => {
   const user = useUser();
   const agent = useAgent();
-console.log("User from ExtendForm: ", user);
+
   const formFillingPerson = user?.email || "Unknown User";
 
 
@@ -47,6 +49,9 @@ console.log("User from ExtendForm: ", user);
   const [contactLink, setContactLink] = useState("");
   const [notes, setNotes] = useState("");
   const [manyChatId, setManyChatId] = useState("");
+
+  const [errors, setErrors] = useState({});
+
 
   // Load Wallets by Currency
   useEffect(() => {
@@ -78,19 +83,44 @@ console.log("User from ExtendForm: ", user);
 
   const handleDrop = async (acceptedFiles) => {
     setIsUploading(true);
+      if (acceptedFiles.length > 0) {
+        setErrors((prev) => ({ ...prev, files: "" }));
+      } 
     await filehandler(acceptedFiles, setFiles, files, setUploadProgress);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
   };
 
+
+   const validateForm = useCallback(() => {
+     let validationErrors = {};
+     if (!currency)
+       validationErrors.currency = "Currency selection is required.";
+     if (!walletId) validationErrors.wallet = "Wallet selection is required.";
+     if (files.length === 0) {
+       validationErrors.files = "You must upload at least one file.";
+       setFileExist(false);
+     } else {
+       setFileExist(true);
+     }
+
+     setErrors(validationErrors);
+     return Object.keys(validationErrors).length === 0;
+   }, [currency, walletId, files]);
+
+
+    const handleCurrencyChange = (e) => {
+      setCurrency(e.target.value);
+      setErrors((prev) => ({ ...prev, currency: "" }));
+    };
+
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (files.length === 0) {
-      setFileExist(false);
-      return;
-    }
-
+    if (!validateForm()) return;
+  
+  
+  
     extendFormSubmit(
       event,
       currency,
@@ -141,7 +171,10 @@ console.log("User from ExtendForm: ", user);
         id="amount"
         margin="normal"
         error={amountValidate}
-        helperText={amountValidate && "Please enter a valid amount"}
+        helperText={
+          amountValidate &&
+          "Amount should be a positive number and up to 2 decimal places"
+        }
         inputProps={{ min: "0", step: "0.01" }}
         onChange={(e) => {
           const value = e.target.value;
@@ -173,41 +206,70 @@ console.log("User from ExtendForm: ", user);
         }}
       />
 
-      {/* Currency Selection */}
-      <FormLabel>Currency</FormLabel>
-      <RadioGroup
-        row
-        value={currency}
-        onChange={(e) => setCurrency(e.target.value)}
-      >
-        {currencies.map((item) => (
-          <FormControlLabel
-            key={item.CurrencyId}
-            value={item.CurrencyCode}
-            control={<Radio />}
-            label={item.CurrencyCode}
-          />
-        ))}
-      </RadioGroup>
+      <Box sx={{ mt: 3 }}>
+        {/* Currency Selection */}
+        <FormControl error={!!errors.currency} component="fieldset">
+          <FormLabel component="legend">Currency</FormLabel>
+          <RadioGroup
+            row
+            value={currency}
+            onChange={(e) => {
+              setCurrency(e.target.value);
+              if (errors.currency) {
+                setErrors((prev) => ({ ...prev, currency: "" }));
+              }
+            }}
+          >
+            {currencies.map((item) => (
+              <FormControlLabel
+                key={item.CurrencyId}
+                value={item.CurrencyCode}
+                control={<Radio />}
+                label={item.CurrencyCode}
+              />
+            ))}
+          </RadioGroup>
+          {errors.currency && (
+            <FormHelperText>{errors.currency}</FormHelperText>
+          )}
+        </FormControl>
+      </Box>
 
       {/* wallet selection*/}
-      <FormLabel id="wallets">Wallets</FormLabel>
-      {wallets && wallets.length > 0 ? (
-        <RadioGroup aria-labelledby="wallets-group-label" name="wallets">
-          {wallets.map((wallet) => (
-            <FormControlLabel
-              value={wallet.WalletID}
-              control={<Radio />}
-              label={wallet.WalletName}
-              key={wallet.WalletID}
-              required={true}
-              sx={{ mx: 1 }}
-            />
-          ))}
-        </RadioGroup>
-      ) : (
-        <h1>No wallets selected.</h1>
-      )}
+      <Box sx={{ mt: 3 ,mb:3}}>
+        <FormControl error={!!errors.wallet}>
+          <FormLabel id="wallets">Wallets</FormLabel>
+          {wallets && wallets.length > 0 ? (
+            <RadioGroup
+              aria-labelledby="wallets-group-label"
+              name="wallets"
+              value={walletId}
+              onChange={(e) => {
+                setWalletId(e.target.value);
+                if (errors.wallet) {
+                  setErrors((prev) => ({ ...prev, wallet: "" }));
+                }
+              }}
+            >
+              {wallets.map((wallet) => (
+                <FormControlLabel
+                  value={wallet.WalletID}
+                  control={<Radio />}
+                  label={wallet.WalletName}
+                  key={wallet.WalletID}
+                  required
+                  sx={{ mx: 1 }}
+                />
+              ))}
+            </RadioGroup>
+          ) : (
+            <Typography variant="body2" sx={{ color: "gray", mt: 1 }}>
+              No wallets selected.
+            </Typography>
+          )}
+          {errors.wallet && <FormHelperText>{errors.wallet}</FormHelperText>}
+        </FormControl>
+      </Box>
 
       {/* Support Region Selection */}
       <Autocomplete
@@ -228,10 +290,21 @@ console.log("User from ExtendForm: ", user);
         name="manyChat"
         label="ManyChat ID"
         value={manyChatId}
-        onChange={(e) => setManyChatId(e.target.value)}
+        onChange={(e) => {
+          const value = e.target.value;
+
+          // Check if value is numeric
+          if (/^\d*$/.test(value)) {
+            setManyChatId(value);
+            setManyChatValidate(false);
+          } else {
+            setManyChatValidate(true);
+          }
+        }}
         margin="normal"
         error={manyChatValidate}
-        helperText={manyChatValidate && "Please enter a valid ManyChat ID"}
+        helperText={manyChatValidate && "ManyChatId should be a numeric value"}
+        required
       />
 
       {/* Contact Link Input */}
@@ -274,12 +347,21 @@ console.log("User from ExtendForm: ", user);
           </div>
         )}
       </Dropzone>
+      {/* Show error message when no file is uploaded */}
+      {errors.files && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {errors.files}
+        </Alert>
+      )}
 
       {/* Uploaded Images Preview */}
       {files.length > 0 && (
         <ImageList cols={3} rowHeight={164} sx={{ mt: 2 }}>
           {files.map((file, index) => (
-            <ImageListItem key={index}>
+            <ImageListItem
+              key={index}
+              sx={{ width: "150px", height: "150px", overflow: "hidden" }}
+            >
               <img src={file.href} alt={file.name} loading="lazy" />
             </ImageListItem>
           ))}
