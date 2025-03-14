@@ -15,7 +15,7 @@ import "@aws-amplify/ui-react/styles.css";
 Amplify.configure(awsconfig);
 import { Box } from "@mui/material";
 
-import Sidebar from "./UI/Sidebar";
+import Sidebar from "./UI/SidebarNav";
 
 function AppLayout({ children }) {
   // const router = useRouter();

@@ -51,7 +51,7 @@ const Sidebar = () => {
 
   // Role-Based Sidebar Navigation
   const roleBasedNavItems = {
-    "Admin": [
+    Admin: [
       {
         text: "အသစ်သွင်းခြင်း",
         icon: <AddCircleOutlineIcon />,
@@ -69,6 +69,11 @@ const Sidebar = () => {
       // },
       { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
       {
+        text: "ဖောင်အဖွင့်အပိတ်",
+        icon: <ToggleOnOutlinedIcon />,
+        path: "/formopenclose",
+      },
+      {
         text: "HOPEID List",
         icon: <FormatListBulletedRoundedIcon />,
         path: "/hopefuelidlist",
@@ -79,16 +84,11 @@ const Sidebar = () => {
         path: "/fundraisers",
       },
     ],
-   "Support Agent": [
+    "Support Agent": [
       {
         text: "အသစ်သွင်းခြင်း",
         icon: <AddCircleOutlineIcon />,
         path: "/createForm",
-      },
-      {
-        text: "ဖောင်အဖွင့်အပိတ်",
-        icon: <ToggleOnOutlinedIcon />,
-        path: "/formopenclose",
       },
       {
         text: "HOPEID List",
@@ -112,9 +112,7 @@ const Sidebar = () => {
         icon: <SyncAltRoundedIcon />,
         path: "/extendUser",
       },
-      { text: "ငွေစစ်ဆေးခြင်း",
-        icon: <AttachMoneyIcon />,
-        path: "/entryForm" },
+      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
     ],
   };
 
