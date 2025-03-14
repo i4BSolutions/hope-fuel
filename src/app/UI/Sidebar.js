@@ -27,7 +27,7 @@ import ModeOutlinedIcon from "@mui/icons-material/ModeOutlined";
 import Divider from "@mui/material/Divider";
 
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 
 const drawerWidth = 250; // Full-width drawer
@@ -36,6 +36,8 @@ const miniDrawerWidth = 80; // Mini sidebar width
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const isActive = (path) => pathname === path;
 
   // Sidebar Menu Items
   const menuItems = [
@@ -113,7 +115,7 @@ const Sidebar = () => {
                   "background-color 0.2s ease-in-out, transform 0.1s ease",
                 borderRadius: "50%",
                 "&:hover": {
-                  backgroundColor: "#F59E0B",
+                  backgroundColor: "#991B1B",
                   transform: "scale(1.1)",
                 },
               }}
@@ -144,11 +146,13 @@ const Sidebar = () => {
                   display: "flex",
                   justifyContent: "center",
                   borderRadius: "20px",
+                  backgroundColor:
+                    pathname === path ? "#F59E0B" : "transparent",
                   transition:
                     "background-color 0.2s ease-in-out, transform 0.1s ease",
                   borderRadius: "50px",
                   "&:hover": {
-                    backgroundColor: "#F59E0B",
+                    backgroundColor: "#991B1B",
                     transform: "scale(1.1)",
                   },
                 }}
@@ -217,19 +221,23 @@ const Sidebar = () => {
                 "background-color 0.3s ease-in-out, transform 0.2s ease",
               borderRadius: "50%",
               "&:hover": {
-                backgroundColor: "#F59E0B",
+                backgroundColor: "#991B1B",
                 transform: "scale(1.1)",
               },
             }}
           >
             <MenuRoundedIcon />
           </IconButton>
-          <Typography variant="h5"
-           sx={{
-             flexGrow: 1, color: "white" , marginLeft:"13px",
-             fontWeight: "bold"
-            }}>
-            HopeFuel 
+          <Typography
+            variant="h5"
+            sx={{
+              flexGrow: 1,
+              color: "white",
+              marginLeft: "13px",
+              fontWeight: "bold",
+            }}
+          >
+            HopeFuel
           </Typography>
         </Toolbar>
         <Divider
@@ -255,11 +263,13 @@ const Sidebar = () => {
                   marginX: "15px",
                   display: "flex",
                   justifyContent: "center",
+                  backgroundColor:
+                    pathname === path ? "#F59E0B" : "transparent",
                   transition:
                     "background-color 0.3s ease-in-out, transform 0.2s ease",
                   borderRadius: "20px",
                   "&:hover": {
-                    backgroundColor: "#F59E0B",
+                    backgroundColor: "#991B1B",
                     transform: "scale(1.1)",
                   },
                 }}
