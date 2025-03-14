@@ -25,6 +25,8 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import FlagIcon from "@mui/icons-material/Flag";
 import ModeOutlinedIcon from "@mui/icons-material/ModeOutlined";
 import Divider from "@mui/material/Divider";
+import { signOut } from "aws-amplify/auth";
+import { useUser } from "../context/UserContext";
 
 
 import { useRouter, usePathname } from "next/navigation";
@@ -37,51 +39,89 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (path) => pathname === path;
+  const { setUser, currentUser } = useUser();
+  
 
-  // Sidebar Menu Items
-  const menuItems = [
-    {
-      text: "အသစ်သွင်းခြင်း",
-      icon: <AddCircleOutlineIcon />,
-      path: "/createForm",
-    },
-    {
-      text: "သက်တမ်းတိုးခြင်း",
-      icon: <SyncAltRoundedIcon />,
-      path: "/extendUser",
-    },
-    {
-      text: "ဖောင်အဖွင့်အပိတ်",
-      icon: <ToggleOnOutlinedIcon />,
-      path: "/formopenclose",
-    },
-    {
-      text: "အချက်အလက်ပြင်ဆင်ခြင်း",
-      icon: <ModeOutlinedIcon />,
-      path: "/fundraisers",
-    },
-    {
-      text: "ငွေစစ်ဆေးခြင်း",
-      icon: <AttachMoneyIcon />,
-      path: "/entryForm",
-    },
-    {
-      text: "HOPEID List",
-      icon: <FormatListBulletedRoundedIcon />,
-      path: "/hopefuelidlist",
-    },
-    {
-      text: "Customers List",
-      icon: <PeopleAltOutlinedIcon />,
-      path: "/customerlist",
-    },
-    {
-      text: "Fundraisers",
-      icon: <FlagIcon />,
-      path: "/fundraisers",
-    },
-  ];
+  // Show a loading state if user is undefined
+  if (!currentUser) {
+     // console.log("User from Sidebar: ", currentUser.UserRole);
+    return <p>Loading...</p>;
+  
+  }
+
+  // Role-Based Sidebar Navigation
+  const roleBasedNavItems = {
+    "Admin": [
+      {
+        text: "အသစ်သွင်းခြင်း",
+        icon: <AddCircleOutlineIcon />,
+        path: "/createForm",
+      },
+      {
+        text: "သက်တမ်းတိုးခြင်း",
+        icon: <SyncAltRoundedIcon />,
+        path: "/extendUser",
+      },
+      // {
+      //   text: "အချက်အလက်ပြင်ဆင်ခြင်း",
+      //   icon: <ModeOutlinedIcon />,
+      //   path: "/fundraisers",
+      // },
+      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
+      {
+        text: "HOPEID List",
+        icon: <FormatListBulletedRoundedIcon />,
+        path: "/hopefuelidlist",
+      },
+      {
+        text: "Fundraisers",
+        icon: <FlagIcon />,
+        path: "/fundraisers",
+      },
+    ],
+   "Support Agent": [
+      {
+        text: "အသစ်သွင်းခြင်း",
+        icon: <AddCircleOutlineIcon />,
+        path: "/createForm",
+      },
+      {
+        text: "ဖောင်အဖွင့်အပိတ်",
+        icon: <ToggleOnOutlinedIcon />,
+        path: "/formopenclose",
+      },
+      {
+        text: "HOPEID List",
+        icon: <FormatListBulletedRoundedIcon />,
+        path: "/hopefuelidlist",
+      },
+      {
+        text: "Customers List",
+        icon: <PeopleAltOutlinedIcon />,
+        path: "/customerlist",
+      },
+    ],
+    "Payment Processor": [
+      {
+        text: "အသစ်သွင်းခြင်း",
+        icon: <AddCircleOutlineIcon />,
+        path: "/createForm",
+      },
+      {
+        text: "သက်တမ်းတိုးခြင်း",
+        icon: <SyncAltRoundedIcon />,
+        path: "/extendUser",
+      },
+      { text: "ငွေစစ်ဆေးခြင်း",
+        icon: <AttachMoneyIcon />,
+        path: "/entryForm" },
+    ],
+  };
+
+  // Get menu items based on `currentUser.UserRole`
+  const menuItems = currentUser?.UserRole
+    ? roleBasedNavItems[currentUser.UserRole] || []
+    : [];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -167,7 +207,11 @@ const Sidebar = () => {
         <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => alert("Logging out!")}
+              onClick={() => {
+                signOut({ global: true });
+                setUser(null);
+                router.push("/");
+              }}
               sx={{
                 marginX: "15px",
                 display: "flex",
@@ -283,7 +327,11 @@ const Sidebar = () => {
         <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => alert("Logging out!")}
+              onClick={() => {
+                signOut({ global: true });
+                setUser(null);
+                router.push("/");
+              }}
               sx={{
                 marginX: "15px",
                 display: "flex",
