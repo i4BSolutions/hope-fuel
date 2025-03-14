@@ -14,15 +14,12 @@ async function SearchCustomers(searchTerm){
     OR c.CardID LIKE CONCAT('%', ?, '%') 
     OR c.ManyChatId LIKE CONCAT('%', ?, '%') 
 `;
-const values = [
-  `${searchTerm}`,
-  `${searchTerm}`,
-  `${searchTerm}`,
-  `${searchTerm}`,
-  `${searchTerm}`];
+
+  const searchPattern = `%${searchTerm}%`;
+  const values = Array(5).fill(searchPattern);
 
     try{
-        console.log("Query:",query);
+     
         const result = await db(query, values);
         return result;
 
