@@ -143,7 +143,7 @@ const Sidebar = () => {
         <List sx={{ flexGrow: 1 }}>
           <ListItem disablePadding>
             <IconButton
-              onClick={() => setOpen(true)}
+              onClick={() => setOpen((prevState) => !prevState)}
               sx={{
                 color: "white",
                 marginX: "auto",
@@ -175,6 +175,7 @@ const Sidebar = () => {
               disablePadding
               sx={{
                 mx: "auto",
+                marginTop: "10px",
               }}
             >
               <ListItemButton
@@ -236,7 +237,7 @@ const Sidebar = () => {
       <Drawer
         anchor="left"
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={() => setOpen((prevState) => !prevState)}
         sx={{
           [`& .MuiDrawer-paper`]: {
             width: drawerWidth,
@@ -253,7 +254,7 @@ const Sidebar = () => {
           {/* Logo & Title */}
 
           <IconButton
-            onClick={() => setOpen(false)}
+            onClick={() => setOpen((prevState) => !prevState)}
             sx={{
               color: "white",
               marginX: "auto",
@@ -286,7 +287,6 @@ const Sidebar = () => {
           sx={{
             backgroundColor: "#F59E0B",
             height: "4px",
-            marginBottom: "17px",
           }}
         />
 
@@ -297,6 +297,7 @@ const Sidebar = () => {
               disablePadding
               sx={{
                 mx: "auto",
+                marginTop: "10px",
               }}
             >
               <ListItemButton
