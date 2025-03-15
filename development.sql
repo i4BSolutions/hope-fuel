@@ -205,5 +205,37 @@ CREATE TABLE ManyChat (
     CONSTRAINT fk_manychat_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
 );
 
+CREATE TABLE Fundraiser (
+    FundraiserID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserName VARCHAR(255) NOT NULL,
+    FundraiserEmail VARCHAR(255) UNIQUE NOT NULL,
+    FundraiserLogo VARCHAR(255),
+	BaseCountryID INT, -- Fundraiser's base country
+    FOREIGN KEY (BaseCountryID) REFERENCES BaseCountry(BaseCountryID) ON DELETE SET NULL
+);
 
+CREATE TABLE Fundraiser_AcceptedCurrencies (
+    FundraiserID INT,
+    CurrencyID INT,
+    PRIMARY KEY (FundraiserID, CurrencyID),
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE,
+    FOREIGN KEY (CurrencyID) REFERENCES Currency(CurrencyID) ON DELETE CASCADE
+);
 
+CREATE TABLE Fundraiser_ContactLinks (
+    ContactID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserID INT,
+    Platform INT,
+    ContactURL VARCHAR(255) NOT NULL,
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE
+);
+
+CREATE TABLE Platform (
+    PlatformID INT PRIMARY KEY AUTO_INCREMENT,
+    PlatformName VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE BaseCountry (
+    BaseCountryID INT PRIMARY KEY AUTO_INCREMENT,
+    BaseCountryName VARCHAR(255) NOT NULL UNIQUE
+);
