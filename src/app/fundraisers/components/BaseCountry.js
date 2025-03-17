@@ -1,6 +1,6 @@
 import { Box, TextField, MenuItem } from "@mui/material";
-import { useState, useEffect } from "react";
-import { Controller, useWatch, useFormState } from "react-hook-form";
+import { useState, useEffect,useMemo } from "react";
+import { Controller, useWatch, useFormState, } from "react-hook-form";
 
 
 const fetchCountries = async (setCountries) => {
@@ -22,9 +22,9 @@ const BaseCountry = ({ control }) => {
   useEffect(() => {
     fetchCountries(setCountries);
   }, []);
-
-
+  const memoizedCountries = useMemo(() => countries, [countries]);
   const selectedCountry = useWatch({ control, name: "BaseCountryName" });
+
 
   return (
     <Box>
@@ -42,7 +42,7 @@ const BaseCountry = ({ control }) => {
             error={!!errors?.BaseCountryName}
             helperText={errors?.BaseCountryName?.message}
           >
-            {countries.map((country) => (
+            {memoizedCountries.map((country) => (
               <MenuItem
                 key={country.BaseCountryID}
                 value={country.BaseCountryName}
@@ -61,7 +61,7 @@ const BaseCountry = ({ control }) => {
           name="NewCountry"
           control={control}
           defaultValue=""
-          rules={{ required: "Please enter a new country" }}
+          rules={{ required: "New Country is required" }}
           render={({ field }) => (
             <TextField
               {...field}
