@@ -3,15 +3,17 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Box, Button, Grid, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
 
 
+
 const FundraisingForm = () => {
   
   const [logoFile, setLogoFile] = useState(null);
+  const [Completed, setCompleted] = useState(false);
   const {
     control,
     register,
@@ -52,6 +54,20 @@ const FundraisingForm = () => {
       });
       const result = await response.json();
       //console.log("Server Response:", result);
+      if (response.ok && result) {
+        reset();
+        setLogoFile(null);
+        setCompleted(true);
+
+         setTimeout(() => {
+           setCompleted(false);
+         }, 3000);
+        
+      } else {
+        setCompleted(false);
+        throw new Error(result.message);
+        
+      }
 
     }catch(error){
       console.log("Error:", error);
@@ -90,7 +106,6 @@ const FundraisingForm = () => {
               errors={errors}
               clearErrors={clearErrors}
             />
-        
           </Grid>
 
           <Grid item xs={12}>
@@ -136,6 +151,19 @@ const FundraisingForm = () => {
               Create
             </Button>
           </Grid>
+          {Completed && (
+            <Alert
+              variant="outlined"
+              severity="success"
+              sx={{
+                textAlign: "center",
+                marginTop: 2,
+                marginX: "auto",
+              }}
+            >
+              Fundraiser created successfully!!
+            </Alert>
+          )}
         </Grid>
       </Box>
     </Box>
