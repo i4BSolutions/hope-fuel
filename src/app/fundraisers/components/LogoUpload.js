@@ -1,6 +1,8 @@
 import { Avatar, Box, Input,Typography } from "@mui/material";
 import { useState,useEffect } from "react";
 import fileHandler from "../../utilites/createForm/fileHandler";
+import getScreenShotUrl from "../../utilites/getScreenShotUrl";
+
 
 export const LogoUpload = ({logoFile, setLogoFile, errors, clearErrors}) => {
 
@@ -22,12 +24,15 @@ export const LogoUpload = ({logoFile, setLogoFile, errors, clearErrors}) => {
 
     //upload to s3
     const uploadedUrl = await fileHandler([file], setLogoFile, [], setUploadProgress);
-    console.log(uploadedUrl);
 
     //preview the image 
     if (uploadedUrl?.length > 0) {
+        const signedUrl = await getScreenShotUrl(uploadedUrl[0].pathname);
+       // console.log("signedUrl:::=>", `${signedUrl.origin}${signedUrl.pathname}`);
+        const url = `${signedUrl.origin}${signedUrl.pathname}`;
+
         setLogoPreview(uploadedUrl[0].href); 
-        setLogoFile(uploadedUrl[0].href); 
+        setLogoFile(url); 
         setUploadProgress("")
         clearErrors("FundraiserLogo");
         } else {

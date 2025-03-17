@@ -7,7 +7,7 @@ import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
-import { set } from "date-fns";
+
 
 const FundraisingForm = () => {
   
@@ -31,14 +31,32 @@ const FundraisingForm = () => {
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
 
     if (data.BaseCountryName === "other" && data.NewCountry) {
       data.BaseCountryName = data.NewCountry.trim();
       delete data.NewCountry;
     }
 
-    console.log("Form Submitted:", data);
+    //console.log("Form Submitted:", data);
+
+    try{
+      //send data to the server
+      const response = await fetch("/api/v1/fundraisers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      //console.log("Server Response:", result);
+
+    }catch(error){
+      console.log("Error:", error);
+      throw new Error("Failed to create fundraiser");
+    }
 
 
   };
