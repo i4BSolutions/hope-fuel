@@ -7,15 +7,17 @@ import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
+import { set } from "date-fns";
 
 const FundraisingForm = () => {
+  
   const [logoFile, setLogoFile] = useState(null);
-
   const {
     control,
     register,
     handleSubmit,
-    watch,
+    setValue,
+    clearErrors,
     reset,
     formState: { errors },
   } = useForm({
@@ -24,13 +26,13 @@ const FundraisingForm = () => {
       FundraiserName: "",
       FundraiserEmail: "",
       BaseCountryName: "",
-      FundraiserLogo: null,
+      FundraiserLogo: "",
       NewCountry: "",
     },
   });
 
   const onSubmit = (data) => {
-    console.log("New Country:", data.NewCountry);
+
     if (data.BaseCountryName === "other" && data.NewCountry) {
       data.BaseCountryName = data.NewCountry.trim();
       delete data.NewCountry;
@@ -55,11 +57,22 @@ const FundraisingForm = () => {
         borderRadius: 3,
       }}
     >
-
       <Box component="form" onSubmit={handleSubmit(onSubmit, onError)}>
         <Grid container spacing={2}>
           <Grid item xs={12} sx={{ textAlign: "center" }}>
-            <LogoUpload setLogoFile={setLogoFile} logoFile={logoFile} />
+            <LogoUpload
+              logoFile={logoFile}
+              setLogoFile={(url) => {
+                if (url.length === 0) {
+                  return;
+                }
+                setLogoFile(url);
+                setValue("FundraiserLogo", url);
+              }}
+              errors={errors}
+              clearErrors={clearErrors}
+            />
+        
           </Grid>
 
           <Grid item xs={12}>
@@ -93,8 +106,9 @@ const FundraisingForm = () => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-                reset()
-                setLogoFile(null)}}
+                reset();
+                setLogoFile(null);
+              }}
             >
               Cancel
             </Button>

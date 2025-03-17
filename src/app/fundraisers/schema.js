@@ -11,6 +11,6 @@ export const FundraisingSchema = z.object({
 //  TelegramLink: z.string().url("Invalid Telegram URL").optional(),
  // otherLink1: z.string().url("Invalid URL").optional(),
  // otherLink2: z.string().url("Invalid URL").optional(),
-   FundraiserLogo: z.any().optional(),
+  FundraiserLogo: z.string().nonempty("Please upload a logo"),
   NewCountry: z.string().nonempty("Please enter a new country"),
 });

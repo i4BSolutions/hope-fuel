@@ -2,7 +2,7 @@ import { Box, TextField, MenuItem } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Controller, useWatch, useFormState } from "react-hook-form";
 
-// ✅ Fetch countries separately for better organization
+
 const fetchCountries = async (setCountries) => {
   try {
     const response = await fetch("/api/countries");
@@ -23,7 +23,7 @@ const BaseCountry = ({ control }) => {
     fetchCountries(setCountries);
   }, []);
 
-  // ✅ Track selected country dynamically
+
   const selectedCountry = useWatch({ control, name: "BaseCountryName" });
 
   return (
