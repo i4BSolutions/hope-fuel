@@ -205,5 +205,22 @@ CREATE TABLE ManyChat (
     CONSTRAINT fk_manychat_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
 );
 
+-- Create Exchange Rate table and insert demo data
+CREATE TABLE ExchangeRates (
+    id SERIAL PRIMARY KEY,
+    country VARCHAR(50) NOT NULL,
+    currency_code VARCHAR(5) NOT NULL,
+    exchange_rate DECIMAL(12,5) NOT NULL,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-
+INSERT INTO ExchangeRates (country, currency_code, exchange_rate) VALUES
+('China', 'CNY', 7.28),
+('Japan', 'JPY', 155.69),
+('Myanmar', 'MMK', 4450.00),
+('Singapore', 'SGD', 1.35),
+('South Korea', 'KRW', 1480.00),
+('Taiwan', 'TWD', 33.00),
+('Thailand', 'THB', 34.17),
+('United Kingdom', 'GBP', 0.80),
+('United States', 'USD', 1.00);
