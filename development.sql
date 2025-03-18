@@ -207,14 +207,14 @@ CREATE TABLE ManyChat (
 
 -- Create Exchange Rate table and insert demo data
 CREATE TABLE ExchangeRates (
-    id SERIAL PRIMARY KEY,
-    country VARCHAR(50) NOT NULL,
-    currency_code VARCHAR(5) NOT NULL,
-    exchange_rate DECIMAL(12,5) NOT NULL,
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ExchangeRateId SERIAL PRIMARY KEY,
+    Country VARCHAR(50) NOT NULL,
+    CurrencyCode VARCHAR(5) NOT NULL,
+    ExchangeRate DECIMAL(12,5) NOT NULL,
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO ExchangeRates (country, currency_code, exchange_rate) VALUES
+INSERT INTO ExchangeRates (Country, CurrencyCode, ExchangeRate) VALUES
 ('China', 'CNY', 7.28),
 ('Japan', 'JPY', 155.69),
 ('Myanmar', 'MMK', 4450.00),
