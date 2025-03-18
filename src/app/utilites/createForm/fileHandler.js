@@ -71,4 +71,5 @@ export default async function filehandler(
 
   setFile([...filesState, ...url]);
   setUploadProgress("Upload Complete!\nDrag and drop more files to upload");
+  return url;
 }

@@ -62,7 +62,7 @@ const UserInfoCard = ({ data, isMobile, onEdit, onViewEditHistory }) => {
         }}
       >
         <Button
-          onClick={() => onEdit && onEdit()}
+          onClick={() => onEdit && onEdit(data.CustomerId)}
           sx={{ borderRadius: 18 }}
           variant="contained"
           color="error"

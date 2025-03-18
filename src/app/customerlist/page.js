@@ -1,11 +1,14 @@
 "use client";
 
 import {
+  Alert,
   Box,
   CircularProgress,
   Grid,
   Modal,
   Paper,
+  Snackbar,
+  TextField,
   Typography,
   useMediaQuery,
   useTheme,
@@ -19,8 +22,10 @@ import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import { SUBSCRIPTION_DATA } from "../variables/const";
 import CardDisplay from "./components/CardDisplay";
 import { useDebounce } from "use-debounce";
-import { useAgent } from "../context/AgentContext";
 import EditHistory from "./components/EditHistory";
+import CustomerInfoEdit from "./components/CustomerInfoEdit";
+import { set } from "date-fns";
+import { useAgent } from "../context/AgentContext";
 
 const mockCards = [
   {
@@ -42,21 +47,11 @@ const mockCards = [
 
 const PAGE_SIZE = 10;
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 800,
-  minHeight: 800,
-  bgcolor: "background.paper",
-  borderRadius: 5,
-  boxShadow: 24,
-};
-
 const CustomerListPage = () => {
   const theme = useTheme();
+  const agentId = useAgent();
   const [searchText, setSearchText] = useState("");
+  const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [hoveredProfileId, setHoveredProfileId] = useState(null);
   const [customerData, setCustomerData] = useState([]);
@@ -69,6 +64,15 @@ const CustomerListPage = () => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [openEditHistoryModal, setOpenEditHistoryModal] = useState(false);
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    email: "",
+    country: "",
+  });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
   const initialLoadRef = useRef(false);
   const [debouncedSearch] = useDebounce(searchText, 100);
@@ -232,6 +236,88 @@ const CustomerListPage = () => {
     setOpenDetailModal((prev) => !prev);
   };
 
+  const handleOpenEditHistoryModal = (id) => {
+    setSelectedEditId(id);
+    setOpenEditHistoryModal((prev) => !prev);
+
+    if (profileDetailData) {
+      setCustomerInfo({
+        name: profileDetailData.Name || "",
+        email: profileDetailData.Email || "",
+        country: profileDetailData.UserCountry || "",
+      });
+    }
+  };
+
+  const handleSave = useCallback(
+    async (data) => {
+      var myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      let raw = JSON.stringify({
+        agentId,
+        updates: [
+          {
+            field: "Name",
+            newValue: data.name,
+          },
+          {
+            field: "Email",
+            newValue: data.email,
+          },
+        ],
+      });
+
+      let requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      try {
+        let response = await fetch(
+          `api/customers/${selectedEditId}/edit`,
+          requestOptions
+        );
+
+        if (response.ok) {
+          const responseData = await response.json();
+
+          setSnackbarMessage(responseData.message);
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+
+          fetchProfileDetails(selectedProfileId);
+        } else {
+          setSnackbarMessage("Failed to update customer information");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+      } catch (error) {
+        console.log(error);
+        setSnackbarMessage(
+          "An error occurred while updating customer information"
+        );
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      } finally {
+        setOpenEditHistoryModal((prev) => !prev);
+      }
+    },
+    [selectedEditId, agentId, fetchProfileDetails, selectedProfileId]
+  );
+
+  const handleCancel = () => {
+    setOpenEditHistoryModal((prev) => !prev);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen((prev) => !prev);
+  };
+
   return (
     <Box sx={{ p: 2, bgcolor: "background.default", minHeight: "100vh" }}>
       <Grid container spacing={2}>
@@ -255,7 +341,7 @@ const CustomerListPage = () => {
             <UserInfoCard
               data={profileDetailData}
               isMobile={isMobile}
-              // onEdit={handleEdit}
+              onEdit={handleOpenEditHistoryModal}
               onViewEditHistory={handleViewEditHistory}
             />
           ) : (
@@ -314,9 +400,8 @@ const CustomerListPage = () => {
             <CircularProgress />
           </Box>
         ) : editHistory ? (
-          <Typography>Hi</Typography>
+          <EditHistory historyData={editHistory.data} />
         ) : (
-          // <EditHistory historyData={editHistory} />
           <Box
             sx={{
               display: "flex",
@@ -330,55 +415,34 @@ const CustomerListPage = () => {
           </Box>
         )}
       </Modal>
-      {/* <DetailModal
-        direction="center"
-        open={openDetailModal}
-        onClose={handleCloseDetailModal}
+      <Modal
+        open={openEditHistoryModal}
+        onClose={() => setOpenEditHistoryModal((prev) => !prev)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        sx={{ alignSelf: "center", justifyItems: "center" }}
       >
-        <Paper
-          sx={{
-            position: "fixed",
-            right: 0,
-            top: 0,
-            width: "100%",
-            maxWidth: "600px",
-            height: "100vh",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            overflow: "auto",
-            zIndex: 1300,
-            borderTopLeftRadius: 20,
-            borderBottomLeftRadius: 20,
-          }}
+        <CustomerInfoEdit
+          customerInfo={customerInfo}
+          setCustomerInfo={setCustomerInfo}
+          onSave={handleSave}
+          onCancel={handleCancel}
+        />
+      </Modal>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
         >
-          {editHistoryLoading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          ) : editHistory ? (
-            <Typography>Edit History Go Here</Typography>
-          ) : (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Typography sx={{ textAlign: "center" }}>
-                No Edit History Found
-              </Typography>
-            </Box>
-          )}
-        </Paper>
-      </DetailModal> */}
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

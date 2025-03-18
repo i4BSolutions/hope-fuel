@@ -13,6 +13,7 @@ import {
   TableRow,
   TableCell,
 } from "@mui/material";
+import moment from "moment-timezone";
 
 const EditHistory = ({ historyData }) => {
   return (
@@ -96,8 +97,10 @@ const EditHistory = ({ historyData }) => {
                         fontSize: 14,
                         fontWeight: 400,
                       }}
-                      primary={item.date}
-                      secondary={`Edited by ${item.editor}`}
+                      primary={moment(item.timestamp).format(
+                        "DD-MM-YYYY HH:mm"
+                      )}
+                      secondary={`Edited by ${item.editedBy}`}
                       secondaryTypographyProps={{
                         fontSize: 14,
                         fontWeight: 600,
@@ -166,10 +169,10 @@ const EditHistory = ({ historyData }) => {
                               fontSize: 18,
                             }}
                           >
-                            {item.details.name}
+                            {item.NewValue}
                           </TableCell>
                         </TableRow>
-                        <TableRow>
+                        {/* <TableRow>
                           <TableCell
                             component="th"
                             sx={{
@@ -190,10 +193,10 @@ const EditHistory = ({ historyData }) => {
                               fontSize: 18,
                             }}
                           >
-                            {item.details.email}
+                            {item.NewValue}
                           </TableCell>
                         </TableRow>
-                        {item.details.country && (
+                        {item.Country && (
                           <TableRow>
                             <TableCell
                               component="th"
@@ -215,10 +218,10 @@ const EditHistory = ({ historyData }) => {
                                 fontSize: 18,
                               }}
                             >
-                              {item.details.country}
+                              {item.NewValue}
                             </TableCell>
                           </TableRow>
-                        )}
+                        )} */}
                       </TableBody>
                     </Table>
                   </Paper>

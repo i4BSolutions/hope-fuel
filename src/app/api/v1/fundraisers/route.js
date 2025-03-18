@@ -63,6 +63,7 @@ export async function POST(req) {
                {
                  status: 500,
                  message: "Internal Server Error in Creating BaseCountry",
+
                },
                { status: 500 }
           );
@@ -91,7 +92,8 @@ export async function POST(req) {
         console.error("Error creating fundraiser:", error);
         return NextResponse.json({ 
             status: 500,
-            message: "Internal Server Error" }, 
+            message: "Internal Server Error" ,
+            error: error.sqlMessage, },
             { status: 500 });
     }
 }
