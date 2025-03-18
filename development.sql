@@ -205,22 +205,52 @@ CREATE TABLE ManyChat (
     CONSTRAINT fk_manychat_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
 );
 
--- Create Exchange Rate table and insert demo data
-CREATE TABLE ExchangeRates (
-    ExchangeRateId SERIAL PRIMARY KEY,
-    Country VARCHAR(50) NOT NULL,
-    CurrencyCode VARCHAR(5) NOT NULL,
-    ExchangeRate DECIMAL(12,5) NOT NULL,
-    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE Fundraiser (
+    FundraiserID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserName VARCHAR(255) NOT NULL,
+    FundraiserEmail VARCHAR(255) UNIQUE NOT NULL,
+    FundraiserLogo VARCHAR(255),
+	BaseCountryID INT, -- Fundraiser's base country
+    FundraiserCentralID INT, -- Fundraiser's central id from central database
+    FOREIGN KEY (BaseCountryID) REFERENCES BaseCountry(BaseCountryID) ON DELETE SET NULL
 );
 
-INSERT INTO ExchangeRates (Country, CurrencyCode, ExchangeRate) VALUES
-('China', 'CNY', 7.28),
-('Japan', 'JPY', 155.69),
-('Myanmar', 'MMK', 4450.00),
-('Singapore', 'SGD', 1.35),
-('South Korea', 'KRW', 1480.00),
-('Taiwan', 'TWD', 33.00),
-('Thailand', 'THB', 34.17),
-('United Kingdom', 'GBP', 0.80),
-('United States', 'USD', 1.00);
+CREATE TABLE Fundraiser_AcceptedCurrencies (
+    FundraiserAcceptedCurrencyID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserID INT,
+    CurrencyID INT,
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE,
+    FOREIGN KEY (CurrencyID) REFERENCES Currency(CurrencyID) ON DELETE CASCADE
+);
+
+CREATE TABLE Fundraiser_ContactLinks (
+    ContactID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserID INT,
+    Platform INT,
+    ContactURL VARCHAR(255) NOT NULL,
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE
+);
+
+CREATE TABLE Platform (
+    PlatformID INT PRIMARY KEY AUTO_INCREMENT,
+    PlatformName VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE BaseCountry (
+    BaseCountryID INT PRIMARY KEY AUTO_INCREMENT,
+    BaseCountryName VARCHAR(255) NOT NULL UNIQUE
+);
+
+-- Create Exchange Rate table
+CREATE TABLE ExchangeRates (
+    ExchangeRateId INT AUTO_INCREMENT PRIMARY KEY,
+    BaseCountryId INT NOT NULL,
+    CurrencyId INT NOT NULL,
+    ExchangeRate DECIMAL(12,5) NOT NULL,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Define Foreign Key Constraint
+    CONSTRAINT fk_currency FOREIGN KEY (CurrencyId) REFERENCES Currency(CurrencyId) ON DELETE CASCADE,
+    CONSTRAINT fk_basecountry FOREIGN KEY (BaseCountryId) REFERENCES BaseCountry(BaseCountryID) ON DELETE CASCADE
+);
