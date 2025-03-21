@@ -46,6 +46,7 @@ export const LogoUpload = ({logoFile, setLogoFile, errors, clearErrors}) => {
       textAlign="center"
       sx={{
         marginX: "auto",
+        marginBottom: 2,
       }}
     >
       {/* Clickable Circular Avatar Button */}

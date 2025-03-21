@@ -8,6 +8,7 @@ import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
 import { useRouter } from "next/navigation";
+import AcceptedCurrency from "./AcceptedCurrency";
 
 
 
@@ -32,6 +33,7 @@ const FundraisingForm = () => {
       BaseCountryName: "",
       FundraiserLogo: "",
       NewCountry: "",
+      AcceptedCurrencies: [],
     },
   });
   const handleClose = () => router.back();
@@ -41,8 +43,6 @@ const FundraisingForm = () => {
       data.BaseCountryName = data.NewCountry.trim();
       delete data.NewCountry;
     }
-
-    //console.log("Form Submitted:", data);
 
     try{
       //send data to the server
@@ -55,7 +55,6 @@ const FundraisingForm = () => {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      //console.log("Server Response:", result);
       if (response.ok && result) {
         reset();
         setLogoFile(null);
@@ -95,7 +94,7 @@ const FundraisingForm = () => {
     >
       <Box component="form" onSubmit={handleSubmit(onSubmit, onError)}>
         <Grid container spacing={2}>
-          <Grid item xs={12} sx={{ textAlign: "center" }}>
+          <Grid item xs={4} sx={{ textAlign: "center",marginX: "auto" }}>
             <LogoUpload
               logoFile={logoFile}
               setLogoFile={(url) => {
@@ -117,6 +116,7 @@ const FundraisingForm = () => {
               {...register("FundraiserName")}
               error={!!errors.FundraiserName}
               helperText={errors.FundraiserName?.message}
+
             />
           </Grid>
 
@@ -133,6 +133,9 @@ const FundraisingForm = () => {
               error={!!errors.FundraiserEmail}
               helperText={errors.FundraiserEmail?.message}
             />
+          </Grid>
+          <Grid item xs={12}>
+              <AcceptedCurrency control={control} />
           </Grid>
 
           <Grid item xs={6}>
