@@ -7,10 +7,12 @@ import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
+import { useRouter } from "next/navigation";
 
 
 
 const FundraisingForm = () => {
+  const router = useRouter();
   
   const [logoFile, setLogoFile] = useState(null);
   const [Completed, setCompleted] = useState(false);
@@ -32,7 +34,7 @@ const FundraisingForm = () => {
       NewCountry: "",
     },
   });
-
+  const handleClose = () => router.back();
   const onSubmit = async (data) => {
 
     if (data.BaseCountryName === "other" && data.NewCountry) {
@@ -139,8 +141,7 @@ const FundraisingForm = () => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-                reset();
-                setLogoFile(null);
+              handleClose();
               }}
             >
               Cancel

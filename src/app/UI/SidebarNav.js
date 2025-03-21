@@ -99,7 +99,7 @@ const Sidebar = () => {
       {
         text: "Fundraisers",
         icon: <FlagIcon />,
-        path: "/fundraisers/create",
+        path: "/fundraisers/",
       },
     ],
     "Payment Processor": [
