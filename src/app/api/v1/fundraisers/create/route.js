@@ -28,15 +28,19 @@ async function CreateFundraiser(
   FundraiserName,
   FundraiserEmail,
   FundraiserLogo,
-  BaseCountryID
+  FundraiserCentralID,
+  BaseCountryID,
+ 
 ) {
-  const query = `INSERT INTO Fundraiser (FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryID ) 
-                  VALUES (?,?,?,?)`;
+  const query = `INSERT INTO Fundraiser (FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryID,FundraiserCentralID ) 
+                  VALUES (?,?,?,?,?)`;
   const values = [
     FundraiserName,
     FundraiserEmail,
     FundraiserLogo,
     BaseCountryID,
+    FundraiserCentralID,
+
   ];
 
   try {
@@ -64,6 +68,7 @@ export async function POST(req) {
     FundraiserName,
     FundraiserEmail,
     FundraiserLogo,
+    FundraiserCentralID,
     BaseCountryName,
     AcceptedCurrencies,
   } = await req.json();
@@ -72,6 +77,7 @@ export async function POST(req) {
     FundraiserName,
     FundraiserEmail,
     FundraiserLogo,
+    FundraiserCentralID,
     BaseCountryName,
     AcceptedCurrencies,
   };
@@ -112,7 +118,8 @@ export async function POST(req) {
       FundraiserName,
       FundraiserEmail,
       FundraiserLogo,
-      BaseCountryID
+      FundraiserCentralID,
+      BaseCountryID,
     );
 
     //Accepted Currencies
@@ -188,6 +195,7 @@ export async function POST(req) {
           name: FundraiserName,
           email: FundraiserEmail,
           logo: FundraiserLogo,
+          centralID: FundraiserCentralID,
           baseCountry: BaseCountryName,
           acceptedCurrencies: AcceptedCurrencies,
         },
