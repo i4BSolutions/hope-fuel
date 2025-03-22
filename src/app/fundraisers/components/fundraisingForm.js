@@ -46,7 +46,7 @@ const FundraisingForm = () => {
 
     try{
       //send data to the server
-      const response = await fetch("/api/v1/fundraisers", {
+      const response = await fetch("/api/v1/fundraisers/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
