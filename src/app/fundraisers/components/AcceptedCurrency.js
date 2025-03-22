@@ -32,7 +32,7 @@ import { Controller } from "react-hook-form";
     const memorizedCurrencyOptions = useMemo(() => currencyOptions, [currencyOptions]);
     return (
       <FormControl fullWidth error={!!errors.AcceptedCurrencies} >
-        <InputLabel id="Accepted Currency">Accepted Currency</InputLabel>
+        <InputLabel id="Accepted Currency">Accepted Currency *</InputLabel>
         <Controller
           name="AcceptedCurrencies"
           control={control}

@@ -1,5 +1,5 @@
 "use client";
-import FundraisingForm from "../../components/fundraisingForm";
+import FundraisingForm from "../../components/FundraisingForm";
 
 import Modal from "../../../components/Modal";
 export default function CreateFundraiserModal() {

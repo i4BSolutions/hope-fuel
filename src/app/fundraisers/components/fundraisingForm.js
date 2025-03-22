@@ -30,6 +30,7 @@ const FundraisingForm = () => {
     defaultValues: {
       FundraiserName: "",
       FundraiserEmail: "",
+      FundraiserCentralID: null,
       BaseCountryName: "",
       FundraiserLogo: "",
       NewCountry: "",
@@ -111,6 +112,7 @@ const FundraisingForm = () => {
 
           <Grid item xs={12}>
             <TextField
+              required
               label="Fundraiser Name"
               fullWidth
               {...register("FundraiserName")}
@@ -118,13 +120,41 @@ const FundraisingForm = () => {
               helperText={errors.FundraiserName?.message}
             />
           </Grid>
+          <Grid item xs={6}>
+            <TextField
+              type="number"
+              required
+              label="Fundraiser ID"
+              variant="outlined"
+              fullWidth
+              {...register("FundraiserCentralID" ,{ valueAsNumber: true })}
+              error={!!errors.FundraiserCentralID}
+              helperText={errors.FundraiserCentralID?.message}
+              InputProps={{
+                inputProps: { min: 1 },
+                sx: {
+                  // Hide the arrows in Chrome, Safari, Edge
+                  "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+                    {
+                      WebkitAppearance: "none",
+                      margin: 0,
+                    },
+                  // Hide arrows in Firefox
+                  "& input[type=number]": {
+                    MozAppearance: "textfield",
+                  },
+                },
+              }}
+            />
+          </Grid>
 
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <BaseCountry control={control} />
           </Grid>
 
           <Grid item xs={12}>
             <TextField
+              required
               label="Email"
               type="email"
               fullWidth
@@ -143,7 +173,7 @@ const FundraisingForm = () => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-              handleClose();
+                handleClose();
               }}
             >
               Cancel

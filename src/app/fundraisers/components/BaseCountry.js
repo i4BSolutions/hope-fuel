@@ -36,6 +36,7 @@ const BaseCountry = ({ control }) => {
         render={({ field }) => (
           <TextField
             {...field}
+            required
             select
             label="Country"
             fullWidth
