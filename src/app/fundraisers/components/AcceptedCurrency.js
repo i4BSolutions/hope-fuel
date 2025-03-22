@@ -31,8 +31,8 @@ import { Controller } from "react-hook-form";
 
     const memorizedCurrencyOptions = useMemo(() => currencyOptions, [currencyOptions]);
     return (
-      <FormControl fullWidth error>
-        <InputLabel>Accepted Currency</InputLabel>
+      <FormControl fullWidth error={!!errors.AcceptedCurrencies} >
+        <InputLabel id="Accepted Currency">Accepted Currency</InputLabel>
         <Controller
           name="AcceptedCurrencies"
           control={control}
@@ -40,7 +40,7 @@ import { Controller } from "react-hook-form";
           sx={{ marginTop: 2 }}
           render={({ field }) => (
             <Select
-             label="Accepted Currency"
+             labelId="Accepted Currency"
               multiple
               {...field}
               value={field.value || []}
@@ -60,7 +60,7 @@ import { Controller } from "react-hook-form";
           )}
         />
         {errors.AcceptedCurrencies && (
-          <FormHelperText sx={{color: "red" }}>{errors.AcceptedCurrencies.message}</FormHelperText>
+          <FormHelperText >{errors.AcceptedCurrencies.message}</FormHelperText>
         )}
       </FormControl>
     );

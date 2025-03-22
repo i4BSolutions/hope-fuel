@@ -143,7 +143,7 @@ const FundraisingForm = () => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-                handleClose();
+              handleClose();
               }}
             >
               Cancel
