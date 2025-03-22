@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import db from "../../../utilites/db";
 
+
 async function CreateFundraiser(
   FundraiserName,
   FundraiserEmail,
   FundraiserLogo,
   BaseCountryID
 ) {
-  const query = `INSERT INTO Fundraiser (FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryID ) VALUES (?,?,?,?)`;
+  const query = `INSERT INTO Fundraiser (FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryID ) 
+                  VALUES (?,?,?,?)`;
   const values = [
     FundraiserName,
     FundraiserEmail,
@@ -20,6 +22,18 @@ async function CreateFundraiser(
     return result;
   } catch (error) {
     throw new Error("[DB] Error creating fundraiser:");
+  }
+}
+async function CreateAcceptedCurrencies(fundraiserCurrencies) {
+  const query = `INSERT INTO Fundraiser_AcceptedCurrencies (FundraiserID, CurrencyID) VALUES ?`;
+  const values = [fundraiserCurrencies];
+  try{
+  
+  const result = await db(query, values);
+  return result;
+  }catch(error){
+    console.log("Error creating AcceptedCurrencies:", error);
+    throw new Error("[DB] Error creating AcceptedCurrencies:");
   }
 }
 
@@ -63,7 +77,7 @@ async function CheckExistingBaseCountry(BaseCountryName) {
 }
 
 export async function POST(req) {
-  const { FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryName } =
+  const { FundraiserName, FundraiserEmail, FundraiserLogo, BaseCountryName , AcceptedCurrencies} =
     await req.json();
 
   const requiredFields = {
@@ -71,6 +85,7 @@ export async function POST(req) {
     FundraiserEmail,
     FundraiserLogo,
     BaseCountryName,
+    AcceptedCurrencies
   };
   const missingFields = Object.keys(requiredFields).filter(
     (field) => !requiredFields[field]
@@ -86,6 +101,8 @@ export async function POST(req) {
   }
 
   try {
+    //BaseCountry
+
     let BaseCountryID = null;
     const existingBaseCountry = await CheckExistingBaseCountry(BaseCountryName);
     if (existingBaseCountry.length > 0) {
@@ -102,13 +119,69 @@ export async function POST(req) {
         );
       }
     }
-
+    //Fundraiser
     const fundraiser = await CreateFundraiser(
       FundraiserName,
       FundraiserEmail,
       FundraiserLogo,
       BaseCountryID
     );
+  
+    //Accepted Currencies
+
+     if (!AcceptedCurrencies || AcceptedCurrencies.length === 0) {
+       return NextResponse.json(
+         {
+           status: 400,
+           message: "AcceptedCurrencies array is missing or empty",
+         },
+         { status: 400 }
+       );
+     }
+
+      if (fundraiser.insertId && AcceptedCurrencies && AcceptedCurrencies.length > 0) {
+      const placeholders = AcceptedCurrencies.map(() => "?").join(",");
+
+     
+      //fetch all currencyID in one query
+      const currencyResults = await db(
+        `SELECT CurrencyID, CurrencyCode FROM Currency WHERE CurrencyCode IN (${placeholders})`,
+        AcceptedCurrencies
+      );
+      if (!currencyResults || !Array.isArray(currencyResults)) {
+        console.error("currencyResults is not valid:", currencyResults);
+        return NextResponse.json(
+          {
+            status: 500,
+            message: "Internal Server Error fetching currencies",
+          },
+          { status: 500 }
+        );
+      }
+      //Map the currencyCode to each currencyID
+      const currencyMap = new Map(currencyResults.map((currency)=>[currency.CurrencyCode, currency.CurrencyID]));
+
+      //Map the currencyID to the fundraiserID
+      const fundraiserCurrencies = AcceptedCurrencies.map((currency) => {
+        const currencyID = currencyMap.get(currency);
+        return currencyID ? [fundraiser.insertId, currencyID] : null;
+      }).filter((currency) => currency !== null);
+
+      //console.log("AcceptedCurrencies::::", fundraiserCurrencies);
+
+      const acceptedCurrencies = await CreateAcceptedCurrencies(fundraiserCurrencies);
+      if (!acceptedCurrencies) {
+        return NextResponse.json(
+          {
+            status: 500,
+            message: "Internal Server Error in Creating AcceptedCurrencies",
+          },
+          { status: 500 }
+        );
+      }
+
+    }
+  
     return NextResponse.json(
       {
         status: 201,
@@ -119,6 +192,7 @@ export async function POST(req) {
           email: FundraiserEmail,
           logo: FundraiserLogo,
           baseCountry: BaseCountryName,
+          acceptedCurrencies: AcceptedCurrencies,
         },
       },
       { status: 201 }
@@ -128,7 +202,7 @@ export async function POST(req) {
     return NextResponse.json(
       {
         status: 500,
-        message: "Internal Server Error",
+        message: "Internal Server Error in post request",
         error: error.sqlMessage,
       },
       { status: 500 }
