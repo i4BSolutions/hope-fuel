@@ -94,7 +94,7 @@ const FundraisingForm = () => {
     >
       <Box component="form" onSubmit={handleSubmit(onSubmit, onError)}>
         <Grid container spacing={2}>
-          <Grid item xs={4} sx={{ textAlign: "center",marginX: "auto" }}>
+          <Grid item xs={4} sx={{ textAlign: "center", marginX: "auto" }}>
             <LogoUpload
               logoFile={logoFile}
               setLogoFile={(url) => {
@@ -116,7 +116,6 @@ const FundraisingForm = () => {
               {...register("FundraiserName")}
               error={!!errors.FundraiserName}
               helperText={errors.FundraiserName?.message}
-
             />
           </Grid>
 
@@ -135,7 +134,7 @@ const FundraisingForm = () => {
             />
           </Grid>
           <Grid item xs={12}>
-              <AcceptedCurrency control={control} />
+            <AcceptedCurrency control={control} errors={errors} />
           </Grid>
 
           <Grid item xs={6}>
@@ -144,7 +143,7 @@ const FundraisingForm = () => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-              handleClose();
+                handleClose();
               }}
             >
               Cancel

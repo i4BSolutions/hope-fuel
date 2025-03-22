@@ -1,12 +1,12 @@
 
 import  {useEffect, useState,useMemo} from "react";
-import {FormControl,InputLabel,Select,MenuItem,Radio,ListItemText} from "@mui/material";
+import {FormControl,InputLabel,Select,MenuItem, Radio,ListItemText, FormHelperText} from "@mui/material";
 import { Controller } from "react-hook-form";
 
 
 
 //const currencyOptions = ["AUD", "CNY", "MMK", "SGD", "USD"];
- const AcceptedCurrency = ({control}) => {
+ const AcceptedCurrency = ({control,errors}) => {
     const [selectedCurrency, setSelectedCurrency] = useState([]);
     const [currencyOptions, setCurrencyOptions] = useState([]);
 
@@ -31,34 +31,38 @@ import { Controller } from "react-hook-form";
 
     const memorizedCurrencyOptions = useMemo(() => currencyOptions, [currencyOptions]);
     return (
-    
-        <FormControl fullWidth>
-          <InputLabel>Accepted Currency</InputLabel>
-          <Controller
-            name="AcceptedCurrency"
-            control={control}
-            render={({ field }) => (
-              <Select
-                multiple
-                {...field}
-                value={selectedCurrency}
-                onChange={(event) => {
-                  field.onChange(event);
-                  handleCurrencyChange(event);
-                }}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {memorizedCurrencyOptions.map((currency) => (
-                  <MenuItem key={currency} value={currency}>
-                    <Radio checked={selectedCurrency.includes(currency)} />
-                    <ListItemText primary={currency} />
-                  </MenuItem>
-                ))}
-              </Select>
-            )}
-          />
-        </FormControl>
-    
+      <FormControl fullWidth error>
+        <InputLabel>Accepted Currency</InputLabel>
+        <Controller
+          name="AcceptedCurrencies"
+          control={control}
+          defaultValue={[]}
+          sx={{ marginTop: 2 }}
+          render={({ field }) => (
+            <Select
+             label="Accepted Currency"
+              multiple
+              {...field}
+              value={field.value || []}
+              onChange={(event) => {
+                field.onChange(event);
+                handleCurrencyChange(event);
+              }}
+              renderValue={(selected) => selected.join(", ")}
+            >
+              {memorizedCurrencyOptions.map((currency) => (
+                <MenuItem key={currency} value={currency}>
+                  <Radio checked={selectedCurrency.includes(currency)} />
+                  <ListItemText primary={currency} />
+                </MenuItem>
+              ))}
+            </Select>
+          )}
+        />
+        {errors.AcceptedCurrencies && (
+          <FormHelperText sx={{color: "red" }}>{errors.AcceptedCurrencies.message}</FormHelperText>
+        )}
+      </FormControl>
     );
 };
 export default AcceptedCurrency;
