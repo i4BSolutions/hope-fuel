@@ -210,10 +210,9 @@ CREATE TABLE Platform (
     PlatformName VARCHAR(100) UNIQUE NOT NULL
 );
 -- Insert data into Platform table
-Insert into Platform(PlatformID,PlatformName)
-Values(1,"Facebook"),
-(2,"Telegram"),
-(3,"Others");
+INSERT INTO Platform(PlatformName)
+VALUES ('Facebook'), ('Telegram'), ('Others');
+
 
 
 CREATE TABLE BaseCountry (
