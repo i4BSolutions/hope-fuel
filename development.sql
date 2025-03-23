@@ -209,6 +209,12 @@ CREATE TABLE Platform (
     PlatformID INT PRIMARY KEY AUTO_INCREMENT,
     PlatformName VARCHAR(100) UNIQUE NOT NULL
 );
+-- Insert data into Platform table
+Insert into Platform(PlatformID,PlatformName)
+Values(1,"Facebook"),
+(2,"Telegram"),
+(3,"Others");
+
 
 CREATE TABLE BaseCountry (
     BaseCountryID INT PRIMARY KEY AUTO_INCREMENT,
@@ -236,9 +242,10 @@ CREATE TABLE Fundraiser_AcceptedCurrencies (
 CREATE TABLE Fundraiser_ContactLinks (
     ContactID INT PRIMARY KEY AUTO_INCREMENT,
     FundraiserID INT,
-    Platform INT,
+    PlatformID INT,
     ContactURL VARCHAR(255) NOT NULL,
-    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE,
+    FOREIGN KEY (PlatformID) REFERENCES Platform(PlatformID) ON DELETE CASCADE
 );
 
 -- Create Exchange Rate table
