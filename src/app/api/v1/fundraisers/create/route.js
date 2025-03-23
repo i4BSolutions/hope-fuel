@@ -1,5 +1,18 @@
 import { NextResponse } from "next/server";
 import db from "../../../../utilites/db";
+async function CreateFundraiserContactLink(FundraiserID,PlatformID,ContactURL){
+  const query = ` Insert into Fundraiser_ContactLinks(FundraiserID,PlatformID,ContactURL) values (?,?,?)`;
+  const values=[FundraiserID,PlatformID,ContactURL];
+  try{
+    const result = await db(query,values);
+    return result;
+  }
+  catch(error){
+    console.error("Error creating FundraiserContactLink:",error);
+    throw new Error("[DB] Error creating Fundraiser Contact Link:");
+  }
+
+}
 async function CreateBaseCountryInFundraiser(BaseCountryName) {
   const query = `INSERT INTO BaseCountry (BaseCountryName) VALUES (?)`;
   const values = [BaseCountryName];
@@ -71,6 +84,10 @@ export async function POST(req) {
     FundraiserCentralID,
     BaseCountryName,
     AcceptedCurrencies,
+    FacebookLink,
+    TelegramLink,
+    OtherLink1,
+    OtherLink2
   } = await req.json();
 
   const requiredFields = {
@@ -121,6 +138,17 @@ export async function POST(req) {
       FundraiserCentralID,
       BaseCountryID,
     );
+
+    //Fundraiser Contact Links
+    if(FacebookLink){
+      await CreateFundraiserContactLink(fundraiser.insertId,1,FacebookLink);
+    }else if(TelegramLink){
+      await CreateFundraiserContactLink(fundraiser.insertId,2,TelegramLink);
+    }else if(OtherLink1){
+      await CreateFundraiserContactLink(fundraiser.insertId,3,OtherLink1);
+    }else if(OtherLink2){
+      await CreateFundraiserContactLink(fundraiser.insertId,3,OtherLink2);
+    }
 
     //Accepted Currencies
 
@@ -198,6 +226,12 @@ export async function POST(req) {
           centralID: FundraiserCentralID,
           baseCountry: BaseCountryName,
           acceptedCurrencies: AcceptedCurrencies,
+          ContactLinks: {
+            ...(FacebookLink && { FacebookLink }),
+            ...(TelegramLink && { TelegramLink }),
+            ...(OtherLink1 && { OtherLink1 }),
+            ...(OtherLink2 && { OtherLink2 }),
+          },
         },
       },
       { status: 201 }

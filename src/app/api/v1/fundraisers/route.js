@@ -3,7 +3,7 @@ import db from "../../../utilites/db";
 
 async function fetchFundraisers(limit, offset) {
   const query = `SELECT * FROM Fundraiser LIMIT ? OFFSET ?`;
-  const values = [`${limit}`, `${offset}`];
+  const values = [limit, offset];
 
   try {
     const result = await db(query, values);
