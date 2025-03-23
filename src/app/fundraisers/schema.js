@@ -14,10 +14,10 @@ export const FundraisingSchema = z
       .string()
       .email("Invalid email address")
       .nonempty("Email is required"),
-    //  FacebookLink: z.string().url("Invalid Facebook URL").optional(),
-    //  TelegramLink: z.string().url("Invalid Telegram URL").optional(),
-    // otherLink1: z.string().url("Invalid URL").optional(),
-    // otherLink2: z.string().url("Invalid URL").optional(),
+    FacebookLink: z.string().url("Invalid Facebook URL").optional().or(z.literal("")),
+    TelegramLink: z.string().url("Invalid Telegram URL").optional().or(z.literal("")),
+    OtherLink1: z.string().url("Invalid URL").optional().or(z.literal("")),
+    OtherLink2: z.string().url("Invalid URL").optional().or(z.literal("")),
     FundraiserLogo: z.string().nonempty("Please upload a logo"),
     NewCountry: z.string().optional(),
   })
