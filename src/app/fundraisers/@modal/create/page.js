@@ -6,7 +6,7 @@ export default function CreateFundraiserModal() {
 
 
   return (
-    <Modal maxWidth="md">
+    <Modal maxWidth="sm" maxHeight="100vh">
       <FundraisingForm />
     </Modal>
   );

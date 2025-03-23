@@ -173,6 +173,7 @@ const FundraisingForm = () => {
           <Grid item xs={6}>
             <TextField
               label="Facebook Link"
+              id="FacebookLink"
               fullWidth
               {...register("FacebookLink")}
               error={!!errors.FacebookLink}
@@ -182,6 +183,7 @@ const FundraisingForm = () => {
           <Grid item xs={6}>
             <TextField
               label="Telegram Link"
+              id="TelegramLink"
               fullWidth
               {...register("TelegramLink")}
               error={!!errors.TelegramLink}
@@ -191,6 +193,7 @@ const FundraisingForm = () => {
           <Grid item xs={6}>
             <TextField
               label="Other Link 1"
+              id="OtherLink1"
               fullWidth
               {...register("OtherLink1")}
               error={!!errors.OtherLink1}
@@ -200,6 +203,7 @@ const FundraisingForm = () => {
           <Grid item xs={6}>
             <TextField
               label="Other Link 2"
+              id="OtherLink2"
               fullWidth
               {...register("OtherLink2")}
               error={!!errors.OtherLink2}
