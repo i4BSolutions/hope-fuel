@@ -72,11 +72,31 @@ export default async function createFormSubmit(event, currency, supportRegion ,f
     body: raw,
     redirect: "follow",
   };
+  
   let answ = await fetch("/api/submitPayment/", requestOptions);
 
+  if (!answ.ok) {
+    // console.error(`Error: ${answ.status} - ${answ.statusText}`);
+    if (answ.status === 400) {
+      // console.error("Bad Request: Please check the submitted data.");
+      return {
+        error: true,
+        status: answ.status,
+        message: answ.status === 400 ? "Bad Request: Please check the submitted data." : answ.statusText,
+      };
+    }
+    setloading(false);
+    return;
+  }
+  
   let res = await answ.json();
   console.log("My answer id: " + res);
- location.reload();
+  location.reload();
+
+  return {
+    success: true,
+    status: answ.status,
+  };
 }
 // var raw = JSON.stringify({
 //   "records": [

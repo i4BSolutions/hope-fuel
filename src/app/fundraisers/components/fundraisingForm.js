@@ -131,7 +131,7 @@ const FundraisingForm = () => {
               label="Fundraiser ID"
               variant="outlined"
               fullWidth
-              {...register("FundraiserCentralID", { valueAsNumber: true })}
+              {...register("FundraiserCentralID" ,{ valueAsNumber: true })}
               error={!!errors.FundraiserCentralID}
               helperText={errors.FundraiserCentralID?.message}
               InputProps={{

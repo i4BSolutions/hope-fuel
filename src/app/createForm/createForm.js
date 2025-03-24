@@ -50,6 +50,7 @@ const CreateForm = ({ userInfo, setloading }) => {
   const [uploadProgress, setUploadProgress] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [minAmountError, setMinAmountError] = useState(false);
 
   // Form Fields
   const [contactLink, setContactLink] = useState("");
@@ -89,9 +90,9 @@ const CreateForm = ({ userInfo, setloading }) => {
 
   const handleDrop = async (acceptedFiles) => {
     setIsUploading(true);
-     if (acceptedFiles.length > 0) {
-    setErrors((prev) => ({ ...prev, files: "" }));
-  } 
+    if (acceptedFiles.length > 0) {
+      setErrors((prev) => ({ ...prev, files: "" }));
+    } 
   
     await filehandler(acceptedFiles, setFiles, files, setUploadProgress);
     setFileExist(acceptedFiles.length > 0);
@@ -103,26 +104,25 @@ const CreateForm = ({ userInfo, setloading }) => {
     if (!currency)
       validationErrors.currency = "Currency selection is required.";
     if (!walletId) validationErrors.wallet = "Wallet selection is required.";
-    if (files.length === 0)
-      {
-        validationErrors.files = "You must upload at least one file.";
-         setFileExist(false)
-        }else {
-          setFileExist(true)
-        }
 
+    if (files.length === 0)
+    {
+      validationErrors.files = "You must upload at least one file.";
+        setFileExist(false)
+    }else {
+      setFileExist(true)
+    }
 
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
   }, [currency, walletId, files]);
 
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validateForm()) return;
    
-
-    createFormSubmit(
+    const res = await createFormSubmit(
       event,
       currency,
       supportRegion,
@@ -142,8 +142,13 @@ const CreateForm = ({ userInfo, setloading }) => {
       walletId
     );
 
-    setFiles([]);
-    setSubmitted(true);
+    if (res.status === 400) {
+      setMinAmountError(true);
+    } else {
+      setMinAmountError(false);
+      setFiles([]);
+      setSubmitted(true);
+    }
   };
 
   return (
@@ -176,6 +181,12 @@ const CreateForm = ({ userInfo, setloading }) => {
           }
         }}
       />
+
+      {minAmountError && (
+        <Alert severity="error" key={minAmountError}>
+          {"The amount entered does not meet the minimum donation requirement of USD 20 (or equivalent in the selected currency) per month. Please adjust your amount or duration."}
+        </Alert>
+      )}
 
       {/* Month Input */}
       <TextField
