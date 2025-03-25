@@ -140,15 +140,25 @@ export async function POST(req) {
     );
 
     //Fundraiser Contact Links
-    if(FacebookLink){
-      await CreateFundraiserContactLink(fundraiser.insertId,1,FacebookLink);
-    }else if(TelegramLink){
-      await CreateFundraiserContactLink(fundraiser.insertId,2,TelegramLink);
-    }else if(OtherLink1){
-      await CreateFundraiserContactLink(fundraiser.insertId,3,OtherLink1);
-    }else if(OtherLink2){
-      await CreateFundraiserContactLink(fundraiser.insertId,3,OtherLink2);
-    }
+   const contactLinks = [];
+
+   if (FacebookLink) {
+     contactLinks.push([fundraiser.insertId, 1, FacebookLink]);
+   }
+   if (TelegramLink) {
+     contactLinks.push([fundraiser.insertId, 2, TelegramLink]);
+   }
+   if (OtherLink1) {
+     contactLinks.push([fundraiser.insertId, 3, OtherLink1]);
+   }
+   if (OtherLink2) {
+     contactLinks.push([fundraiser.insertId, 3, OtherLink2]);
+   }
+   
+   // Insert each contact link
+   for (const [fundraiserId, platformId, url] of contactLinks) {
+     await CreateFundraiserContactLink(fundraiserId, platformId, url);
+   }
 
     //Accepted Currencies
 
