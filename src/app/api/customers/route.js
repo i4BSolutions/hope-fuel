@@ -3,7 +3,7 @@ import db from "../../utilites/db";
 
 async function fetchCustomers(limit,offset) {
     const query = `SELECT CustomerId, Name, Email, ManyChatId FROM Customer LIMIT ? OFFSET ?`;
-    const values =[`${limit}`, `${offset}`];
+    const values =[limit, offset];
   try {
 
     const result = await db(query, values);
