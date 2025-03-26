@@ -7,7 +7,7 @@ const FundraiserCard = ({ fundraiser, onClick }) => {
   return (
     <Card
       key={fundraiser.FundraiserID}
-      onClick={() => onClick(fundraiser.id)}
+      onClick={() => onClick(fundraiser.FundraiserID)}
       sx={{
         display: "flex",
         alignItems: "center",

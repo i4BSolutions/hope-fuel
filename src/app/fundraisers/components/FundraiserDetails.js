@@ -13,9 +13,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-const FundraiserDetails = () => {
+const FundraiserDetails = ({
+  fundraiserDetails,
+  onClose,
+  onEdit,
+  onDelete,
+}) => {
   return (
     <Paper
+      key={fundraiserDetails.FundraiserID}
       elevation={3}
       sx={{
         width: 1000,
@@ -26,14 +32,27 @@ const FundraiserDetails = () => {
       }}
     >
       <Box sx={{ p: 1, display: "flex", justifyContent: "space-between" }}>
-        <IconButton size="small">
+        <IconButton onClick={() => onClose && onClose()} size="small">
           <CloseIcon />
         </IconButton>
         <Box>
-          <IconButton size="small" sx={{ color: "#f44336" }}>
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              onDelete && onDelete(fundraiserDetails.FundraiserID);
+            }}
+            size="small"
+            sx={{ color: "#f44336" }}
+          >
             <DeleteOutlineIcon />
           </IconButton>
-          <IconButton size="small">
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              onEdit && onEdit(fundraiserDetails.FundraiserID);
+            }}
+            size="small"
+          >
             <EditOutlinedIcon />
           </IconButton>
         </Box>
@@ -41,7 +60,7 @@ const FundraiserDetails = () => {
 
       <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
         <Avatar
-          src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/1200px-Starbucks_Corporation_Logo_2011.svg.png"
+          src={fundraiserDetails.FundraiserLogo}
           sx={{
             width: 80,
             height: 80,
@@ -54,13 +73,13 @@ const FundraiserDetails = () => {
           variant="h3"
           sx={{ color: "#0F172A", fontSize: 28, fontWeight: 700 }}
         >
-          Starbucks Coffee
+          {fundraiserDetails.FundraiserName}
         </Typography>
         <Typography
           variant="body2"
           sx={{ color: "#0F172A", fontSize: 18, fontWeight: 400 }}
         >
-          12345678
+          {fundraiserDetails.FundraiserCentralID}
         </Typography>
       </Box>
 
@@ -94,7 +113,7 @@ const FundraiserDetails = () => {
             variant="body2"
             sx={{ color: "#000000", fontSize: 18, fontWeight: 600 }}
           >
-            Japan
+            {fundraiserDetails.BaseCountryName}
           </Typography>
         </Box>
 
@@ -118,7 +137,7 @@ const FundraiserDetails = () => {
             variant="body2"
             sx={{ color: "#000000", fontSize: 18, fontWeight: 600 }}
           >
-            JPY, MMK, USD, SGD
+            {fundraiserDetails.AcceptedCurrencies[0]}
           </Typography>
         </Box>
 
@@ -168,7 +187,7 @@ const FundraiserDetails = () => {
                 textDecorationThickness: 0,
               }}
             >
-              starbucksjp@sbcoffee.com
+              {fundraiserDetails.FundraiserEmail}
             </Link>
           </Box>
 
@@ -183,12 +202,18 @@ const FundraiserDetails = () => {
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ mr: 2, minWidth: "60px" }}
+              sx={{
+                mr: 2,
+                minWidth: "60px",
+                color: "#000000",
+                fontSize: 14,
+                fontWeight: 400,
+              }}
             >
               Facebook
             </Typography>
             <Link
-              href="https://m.facebook.com/starbucksjp"
+              href={fundraiserDetails.ContactLinks.FacebookLink}
               sx={{
                 color: "#3460DC",
                 fontSize: 18,
@@ -198,7 +223,7 @@ const FundraiserDetails = () => {
                 textDecorationThickness: 0,
               }}
             >
-              m.facebook.com/starbucksjp
+              {fundraiserDetails.ContactLinks.FacebookLink}
             </Link>
           </Box>
 
@@ -213,12 +238,22 @@ const FundraiserDetails = () => {
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ mr: 2, minWidth: "60px" }}
+              sx={{
+                mr: 2,
+                minWidth: "60px",
+                color: "#000000",
+                fontSize: 14,
+                fontWeight: 400,
+              }}
             >
               Telegram
             </Typography>
             <Link
-              href="https://t.me/starbucksjp"
+              href={
+                fundraiserDetails.ContactLinks.TelegramLink
+                  ? fundraiserDetails.ContactLinks.TelegramLink
+                  : "https://t.me/"
+              }
               sx={{
                 color: "#3460DC",
                 fontSize: 18,
@@ -228,9 +263,49 @@ const FundraiserDetails = () => {
                 textDecorationThickness: 0,
               }}
             >
-              t.me/starbucksjp
+              {fundraiserDetails.ContactLinks.TelegramLink
+                ? fundraiserDetails.ContactLinks.TelegramLink
+                : "https://t.me/"}
             </Link>
           </Box>
+
+          {fundraiserDetails.ContactLinks.OtherLink1 && (
+            <Box
+              sx={{
+                display: "flex",
+                mb: 2,
+                maxWidth: 400,
+                justifyContent: "space-between",
+              }}
+            >
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{
+                  mr: 2,
+                  minWidth: "60px",
+                  color: "#000000",
+                  fontSize: 14,
+                  fontWeight: 400,
+                }}
+              >
+                OtherLink1
+              </Typography>
+              <Link
+                href={fundraiserDetails.ContactLinks.OtherLink1}
+                sx={{
+                  color: "#3460DC",
+                  fontSize: 18,
+                  fontWeight: 600,
+                  textDecorationLine: "underline",
+                  textDecorationColor: "#3460DC",
+                  textDecorationThickness: 0,
+                }}
+              >
+                {fundraiserDetails.ContactLinks.OtherLink1}
+              </Link>
+            </Box>
+          )}
         </Box>
       </Box>
     </Paper>
