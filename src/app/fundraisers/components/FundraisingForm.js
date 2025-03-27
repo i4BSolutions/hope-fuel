@@ -67,8 +67,7 @@ useEffect(() => {
          
         }catch(error){
           console.log("Error:", error);
-          throw new Error("Failed to updatefundraiser");
-
+          throw new Error("Failed to update fundraiser");
         }
 
         return ;
