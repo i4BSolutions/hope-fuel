@@ -7,14 +7,14 @@ import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
-import { usePathname, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import AcceptedCurrency from "./AcceptedCurrency";
 
 
-const FundraisingForm = ({defaultValues={}}) => {
+
+const FundraisingForm = ({defaultValues={}, onSubmitHandler}) => {
   const router = useRouter();
   
-  console.log("Defaults::", defaultValues);
   const [logoFile, setLogoFile] = useState(null);
   const [Completed, setCompleted] = useState(false);
   const initialValues = useMemo(
@@ -58,7 +58,9 @@ useEffect(() => {
 
   const handleClose = () => router.back();
   const onSubmit = async (data) => {
-
+      if(onSubmitHandler){
+        return onSubmitHandler(data);
+      }
     if (data.BaseCountryName === "other" && data.NewCountry) {
       data.BaseCountryName = data.NewCountry.trim();
       delete data.NewCountry;
