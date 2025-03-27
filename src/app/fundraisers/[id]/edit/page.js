@@ -29,7 +29,7 @@ function FundraiserEditPage() {
   const handleSubmit = async (data) => {
     console.log("Data:", data);
     try {
-      const response = await fetch(`/api/v1/fundraisers/update/${id}`, {
+      await fetch(`/api/v1/fundraisers/update/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -49,8 +49,11 @@ function FundraiserEditPage() {
   return (
     <>
       {fundraiser ? (
-        <Modal>
-          <FundraisingForm defaultValues={fundraiser} onSubmitHandler={handleSubmit} />
+        <Modal maxWidth="sm" maxHeight="100vh">
+          <FundraisingForm
+            defaultValues={fundraiser}
+            onSubmitHandler={handleSubmit}
+          />
         </Modal>
       ) : (
         <p>Loading...</p>

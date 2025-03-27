@@ -9,6 +9,7 @@ import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
 import {  useRouter } from "next/navigation";
 import AcceptedCurrency from "./AcceptedCurrency";
+import { set } from "date-fns";
 
 
 
@@ -59,7 +60,20 @@ useEffect(() => {
   const handleClose = () => router.back();
   const onSubmit = async (data) => {
       if(onSubmitHandler){
-        return onSubmitHandler(data);
+        try{
+          onSubmitHandler(data);
+          setCompleted(true);
+            setTimeout(() => {
+              setCompleted(false);
+            }, 5000);
+         
+        }catch(error){
+          console.log("Error:", error);
+          throw new Error("Failed to updatefundraiser");
+
+        }
+
+        return ;
       }
     if (data.BaseCountryName === "other" && data.NewCountry) {
       data.BaseCountryName = data.NewCountry.trim();
@@ -85,7 +99,6 @@ useEffect(() => {
          setTimeout(() => {
            setCompleted(false);
          }, 3000);
-        
       } else {
         setCompleted(false);
         throw new Error(result.message);
@@ -107,9 +120,8 @@ useEffect(() => {
   return (
     <Box
       sx={{
-        p: 4,
+        padding: 2,
         maxWidth: 600,
-        margin: "auto",
         bgcolor: "white",
         borderRadius: 3,
       }}
@@ -241,7 +253,7 @@ useEffect(() => {
           </Grid>
           <Grid item xs={6}>
             <Button fullWidth variant="contained" color="primary" type="submit">
-              {defaultValues? "Save Changes" : "Create"}
+              {defaultValues ? "Save Changes" : "Create"}
             </Button>
           </Grid>
           {Completed && (
@@ -254,7 +266,9 @@ useEffect(() => {
                 marginX: "auto",
               }}
             >
-              Fundraiser created successfully!!
+              {onSubmitHandler
+                ? "Changes saved successfully!"
+                : "Fundraiser created successfully!"}
             </Alert>
           )}
         </Grid>
