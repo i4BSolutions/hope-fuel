@@ -6,7 +6,6 @@ import { useParams } from "next/navigation";
 import Modal from "../../../components/Modal";
 
 function FundraiserEditPage() {
-  console.log("FundraiserEditPage::: ");
   const { id } = useParams();
 
   const [fundraiser, setFundraiser] = useState(null);
@@ -27,11 +26,31 @@ function FundraiserEditPage() {
     fetchFundraiser();
   }, []);
 
+  const handleSubmit = async (data) => {
+    console.log("Data:", data);
+    try {
+      const response = await fetch(`/api/v1/fundraisers/update/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      
+    } catch (error) {
+      console.log("Error:", error);
+      throw new Error("Failed to update fundraiser");
+      
+    }
+   
+  };
+
+
   return (
     <>
       {fundraiser ? (
         <Modal>
-          <FundraisingForm defaultValues={fundraiser} />
+          <FundraisingForm defaultValues={fundraiser} onSubmitHandler={handleSubmit} />
         </Modal>
       ) : (
         <p>Loading...</p>
