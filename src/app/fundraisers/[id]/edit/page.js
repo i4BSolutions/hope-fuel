@@ -1,18 +1,19 @@
 "use client";
 
-import { useEffect, useState, } from "react";
+import { useEffect, useState } from "react";
 import FundraisingForm from "../../components/FundraisingForm";
 import { useParams } from "next/navigation";
+import Modal from "../../../components/Modal";
 
 function FundraiserEditPage() {
+  console.log("FundraiserEditPage::: ");
+  const { id } = useParams();
+
   const [fundraiser, setFundraiser] = useState(null);
-  const {id} = useParams();
 
   useEffect(() => {
     const fetchFundraiser = async () => {
-      const response = await fetch(
-        `/api/v1/fundraisers/details/${id}`
-      );
+      const response = await fetch(`/api/v1/fundraisers/details/${id}`);
       const result = await response.json();
       if (response.ok && result.data) {
         const transformed = {
@@ -26,15 +27,12 @@ function FundraiserEditPage() {
     fetchFundraiser();
   }, []);
 
-
-
   return (
     <>
-      {console.log("Fundraisers from EditPgae::: ", fundraiser)}
       {fundraiser ? (
-        <FundraisingForm
-         defaultValues={fundraiser}
-        />
+        <Modal>
+          <FundraisingForm defaultValues={fundraiser} />
+        </Modal>
       ) : (
         <p>Loading...</p>
       )}

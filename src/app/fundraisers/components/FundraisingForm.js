@@ -7,10 +7,8 @@ import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import AcceptedCurrency from "./AcceptedCurrency";
-
-
 
 
 const FundraisingForm = ({defaultValues={}}) => {
@@ -148,7 +146,7 @@ useEffect(() => {
               label="Fundraiser ID"
               variant="outlined"
               fullWidth
-              {...register("FundraiserCentralID" ,{ valueAsNumber: true })}
+              {...register("FundraiserCentralID", { valueAsNumber: true })}
               error={!!errors.FundraiserCentralID}
               helperText={errors.FundraiserCentralID?.message}
               InputProps={{
@@ -241,7 +239,7 @@ useEffect(() => {
           </Grid>
           <Grid item xs={6}>
             <Button fullWidth variant="contained" color="primary" type="submit">
-              Create
+              {defaultValues? "Save Changes" : "Create"}
             </Button>
           </Grid>
           {Completed && (
