@@ -9,8 +9,6 @@ import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
 import {  useRouter } from "next/navigation";
 import AcceptedCurrency from "./AcceptedCurrency";
-import { set } from "date-fns";
-
 
 
 const FundraisingForm = ({defaultValues={}, onSubmitHandler}) => {
