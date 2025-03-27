@@ -88,6 +88,9 @@ const FundraisingFormPage = () => {
     () => setOpenFundraiserDetailsModal((prev) => !prev),
     []
   );
+  const handleEdit = (id) => {
+      router.push(`/fundraisers/${id}/edit`);
+  }
 
   if (fetchFundraiserLoading) {
     return (
@@ -125,6 +128,7 @@ const FundraisingFormPage = () => {
                 <FundraiserCard
                   fundraiser={fundraiser}
                   onClick={handleOpenFundraiserDetailsModal}
+                  onEdit ={handleEdit}
                 />
               </Grid2>
             ))}
@@ -151,6 +155,7 @@ const FundraisingFormPage = () => {
             <FundraiserDetails
               fundraiserDetails={fundraiserDetails}
               onClose={handleCloseFundraiserDetailsModal}
+              onEdit={handleEdit}
             />
           )}
         </Modal>

@@ -12,6 +12,8 @@ export const LogoUpload = ({logoFile, setLogoFile, errors, clearErrors}) => {
    useEffect(() => {
      if (!logoFile) {
        setLogoPreview(null); 
+     }else{
+       setLogoPreview(logoFile);
      }
    }, [logoFile]);
 

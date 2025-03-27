@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useState,useMemo ,useEffect} from "react";
 import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
@@ -12,11 +12,30 @@ import AcceptedCurrency from "./AcceptedCurrency";
 
 
 
-const FundraisingForm = () => {
+
+const FundraisingForm = ({defaultValues={}}) => {
   const router = useRouter();
   
+  console.log("Defaults::", defaultValues);
   const [logoFile, setLogoFile] = useState(null);
   const [Completed, setCompleted] = useState(false);
+  const initialValues = useMemo(
+    () => ({
+      FundraiserName: "",
+      FundraiserEmail: "",
+      FundraiserCentralID: null,
+      BaseCountryName: "",
+      FundraiserLogo:  "",
+      NewCountry: "",
+      AcceptedCurrencies: [],
+      FacebookLink: "",
+      TelegramLink: "",
+      OtherLink1: "",
+      OtherLink2: "",
+      ...defaultValues,
+    }),
+    [defaultValues]
+  );
   const {
     control,
     register,
@@ -27,20 +46,18 @@ const FundraisingForm = () => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(FundraisingSchema),
-    defaultValues: {
-      FundraiserName: "",
-      FundraiserEmail: "",
-      FundraiserCentralID: null,
-      BaseCountryName: "",
-      FundraiserLogo: "",
-      NewCountry: "",
-      AcceptedCurrencies: [],
-      FacebookLink: "",
-      TelegramLink: "",
-      OtherLink1: "",
-      OtherLink2: "",
-    },
+    defaultValues: initialValues,
   });
+
+ 
+useEffect(() => {
+  if (defaultValues?.FundraiserLogo) {
+    setLogoFile(defaultValues.FundraiserLogo);
+    setValue("FundraiserLogo", defaultValues.FundraiserLogo);
+  }
+}, [defaultValues, setValue]);
+
+
   const handleClose = () => router.back();
   const onSubmit = async (data) => {
 
@@ -103,7 +120,7 @@ const FundraisingForm = () => {
             <LogoUpload
               logoFile={logoFile}
               setLogoFile={(url) => {
-                if (url.length === 0) {
+                if (!url) {
                   return;
                 }
                 setLogoFile(url);
