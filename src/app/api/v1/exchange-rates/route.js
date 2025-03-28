@@ -104,6 +104,18 @@ async function GetExchangeRates(page = 1, limit = 10) {
     }
 }
 
+// Update Exchange Rate Query
+async function UpdateExchangeRates(id, ExchangeRate) {
+    const query = `UPDATE ExchangeRates SET ExchangeRate=? WHERE ExchangeRateId=?`;
+    
+    try {
+        const result = await db(query, [ ExchangeRate, id]);
+        return result.affectedRows > 0 ? { id, ExchangeRate } : null;
+    } catch (error) {
+        throw new Error("Error updating exchange rate");
+    }
+}
+
 // Create Exchange Rate API
 export async function POST(req) {
     try {
@@ -145,7 +157,7 @@ export async function GET(req) {
 
         const { searchParams } = new URL(req.url);
         const page = Number(searchParams.get("page")) || 1;
-        const limit = Number(searchParams.get("limit")) || 10;
+        const limit = Number(searchParams.get("limit")) || 40;
 
         if (isNaN(page) || page < 1) throw new Error("Invalid page number");
         if (isNaN(limit) || limit < 1) throw new Error("Invalid limit value");
@@ -167,5 +179,41 @@ export async function GET(req) {
             { message: "Cannot fetch exchange rates", error: error.message },
             { status: 500 }
         );
+    }
+}
+
+// Update Exchange Rate API
+export async function PUT(req) {
+    try {
+        const payload = await req.json();
+
+        console.log("payload", payload.data);
+        if (!Array.isArray(payload.data) || payload.data.length === 0) {
+            return NextResponse.json(
+                { message: "No data provided for update." },
+                { status: 400 }
+            );
+        }
+        
+        for (const item of payload.data) {
+            if (item.ExchangeRate == null) continue;
+
+            await UpdateExchangeRates(item.ExchangeRateId, item.ExchangeRate);
+        }
+
+        const data = await GetExchangeRates(1, 40);
+
+        return NextResponse.json(
+            {
+                totalRecords: "",
+                totalPages: "",
+                currentPage: "",
+                data,
+            },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.log(error);
+        return NextResponse.json({ message: "Cannot update exchange rate" }, { status: 500 });
     }
 }

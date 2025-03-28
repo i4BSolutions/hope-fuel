@@ -1,136 +1,105 @@
 // Desc: This file contains the function that is used to submit the form data to the database
 
-export default async function createFormSubmit(event, currency, supportRegion ,files, userInfo, setloading, formFillingPerson, setAmountValidate, setmonthValidate, setmanyChatValidate,fileExist, setfileExist,agentId) {
+export default function createFormSubmit(
+  event,
+  supportRegion,
+  files,
+  userInfo,
+  setloading,
+  formFillingPerson,
+  setAmountValidate,
+  setmonthValidate,
+  setmanyChatValidate,
+  fileExist,
+  setfileExist,
+  agentId,
+  contactLink,
+  note,
+  manyChatId,
+  walletId,
+  amount,
+  month
+) {
   event.preventDefault();
+  
+  // Reset validation states
   setAmountValidate(false);
   setmonthValidate(false);
   setmanyChatValidate(false);
-  console.log("from the createFormSubmit", fileExist);
-  // setloading(true)
+  setloading(true);
 
-  const data = new FormData(event.currentTarget);
-  const amount = data.get("amount");
-  const month = data.get("month");
-  const manychat = data.get("manyChat");
-  const wallet = JSON.parse(data.get("wallets"));
-  const notes = data.get("notes");
-  const contactLink = data.get("contactLink");
-  //validate month and amount
-  if (!/^\d+(\.\d{1,2})?$/g.test(amount) || amount == "") {
-    
-    console.log("Amount validation failed:", amount);
+  // Validation checks with consistent return
+  if (!/^\d+(\.\d{1,2})?$/g.test(amount) || amount === "") {
     setAmountValidate(true);
     setloading(false);
-    return;
+    return {
+      success: false,
+      error: 'Invalid amount',
+      status: 400
+    };
   }
+
   if (!/^\d+$/g.test(month)) {
     setmonthValidate(true);
     setloading(false);
-    return;
+    return {
+      success: false,
+      error: 'Invalid month',
+      status: 400
+    };
   }
-  if (!/^\d+$/g.test(manychat)) {
+
+  if (!/^\d+$/g.test(manyChatId)) {
     setmanyChatValidate(true);
     setloading(false);
-    return;
+    return {
+      success: false,
+      error: 'Invalid ManyChat ID',
+      status: 400
+    };
   }
 
-  //check if file exist
-  if (files.length == 0) {
+  if (files.length === 0) {
     setfileExist(false);
     setloading(false);
-    return;
+    return {
+      success: false,
+      error: 'No files uploaded',
+      status: 400
+    };
   }
 
-  var myHeaders = new Headers();
+  const myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
-  console.log("agentID is " + agentId);
-  console.log("UserInfo", userInfo);
 
-
-  let raw = JSON.stringify({
+  const raw = JSON.stringify({
     customerName: userInfo.name,
     customerEmail: userInfo.email,
     agentId: agentId,
-    supportRegionId: supportRegion["SupportRegionID"],
-    manyChatId: manychat,
+    supportRegionId: supportRegion,
+    manyChatId: manyChatId,
     contactLink: contactLink,
     amount: amount,
     month: month,
-    note: notes,
-    walletId: wallet,
-    screenShot: files.map((url) => {
-      return { url: url.href };
-    }),
+    note: note,
+    walletId: walletId,
+    screenShot: files.map((url) => ({ url: url.href })),
   });
 
-  console.log("RawData is ");
-  console.log(raw)
-
-  let requestOptions = {
+  const requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: raw,
     redirect: "follow",
   };
   
-  let answ = await fetch("/api/submitPayment/", requestOptions);
-
-  if (!answ.ok) {
-    // console.error(`Error: ${answ.status} - ${answ.statusText}`);
-    if (answ.status === 400) {
-      // console.error("Bad Request: Please check the submitted data.");
-      return {
-        error: true,
-        status: answ.status,
-        message: answ.status === 400 ? "Bad Request: Please check the submitted data." : answ.statusText,
-      };
-    }
-    setloading(false);
-    return;
-  }
+  // TODO: handle errors later
+  fetch("/api/submitPayment/", requestOptions);
   
-  let res = await answ.json();
-  console.log("My answer id: " + res);
-  location.reload();
+  setloading(false);
 
   return {
     success: true,
-    status: answ.status,
+    status: 200,
   };
 }
-// var raw = JSON.stringify({
-//   "records": [
-//     {
-//       "fields": {
-//         "Name": userInfo.name,
-//         "Email": userInfo.email,
-//         "Status":  '၁ - ဖောင်တင်သွင်း',
-//         "Currency":  currency,
-//         "Amount": parseInt(amount),
-//         "Month": parseInt(month),
-//         "support_region": supportRegion,
-//         "notes": notes,
-//         "contact_person_link": contactLink,
-//         "wallet": [wallet.id],
-//         "screenshot": files.map((url) => {return {url: url.href}}),
-//         "notion_form_filled_person": formFillingPerson,
-//         "manychat_id": parseInt(manychat)
-        
-//       }
-//     }
-//   ]
-// });
-
-// var requestOptions = {
-//   method: 'POST',
-//   headers: myHeaders,
-//   body: raw,
-//   redirect: 'follow'
-// };
-
-//  let response = await fetch(`/api/createNewUser`, requestOptions)
-
-//  let json = await response.json();
-//  location.reload();
-
-

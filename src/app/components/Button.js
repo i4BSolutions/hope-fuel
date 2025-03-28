@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Button } from "@mui/material";
 
 const CustomButton = ({
@@ -13,6 +13,7 @@ const CustomButton = ({
   fontWeight,
   type,
   disabled = false,
+  borderColor,
 }) => {
   return (
     <Button
@@ -24,7 +25,7 @@ const CustomButton = ({
       disabled={disabled}
       sx={{
         color: color,
-        borderColor: disabled ? "#ccc" : color,
+        borderColor: disabled ? "#ccc" : borderColor,
         backgroundColor: disabled ? "#ccc" : color,
         borderRadius: "24px",
         padding: "8px 16px",
@@ -32,7 +33,7 @@ const CustomButton = ({
         fontWeight: fontWeight ? fontWeight : "bold",
         "&:hover": {
           backgroundColor: `${color}20`,
-          borderColor: color,
+          borderColor: borderColor,
         },
       }}
     >

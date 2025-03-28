@@ -40,16 +40,16 @@ async function GetExchangeRateById(id) {
 }
 
 // Update Exchange Rate Query
-async function UpdateExchangeRate(id, ExchangeRate) {
-    const query = `UPDATE ExchangeRates SET ExchangeRate=? WHERE ExchangeRateId=?`;
+// async function UpdateExchangeRate(id, ExchangeRate) {
+//     const query = `UPDATE ExchangeRates SET ExchangeRate=? WHERE ExchangeRateId=?`;
     
-    try {
-        const result = await db(query, [ ExchangeRate, id]);
-        return result.affectedRows > 0 ? { id, ExchangeRate } : null;
-    } catch (error) {
-        throw new Error("Error updating exchange rate");
-    }
-}
+//     try {
+//         const result = await db(query, [ ExchangeRate, id]);
+//         return result.affectedRows > 0 ? { id, ExchangeRate } : null;
+//     } catch (error) {
+//         throw new Error("Error updating exchange rate");
+//     }
+// }
 
 // Delete Exchange Rate Query
 async function DeleteExchangeRate(id) {
@@ -76,18 +76,18 @@ export async function GET(req, { params }) {
 }
 
 // Update Exchange Rate API
-export async function PUT(req, { params }) {
-    try {
-        const { ExchangeRate } = await req.json();
-        const data = await UpdateExchangeRate(params.id, ExchangeRate);
+// export async function PUT(req, { params }) {
+//     try {
+//         const { ExchangeRate } = await req.json();
+//         const data = await UpdateExchangeRate(params.id, ExchangeRate);
 
-        if (!data) return NextResponse.json({ message: "Not found" }, { status: 404 });
-        return NextResponse.json({ data }, { status: 200 });
-    } catch (error) {
-        console.log(error);
-        return NextResponse.json({ message: "Cannot update exchange rate" }, { status: 500 });
-    }
-}
+//         if (!data) return NextResponse.json({ message: "Not found" }, { status: 404 });
+//         return NextResponse.json({ data }, { status: 200 });
+//     } catch (error) {
+//         console.log(error);
+//         return NextResponse.json({ message: "Cannot update exchange rate" }, { status: 500 });
+//     }
+// }
 
 // Delete Exchange Rate API
 export async function DELETE(req, { params }) {

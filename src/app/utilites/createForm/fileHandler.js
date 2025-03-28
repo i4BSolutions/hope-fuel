@@ -2,7 +2,6 @@
 //input is setfile functions and files
 import { uploadData } from "aws-amplify/storage";
 import { getUrl } from "aws-amplify/storage";
-import { set } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 
 export default async function filehandler(
@@ -12,13 +11,42 @@ export default async function filehandler(
   setUploadProgress
 ) {
   let arrayFiles = [];
-  console.log(files);
+  let url = [];
+
   // get the submitted files
   for (let i = 0; i < files.length; i++) {
+    try {
+      const file = files[i];
+      setUploadProgress(`Uploading ${file.name} (${i + 1} of ${files.length})...`);
+
+      const result = await uploadData({
+        key: uuidv4() + file.name,
+        data: file,
+        options: {
+          onProgress: ({ transferredBytes, totalBytes }) => {
+            if (totalBytes) {
+              const progress = Math.round(transferredBytes / totalBytes) * 100;
+              setUploadProgress(`Uploading ${file.name}: ${progress}`);
+            }
+          },
+          contentType: "image/png",
+          contentDisposition: "inline",
+        },
+      }).result;
+
+      const fileUrl = (await getUrl({ key: result.key })).url;
+      url.push(fileUrl);
+    } catch (error) {
+      console.error("Upload error: ", error);
+      setUploadProgress(`Error uploading file: ${arrayFiles[i].name}`);
+    }
     arrayFiles.push(files[i]);
   }
-  console.log(arrayFiles);
 
+  // upload all submitted files
+  setFile([...filesState, ...url]);
+  setUploadProgress("Upload Complete!\nDrag and drop more files to upload");
+  return url;
   // get the previous files
 
   //Every file in current files
@@ -39,37 +67,4 @@ export default async function filehandler(
   //     url.push(json['fileUrl'])
   // }
   // setFile(url) // give the urls
-  let url = [];
-  // upload all submitted files
-  for (let file in arrayFiles) {
-    try {
-      const result = await uploadData({
-        key: uuidv4() + arrayFiles[file].name,
-        data: arrayFiles[file],
-        options: {
-          onProgress: ({ transferredBytes, totalBytes }) => {
-            if (totalBytes) {
-              const progress = Math.round(transferredBytes / totalBytes) * 100;
-              console.log(`Upload progress ${progress} %`);
-              setUploadProgress("Uploading .....");
-            }
-          },
-          contentType: "image/png",
-          contentDisposition: "inline",
-        },
-      }).result;
-
-      let fileName = result.key;
-      const respone = await getUrl({ key: fileName });
-      const tmpURL = respone.url;
-      console.log(tmpURL);
-      url.push(tmpURL);
-    } catch (error) {
-      console.log("Error : ", error);
-    }
-  }
-
-  setFile([...filesState, ...url]);
-  setUploadProgress("Upload Complete!\nDrag and drop more files to upload");
-  return url;
 }

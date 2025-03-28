@@ -19,6 +19,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import ToggleOnOutlinedIcon from "@mui/icons-material/ToggleOnOutlined";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -65,9 +66,9 @@ const Sidebar = () => {
       // },
       { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
       {
-        text: "ဖောင်အဖွင့်အပိတ်",
-        icon: <ToggleOnOutlinedIcon />,
-        path: "/formopenclose",
+        text: "Admin Panel",
+        icon: <ManageAccountsIcon />,
+        path: "/admin-panel",
       },
       {
         text: "HOPEID List",

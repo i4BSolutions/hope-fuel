@@ -170,7 +170,6 @@ export default function CheckUser({ onUserCheck, userRole }) {
             variant="contained"
             type="submit"
             text="Check"
-            color="white"
           />
         </Box>
       ) : (
