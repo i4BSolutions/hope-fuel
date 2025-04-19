@@ -8,37 +8,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model agent {
+model Agent {
   AgentId              Int                    @id @default(autoincrement())
   AwsId                String?                @db.VarChar(255)
   UserRoleId           Int?
-  userrole             userrole?              @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
-  customer             customer[]
-  customerauditlogs    customerauditlogs[]
-  formvisibilitystatus formvisibilitystatus[]
-  note                 note[]
-  transactionagent     transactionagent[]
+  UserRole             UserRole?              @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
+  Customer             Customer[]
+  CustomerAuditlogs    CustomerAuditLogs[]
+  FormVisibilityStatus FormVisibilityStatus[]
+  Note                 Note[]
+  TransactionAgent     TransactionAgent[]
 
   @@index([UserRoleId], map: "UserRoleId")
 }
 
-model basecountry {
+model BaseCountry {
   BaseCountryID   Int             @id @default(autoincrement())
   BaseCountryName String          @unique(map: "BaseCountryName") @db.VarChar(191)
-  exchangerates   exchangerates[]
-  fundraiser      fundraiser[]
+  ExchangeRates   ExchangeRates[]
+  Fundraiser      Fundraiser[]
 }
 
-model currency {
+model Currency {
   CurrencyId                    Int                             @id @default(autoincrement())
   CurrencyCode                  String?                         @db.VarChar(10)
-  exchangerates                 exchangerates[]
-  fundraiser_acceptedcurrencies fundraiser_acceptedcurrencies[]
-  minimumamount                 minimumamount[]
-  wallet                        wallet[]
+  ExchangeRates                 ExchangeRates[]
+  Fundraiser_AcceptedCurrencies Fundraiser_AcceptedCurrencies[]
+  MinimumAmount                 MinimumAmount[]
+  Wallet                        Wallet[]
 }
 
-model customer {
+model Customer {
   CustomerId        Int                 @id @default(autoincrement())
   Name              String?             @db.VarChar(255)
   Email             String?             @db.VarChar(255)
@@ -48,84 +48,84 @@ model customer {
   ContactLink       String?             @db.VarChar(255)
   AgentId           Int?
   CardID            Int?
-  agent             agent?              @relation(fields: [AgentId], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "customer_ibfk_1")
-  customerauditlogs customerauditlogs[]
-  manychat          manychat[]
-  transactions      transactions[]
+  Agent             Agent?              @relation(fields: [AgentId], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "customer_ibfk_1")
+  CustomerAuditLogs CustomerAuditLogs[]
+  ManyChat          ManyChat[]
+  Transactions      Transactions[]
 
   @@index([AgentId], map: "AgentId")
 }
 
-model customerauditlogs {
+model CustomerAuditLogs {
   LogId        Int                            @id @default(autoincrement())
   AgentId      Int
-  FieldChanged customerauditlogs_FieldChanged
+  FieldChanged CustomerAuditLogs_FieldChanged
   OldValue     String?                        @db.VarChar(255)
   NewValue     String?                        @db.VarChar(255)
   CustomerId   Int
   ChangeDate   DateTime                       @default(now()) @db.Timestamp(0)
-  agent        agent                          @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "fk_agent")
-  customer     customer                       @relation(fields: [CustomerId], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "fk_customer")
+  Agent        Agent                          @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "fk_agent")
+  Customer     Customer                       @relation(fields: [CustomerId], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "fk_customer")
 
   @@index([AgentId], map: "fk_agent")
   @@index([CustomerId], map: "fk_customer")
 }
 
-model exchangerates {
+model ExchangeRates {
   ExchangeRateId Int         @id @default(autoincrement())
   BaseCountryId  Int
   CurrencyId     Int
   ExchangeRate   Decimal     @db.Decimal(12, 5)
   CreateAt       DateTime    @default(now()) @db.Timestamp(0)
   UpdatedAt      DateTime    @default(now()) @db.Timestamp(0)
-  basecountry    basecountry @relation(fields: [BaseCountryId], references: [BaseCountryID], onDelete: Cascade, onUpdate: Restrict, map: "fk_basecountry")
-  currency       currency    @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "fk_currency")
+  BaseCountry    BaseCountry @relation(fields: [BaseCountryId], references: [BaseCountryID], onDelete: Cascade, onUpdate: Restrict, map: "fk_basecountry")
+  Currency       Currency    @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "fk_currency")
 
   @@index([BaseCountryId], map: "fk_basecountry")
   @@index([CurrencyId], map: "fk_currency")
 }
 
-model formstatus {
+model FormStatus {
   FormStatusID        Int                @id @default(autoincrement())
   TransactionID       Int?
   TransactionStatusID Int?
-  transactions        transactions?      @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "formstatus_ibfk_1")
-  transactionstatus   transactionstatus? @relation(fields: [TransactionStatusID], references: [TransactionStatusID], onDelete: Restrict, onUpdate: Restrict, map: "formstatus_ibfk_2")
+  Transactions        Transactions?      @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "formstatus_ibfk_1")
+  TransactionStatus   TransactionStatus? @relation(fields: [TransactionStatusID], references: [TransactionStatusID], onDelete: Restrict, onUpdate: Restrict, map: "formstatus_ibfk_2")
 
   @@index([TransactionID], map: "TransactionID")
   @@index([TransactionStatusID], map: "TransactionStatusID")
 }
 
-model formvisibilitystatus {
+model FormVisibilityStatus {
   VisibilityStatusId Int      @id @default(autoincrement())
   AgentId            Int
   IsFormOpen         Boolean
   FormTimeStamp      DateTime @default(now()) @db.Timestamp(0)
-  agent              agent    @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "formvisibilitystatus_ibfk_1")
+  Agent              Agent    @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "formvisibilitystatus_ibfk_1")
 
   @@index([AgentId], map: "AgentId")
 }
 
-model fundraiser {
+model Fundraiser {
   FundraiserID                  Int                             @id @default(autoincrement())
   FundraiserName                String                          @db.VarChar(255)
   FundraiserEmail               String                          @unique(map: "FundraiserEmail") @db.VarChar(191)
   FundraiserLogo                String?                         @db.VarChar(255)
   BaseCountryID                 Int?
   FundraiserCentralID           Int?
-  basecountry                   basecountry?                    @relation(fields: [BaseCountryID], references: [BaseCountryID], onUpdate: Restrict, map: "fundraiser_ibfk_1")
-  fundraiser_acceptedcurrencies fundraiser_acceptedcurrencies[]
+  BaseCountry                   BaseCountry?                    @relation(fields: [BaseCountryID], references: [BaseCountryID], onUpdate: Restrict, map: "fundraiser_ibfk_1")
+  Fundraiser_AcceptedCurrencies Fundraiser_AcceptedCurrencies[]
   fundraiser_contactlinks       fundraiser_contactlinks[]
 
   @@index([BaseCountryID], map: "BaseCountryID")
 }
 
-model fundraiser_acceptedcurrencies {
+model Fundraiser_AcceptedCurrencies {
   FundraiserAcceptedCurrencyID Int         @id @default(autoincrement())
   FundraiserID                 Int?
   CurrencyID                   Int?
-  fundraiser                   fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_acceptedcurrencies_ibfk_1")
-  currency                     currency?   @relation(fields: [CurrencyID], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_acceptedcurrencies_ibfk_2")
+  Fundraiser                   Fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_acceptedcurrencies_ibfk_1")
+  Currency                     Currency?   @relation(fields: [CurrencyID], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_acceptedcurrencies_ibfk_2")
 
   @@index([CurrencyID], map: "CurrencyID")
   @@index([FundraiserID], map: "FundraiserID")
@@ -136,77 +136,77 @@ model fundraiser_contactlinks {
   FundraiserID Int?
   Platform     Int?
   ContactURL   String      @db.VarChar(255)
-  fundraiser   fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_contactlinks_ibfk_1")
+  Fundraiser   Fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_contactlinks_ibfk_1")
 
   @@index([FundraiserID], map: "FundraiserID")
 }
 
-model manychat {
+model ManyChat {
   ManyChatId     Int      @id @default(autoincrement())
   ConversationId String   @db.VarChar(255)
   CustomerId     Int
   CreateAt       DateTime @default(now()) @db.Timestamp(0)
   UpdateAt       DateTime @default(now()) @db.Timestamp(0)
-  customer       customer @relation(fields: [CustomerId], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "fk_manychat_customer")
+  Customer       Customer @relation(fields: [CustomerId], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "fk_manychat_customer")
 
   @@index([CustomerId], map: "fk_manychat_customer")
 }
 
-model minimumamount {
+model MinimumAmount {
   MinimumAmountId Int      @id @default(autoincrement())
   CurrencyId      Int
   Amount          Decimal  @db.Decimal(12, 2)
   CreateAt        DateTime @default(now()) @db.Timestamp(0)
   UpdatedAt       DateTime @default(now()) @db.Timestamp(0)
-  currency        currency @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "minimumamount_ibfk_1")
+  Currency        Currency @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Cascade, onUpdate: Restrict, map: "minimumamount_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
 }
 
-model note {
+model Note {
   NoteID       Int            @id @default(autoincrement())
   Note         String?        @db.VarChar(255)
   Date         DateTime?      @db.Date
   AgentID      Int?
-  agent        agent?         @relation(fields: [AgentID], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "note_ibfk_1")
-  transactions transactions[]
+  Agent        Agent?         @relation(fields: [AgentID], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "note_ibfk_1")
+  Transactions Transactions[]
 
   @@index([AgentID], map: "AgentID")
 }
 
-model platform {
+model Platform {
   PlatformID   Int    @id @default(autoincrement())
   PlatformName String @unique(map: "PlatformName") @db.VarChar(191)
 }
 
-model screenshot {
+model Screenshot {
   ScreenShotID   Int           @id @default(autoincrement())
   TransactionID  Int?
   ScreenShotLink String?       @db.VarChar(2048)
-  transactions   transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "screenshot_ibfk_1")
+  Transactions   Transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "screenshot_ibfk_1")
 
   @@index([TransactionID], map: "TransactionID")
 }
 
-model supportregion {
+model SupportRegion {
   SupportRegionID Int            @id @default(autoincrement())
   Region          String?        @db.VarChar(255)
-  transactions    transactions[]
+  Transactions    Transactions[]
 }
 
-model transactionagent {
+model TransactionAgent {
   TransactionAgentID Int           @id @default(autoincrement())
   TransactionID      Int?
   AgentID            Int?
   LogDate            DateTime      @default(now()) @db.Timestamp(0)
-  transactions       transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "transactionagent_ibfk_1")
-  agent              agent?        @relation(fields: [AgentID], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "transactionagent_ibfk_2")
+  Transactions       Transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "transactionagent_ibfk_1")
+  Agent              Agent?        @relation(fields: [AgentID], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "transactionagent_ibfk_2")
 
   @@index([AgentID], map: "AgentID")
   @@index([TransactionID], map: "TransactionID")
 }
 
-model transactions {
+model Transactions {
   TransactionID    Int                @id @default(autoincrement())
   CustomerID       Int?
   SupportRegionID  Int?
@@ -219,13 +219,13 @@ model transactions {
   PaymentDenied    Boolean?
   Month            Int?
   HopeFuelID       Int?
-  formstatus       formstatus[]
-  screenshot       screenshot[]
-  transactionagent transactionagent[]
-  customer         customer?          @relation(fields: [CustomerID], references: [CustomerId], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_1")
-  supportregion    supportregion?     @relation(fields: [SupportRegionID], references: [SupportRegionID], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_2")
-  wallet           wallet?            @relation(fields: [WalletID], references: [WalletId], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_3")
-  note             note?              @relation(fields: [NoteID], references: [NoteID], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_4")
+  FormStatus       FormStatus[]
+  Screenshot       Screenshot[]
+  TransactionAgent TransactionAgent[]
+  Customer         Customer?          @relation(fields: [CustomerID], references: [CustomerId], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_1")
+  SupportRegion    SupportRegion?     @relation(fields: [SupportRegionID], references: [SupportRegionID], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_2")
+  Wallet           Wallet?            @relation(fields: [WalletID], references: [WalletId], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_3")
+  Note             Note?              @relation(fields: [NoteID], references: [NoteID], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_4")
 
   @@index([CustomerID], map: "CustomerID")
   @@index([NoteID], map: "NoteID")
@@ -233,29 +233,36 @@ model transactions {
   @@index([WalletID], map: "WalletID")
 }
 
-model transactionstatus {
+model TransactionStatus {
   TransactionStatusID Int          @id @default(autoincrement())
   TransactionStatus   String       @db.VarChar(255)
-  formstatus          formstatus[]
+  FormStatus          FormStatus[]
 }
 
-model userrole {
+model UserRole {
   UserRoleID Int     @id @default(autoincrement())
   UserRole   String? @db.VarChar(255)
-  agent      agent[]
+  Agent      Agent[]
 }
 
-model wallet {
+model Wallet {
   WalletId     Int            @id @default(autoincrement())
   CurrencyId   Int?
   WalletName   String?        @db.VarChar(255)
-  transactions transactions[]
-  currency     currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
+  Transactions Transactions[]
+  Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
 }
 
-enum customerauditlogs_FieldChanged {
+model NewTable {
+  NewTableId  Int    @id @default(autoincrement())
+  Name        String @db.VarChar(255)
+  Email       String @db.VarChar(255)
+  UserCountry String @db.VarChar(255)
+}
+
+enum CustomerAuditLogs_FieldChanged {
   Name
   Email
   UserCountry

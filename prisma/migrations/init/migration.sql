@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `agent` (
+CREATE TABLE `Agent` (
     `AgentId` INTEGER NOT NULL AUTO_INCREMENT,
     `AwsId` VARCHAR(255) NULL,
     `UserRoleId` INTEGER NULL,
@@ -9,7 +9,7 @@ CREATE TABLE `agent` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `basecountry` (
+CREATE TABLE `BaseCountry` (
     `BaseCountryID` INTEGER NOT NULL AUTO_INCREMENT,
     `BaseCountryName` VARCHAR(191) NOT NULL,
 
@@ -18,7 +18,7 @@ CREATE TABLE `basecountry` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `currency` (
+CREATE TABLE `Currency` (
     `CurrencyId` INTEGER NOT NULL AUTO_INCREMENT,
     `CurrencyCode` VARCHAR(10) NULL,
 
@@ -26,7 +26,7 @@ CREATE TABLE `currency` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `customer` (
+CREATE TABLE `Customer` (
     `CustomerId` INTEGER NOT NULL AUTO_INCREMENT,
     `Name` VARCHAR(255) NULL,
     `Email` VARCHAR(255) NULL,
@@ -42,7 +42,7 @@ CREATE TABLE `customer` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `customerauditlogs` (
+CREATE TABLE `CustomerAuditLogs` (
     `LogId` INTEGER NOT NULL AUTO_INCREMENT,
     `AgentId` INTEGER NOT NULL,
     `FieldChanged` ENUM('Name', 'Email', 'UserCountry') NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE `customerauditlogs` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `exchangerates` (
+CREATE TABLE `ExchangeRates` (
     `ExchangeRateId` INTEGER NOT NULL AUTO_INCREMENT,
     `BaseCountryId` INTEGER NOT NULL,
     `CurrencyId` INTEGER NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE `exchangerates` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `formstatus` (
+CREATE TABLE `FormStatus` (
     `FormStatusID` INTEGER NOT NULL AUTO_INCREMENT,
     `TransactionID` INTEGER NULL,
     `TransactionStatusID` INTEGER NULL,
@@ -82,7 +82,7 @@ CREATE TABLE `formstatus` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `formvisibilitystatus` (
+CREATE TABLE `FormVisibilityStatus` (
     `VisibilityStatusId` INTEGER NOT NULL AUTO_INCREMENT,
     `AgentId` INTEGER NOT NULL,
     `IsFormOpen` BOOLEAN NOT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE `formvisibilitystatus` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `fundraiser` (
+CREATE TABLE `Fundraiser` (
     `FundraiserID` INTEGER NOT NULL AUTO_INCREMENT,
     `FundraiserName` VARCHAR(255) NOT NULL,
     `FundraiserEmail` VARCHAR(191) NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE `fundraiser` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `fundraiser_acceptedcurrencies` (
+CREATE TABLE `Fundraiser_AcceptedCurrencies` (
     `FundraiserAcceptedCurrencyID` INTEGER NOT NULL AUTO_INCREMENT,
     `FundraiserID` INTEGER NULL,
     `CurrencyID` INTEGER NULL,
@@ -129,7 +129,7 @@ CREATE TABLE `fundraiser_contactlinks` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `manychat` (
+CREATE TABLE `ManyChat` (
     `ManyChatId` INTEGER NOT NULL AUTO_INCREMENT,
     `ConversationId` VARCHAR(255) NOT NULL,
     `CustomerId` INTEGER NOT NULL,
@@ -141,7 +141,7 @@ CREATE TABLE `manychat` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `minimumamount` (
+CREATE TABLE `MinimumAmount` (
     `MinimumAmountId` INTEGER NOT NULL AUTO_INCREMENT,
     `CurrencyId` INTEGER NOT NULL,
     `Amount` DECIMAL(12, 2) NOT NULL,
@@ -153,7 +153,7 @@ CREATE TABLE `minimumamount` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `note` (
+CREATE TABLE `Note` (
     `NoteID` INTEGER NOT NULL AUTO_INCREMENT,
     `Note` VARCHAR(255) NULL,
     `Date` DATE NULL,
@@ -164,7 +164,7 @@ CREATE TABLE `note` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `platform` (
+CREATE TABLE `Platform` (
     `PlatformID` INTEGER NOT NULL AUTO_INCREMENT,
     `PlatformName` VARCHAR(191) NOT NULL,
 
@@ -173,7 +173,7 @@ CREATE TABLE `platform` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `screenshot` (
+CREATE TABLE `Screenshot` (
     `ScreenShotID` INTEGER NOT NULL AUTO_INCREMENT,
     `TransactionID` INTEGER NULL,
     `ScreenShotLink` VARCHAR(2048) NULL,
@@ -183,7 +183,7 @@ CREATE TABLE `screenshot` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `supportregion` (
+CREATE TABLE `SupportRegion` (
     `SupportRegionID` INTEGER NOT NULL AUTO_INCREMENT,
     `Region` VARCHAR(255) NULL,
 
@@ -191,7 +191,7 @@ CREATE TABLE `supportregion` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `transactionagent` (
+CREATE TABLE `TransactionAgent` (
     `TransactionAgentID` INTEGER NOT NULL AUTO_INCREMENT,
     `TransactionID` INTEGER NULL,
     `AgentID` INTEGER NULL,
@@ -203,7 +203,7 @@ CREATE TABLE `transactionagent` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `transactions` (
+CREATE TABLE `Transactions` (
     `TransactionID` INTEGER NOT NULL AUTO_INCREMENT,
     `CustomerID` INTEGER NULL,
     `SupportRegionID` INTEGER NULL,
@@ -225,7 +225,7 @@ CREATE TABLE `transactions` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `transactionstatus` (
+CREATE TABLE `TransactionStatus` (
     `TransactionStatusID` INTEGER NOT NULL AUTO_INCREMENT,
     `TransactionStatus` VARCHAR(255) NOT NULL,
 
@@ -233,7 +233,7 @@ CREATE TABLE `transactionstatus` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `userrole` (
+CREATE TABLE `UserRole` (
     `UserRoleID` INTEGER NOT NULL AUTO_INCREMENT,
     `UserRole` VARCHAR(255) NULL,
 
@@ -241,7 +241,7 @@ CREATE TABLE `userrole` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `wallet` (
+CREATE TABLE `Wallet` (
     `WalletId` INTEGER NOT NULL AUTO_INCREMENT,
     `CurrencyId` INTEGER NULL,
     `WalletName` VARCHAR(255) NULL,
@@ -251,74 +251,74 @@ CREATE TABLE `wallet` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `agent` ADD CONSTRAINT `agent_ibfk_1` FOREIGN KEY (`UserRoleId`) REFERENCES `userrole`(`UserRoleID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Agent` ADD CONSTRAINT `agent_ibfk_1` FOREIGN KEY (`UserRoleId`) REFERENCES `UserRole`(`UserRoleID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `customer` ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`AgentId`) REFERENCES `agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Customer` ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`AgentId`) REFERENCES `Agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `customerauditlogs` ADD CONSTRAINT `fk_agent` FOREIGN KEY (`AgentId`) REFERENCES `agent`(`AgentId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `CustomerAuditLogs` ADD CONSTRAINT `fk_agent` FOREIGN KEY (`AgentId`) REFERENCES `Agent`(`AgentId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `customerauditlogs` ADD CONSTRAINT `fk_customer` FOREIGN KEY (`CustomerId`) REFERENCES `customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `CustomerAuditLogs` ADD CONSTRAINT `fk_customer` FOREIGN KEY (`CustomerId`) REFERENCES `Customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `exchangerates` ADD CONSTRAINT `fk_basecountry` FOREIGN KEY (`BaseCountryId`) REFERENCES `basecountry`(`BaseCountryID`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `ExchangeRates` ADD CONSTRAINT `fk_basecountry` FOREIGN KEY (`BaseCountryId`) REFERENCES `BaseCountry`(`BaseCountryID`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `exchangerates` ADD CONSTRAINT `fk_currency` FOREIGN KEY (`CurrencyId`) REFERENCES `currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `ExchangeRates` ADD CONSTRAINT `fk_currency` FOREIGN KEY (`CurrencyId`) REFERENCES `Currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `formstatus` ADD CONSTRAINT `formstatus_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `FormStatus` ADD CONSTRAINT `formstatus_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `formstatus` ADD CONSTRAINT `formstatus_ibfk_2` FOREIGN KEY (`TransactionStatusID`) REFERENCES `transactionstatus`(`TransactionStatusID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `FormStatus` ADD CONSTRAINT `formstatus_ibfk_2` FOREIGN KEY (`TransactionStatusID`) REFERENCES `TransactionStatus`(`TransactionStatusID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `formvisibilitystatus` ADD CONSTRAINT `formvisibilitystatus_ibfk_1` FOREIGN KEY (`AgentId`) REFERENCES `agent`(`AgentId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `FormVisibilityStatus` ADD CONSTRAINT `formvisibilitystatus_ibfk_1` FOREIGN KEY (`AgentId`) REFERENCES `Agent`(`AgentId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `fundraiser` ADD CONSTRAINT `fundraiser_ibfk_1` FOREIGN KEY (`BaseCountryID`) REFERENCES `basecountry`(`BaseCountryID`) ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE `Fundraiser` ADD CONSTRAINT `fundraiser_ibfk_1` FOREIGN KEY (`BaseCountryID`) REFERENCES `BaseCountry`(`BaseCountryID`) ON DELETE SET NULL ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `fundraiser_acceptedcurrencies` ADD CONSTRAINT `fundraiser_acceptedcurrencies_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `Fundraiser_AcceptedCurrencies` ADD CONSTRAINT `fundraiser_acceptedcurrencies_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `Fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `fundraiser_acceptedcurrencies` ADD CONSTRAINT `fundraiser_acceptedcurrencies_ibfk_2` FOREIGN KEY (`CurrencyID`) REFERENCES `currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `Fundraiser_AcceptedCurrencies` ADD CONSTRAINT `fundraiser_acceptedcurrencies_ibfk_2` FOREIGN KEY (`CurrencyID`) REFERENCES `Currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `fundraiser_contactlinks` ADD CONSTRAINT `fundraiser_contactlinks_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `fundraiser_contactlinks` ADD CONSTRAINT `fundraiser_contactlinks_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `Fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `manychat` ADD CONSTRAINT `fk_manychat_customer` FOREIGN KEY (`CustomerId`) REFERENCES `customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `ManyChat` ADD CONSTRAINT `fk_manychat_customer` FOREIGN KEY (`CustomerId`) REFERENCES `Customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `minimumamount` ADD CONSTRAINT `minimumamount_ibfk_1` FOREIGN KEY (`CurrencyId`) REFERENCES `currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `MinimumAmount` ADD CONSTRAINT `minimumamount_ibfk_1` FOREIGN KEY (`CurrencyId`) REFERENCES `Currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `note` ADD CONSTRAINT `note_ibfk_1` FOREIGN KEY (`AgentID`) REFERENCES `agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Note` ADD CONSTRAINT `note_ibfk_1` FOREIGN KEY (`AgentID`) REFERENCES `Agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `screenshot` ADD CONSTRAINT `screenshot_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Screenshot` ADD CONSTRAINT `screenshot_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactionagent` ADD CONSTRAINT `transactionagent_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `TransactionAgent` ADD CONSTRAINT `transactionagent_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactionagent` ADD CONSTRAINT `transactionagent_ibfk_2` FOREIGN KEY (`AgentID`) REFERENCES `agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `TransactionAgent` ADD CONSTRAINT `transactionagent_ibfk_2` FOREIGN KEY (`AgentID`) REFERENCES `Agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `customer`(`CustomerId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Transactions` ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `Customer`(`CustomerId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`SupportRegionID`) REFERENCES `supportregion`(`SupportRegionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Transactions` ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`SupportRegionID`) REFERENCES `SupportRegion`(`SupportRegionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`WalletID`) REFERENCES `wallet`(`WalletId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Transactions` ADD CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`WalletID`) REFERENCES `Wallet`(`WalletId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `transactions` ADD CONSTRAINT `transactions_ibfk_4` FOREIGN KEY (`NoteID`) REFERENCES `note`(`NoteID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Transactions` ADD CONSTRAINT `transactions_ibfk_4` FOREIGN KEY (`NoteID`) REFERENCES `Note`(`NoteID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `wallet` ADD CONSTRAINT `wallet_ibfk_1` FOREIGN KEY (`CurrencyId`) REFERENCES `currency`(`CurrencyId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `Wallet` ADD CONSTRAINT `wallet_ibfk_1` FOREIGN KEY (`CurrencyId`) REFERENCES `Currency`(`CurrencyId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
