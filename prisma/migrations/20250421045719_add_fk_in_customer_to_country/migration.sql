@@ -5,7 +5,7 @@
 
 */
 -- AlterTable
-ALTER TABLE `customer` MODIFY `UserCountry` INTEGER NULL;
+ALTER TABLE `Customer` MODIFY `UserCountry` INTEGER NULL;
 
 -- CreateIndex
 CREATE INDEX `BaseCountryID` ON `Customer`(`UserCountry`);
