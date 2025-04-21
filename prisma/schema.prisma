@@ -27,6 +27,7 @@ model BaseCountry {
   BaseCountryName String          @unique(map: "BaseCountryName") @db.VarChar(191)
   ExchangeRates   ExchangeRates[]
   Fundraiser      Fundraiser[]
+  Customer        Customer[]
 }
 
 model Currency {
@@ -44,7 +45,7 @@ model Customer {
   Email             String?             @db.VarChar(255)
   ManyChatId        String?             @db.VarChar(255)
   ExpireDate        DateTime?           @db.Date
-  UserCountry       String?             @db.VarChar(255)
+  UserCountry       Int?
   ContactLink       String?             @db.VarChar(255)
   AgentId           Int?
   CardID            Int?
@@ -53,7 +54,10 @@ model Customer {
   ManyChat          ManyChat[]
   Transactions      Transactions[]
 
+  BaseCountry BaseCountry? @relation(fields: [UserCountry], references: [BaseCountryID], map: "BaseCountryID")
+
   @@index([AgentId], map: "AgentId")
+  @@index([UserCountry], map: "BaseCountryID")
 }
 
 model CustomerAuditLogs {
@@ -253,13 +257,6 @@ model Wallet {
   Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
-}
-
-model NewTable {
-  NewTableId  Int    @id @default(autoincrement())
-  Name        String @db.VarChar(255)
-  Email       String @db.VarChar(255)
-  UserCountry String @db.VarChar(255)
 }
 
 enum CustomerAuditLogs_FieldChanged {
