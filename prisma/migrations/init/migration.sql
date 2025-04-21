@@ -32,12 +32,13 @@ CREATE TABLE `Customer` (
     `Email` VARCHAR(255) NULL,
     `ManyChatId` VARCHAR(255) NULL,
     `ExpireDate` DATE NULL,
-    `UserCountry` VARCHAR(255) NULL,
+    `UserCountry` INTEGER NULL,
     `ContactLink` VARCHAR(255) NULL,
     `AgentId` INTEGER NULL,
     `CardID` INTEGER NULL,
 
     INDEX `AgentId`(`AgentId`),
+    INDEX `BaseCountryID`(`UserCountry`),
     PRIMARY KEY (`CustomerId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -118,10 +119,10 @@ CREATE TABLE `Fundraiser_AcceptedCurrencies` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `fundraiser_contactlinks` (
+CREATE TABLE `Fundraiser_Contactlinks` (
     `ContactID` INTEGER NOT NULL AUTO_INCREMENT,
     `FundraiserID` INTEGER NULL,
-    `Platform` INTEGER NULL,
+    `PlatformID` INTEGER NULL,
     `ContactURL` VARCHAR(255) NOT NULL,
 
     INDEX `FundraiserID`(`FundraiserID`),
@@ -257,6 +258,9 @@ ALTER TABLE `Agent` ADD CONSTRAINT `agent_ibfk_1` FOREIGN KEY (`UserRoleId`) REF
 ALTER TABLE `Customer` ADD CONSTRAINT `customer_ibfk_1` FOREIGN KEY (`AgentId`) REFERENCES `Agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
+ALTER TABLE `Customer` ADD CONSTRAINT `BaseCountryID` FOREIGN KEY (`UserCountry`) REFERENCES `BaseCountry`(`BaseCountryID`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `CustomerAuditLogs` ADD CONSTRAINT `fk_agent` FOREIGN KEY (`AgentId`) REFERENCES `Agent`(`AgentId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
@@ -287,7 +291,7 @@ ALTER TABLE `Fundraiser_AcceptedCurrencies` ADD CONSTRAINT `fundraiser_acceptedc
 ALTER TABLE `Fundraiser_AcceptedCurrencies` ADD CONSTRAINT `fundraiser_acceptedcurrencies_ibfk_2` FOREIGN KEY (`CurrencyID`) REFERENCES `Currency`(`CurrencyId`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `fundraiser_contactlinks` ADD CONSTRAINT `fundraiser_contactlinks_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `Fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `Fundraiser_Contactlinks` ADD CONSTRAINT `fundraiser_contactlinks_ibfk_1` FOREIGN KEY (`FundraiserID`) REFERENCES `Fundraiser`(`FundraiserID`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 -- AddForeignKey
 ALTER TABLE `ManyChat` ADD CONSTRAINT `fk_manychat_customer` FOREIGN KEY (`CustomerId`) REFERENCES `Customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;

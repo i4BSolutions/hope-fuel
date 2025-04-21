@@ -119,7 +119,7 @@ model Fundraiser {
   FundraiserCentralID           Int?
   BaseCountry                   BaseCountry?                    @relation(fields: [BaseCountryID], references: [BaseCountryID], onUpdate: Restrict, map: "fundraiser_ibfk_1")
   Fundraiser_AcceptedCurrencies Fundraiser_AcceptedCurrencies[]
-  fundraiser_contactlinks       fundraiser_contactlinks[]
+  fundraiser_contactlinks       Fundraiser_Contactlinks[]
 
   @@index([BaseCountryID], map: "BaseCountryID")
 }
@@ -135,10 +135,10 @@ model Fundraiser_AcceptedCurrencies {
   @@index([FundraiserID], map: "FundraiserID")
 }
 
-model fundraiser_contactlinks {
+model Fundraiser_Contactlinks {
   ContactID    Int         @id @default(autoincrement())
   FundraiserID Int?
-  Platform     Int?
+  PlatformID   Int?
   ContactURL   String      @db.VarChar(255)
   Fundraiser   Fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_contactlinks_ibfk_1")
 
