@@ -21,12 +21,12 @@ jobs:
           npm ci
           npx prisma generate
 
-          if ! npx prisma migrate status | grep -q "Migration name: init"; then
-            echo "🔧 Resolving init migration..."
-            npx prisma migrate resolve --applied init
-          else
-            echo "✅ 'init' migration already resolved. Skipping."
-          fi
+          # if ! npx prisma migrate status | grep -q "Migration name: init"; then
+          #   echo "🔧 Resolving init migration..."
+          #   npx prisma migrate resolve --applied init
+          # else
+          #   echo "✅ 'init' migration already resolved. Skipping."
+          # fi
             
           npx prisma migrate deploy
         env:
