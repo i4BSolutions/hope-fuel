@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import FundraisingForm from "../../components/FundraisingForm";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Modal from "../../../components/Modal";
 
 function FundraiserEditPage() {
   const { id } = useParams();
+  const router = useRouter();
 
   const [fundraiser, setFundraiser] = useState(null);
 
@@ -36,15 +37,11 @@ function FundraiserEditPage() {
         },
         body: JSON.stringify(data),
       });
-      
     } catch (error) {
       console.log("Error:", error);
       throw new Error("Failed to update fundraiser");
-      
     }
-   
   };
-
 
   return (
     <>
@@ -53,6 +50,7 @@ function FundraiserEditPage() {
           <FundraisingForm
             defaultValues={fundraiser}
             onSubmitHandler={handleSubmit}
+            onCancel={() => router.back()}
           />
         </Modal>
       ) : (

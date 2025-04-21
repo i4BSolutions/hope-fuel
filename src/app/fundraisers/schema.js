@@ -5,7 +5,7 @@ export const FundraisingSchema = z
     FundraiserCentralID: z
       .number("Fundraiser ID is required")
       .min(3, "Fundraiser ID must be numeric"),
-     
+
     BaseCountryName: z.string().nonempty("Country is required"),
     AcceptedCurrencies: z
       .array(z.string())
@@ -14,8 +14,16 @@ export const FundraisingSchema = z
       .string()
       .email("Invalid email address")
       .nonempty("Email is required"),
-    FacebookLink: z.string().url("Invalid Facebook URL").optional().or(z.literal("")),
-    TelegramLink: z.string().url("Invalid Telegram URL").optional().or(z.literal("")),
+    FacebookLink: z
+      .string()
+      .url("Invalid Facebook URL")
+      .optional()
+      .or(z.literal("")),
+    TelegramLink: z
+      .string()
+      .url("Invalid Telegram URL")
+      .optional()
+      .or(z.literal("")),
     OtherLink1: z.string().url("Invalid URL").optional().or(z.literal("")),
     OtherLink2: z.string().url("Invalid URL").optional().or(z.literal("")),
     FundraiserLogo: z.string().nonempty("Please upload a logo"),

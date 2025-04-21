@@ -25,6 +25,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import SearchIcon from "@mui/icons-material/Search";
 import FundraiserDetails from "./components/FundraiserDetails";
 import CustomButton from "../components/Button";
+import FundraisingForm from "./components/FundraisingForm";
 
 const FundraisingFormPage = () => {
   const router = useRouter();
@@ -40,6 +41,8 @@ const FundraisingFormPage = () => {
   const [openFundraiserDetailsModal, setOpenFundraiserDetailsModal] =
     useState(false);
   const [openFundraiserDeleteModal, setOpenFundraiserDeleteModal] =
+    useState(false);
+  const [openCreateFundraiserModal, setOpenCreateFundraiserModal] =
     useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
@@ -231,7 +234,7 @@ const FundraisingFormPage = () => {
         />
         <CustomButton
           onClick={() => {
-            router.push("/fundraisers/create", { scroll: false });
+            setOpenCreateFundraiserModal((prev) => !prev);
           }}
           text="Create New"
           icon={<AddCircleOutlineOutlinedIcon />}
@@ -277,6 +280,22 @@ const FundraisingFormPage = () => {
             </Typography>
           </Box>
         )}
+
+        <Modal
+          open={openCreateFundraiserModal}
+          onClose={() => {
+            setOpenCreateFundraiserModal((prev) => !prev);
+          }}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          sx={{ alignSelf: "center", justifyItems: "center" }}
+        >
+          <FundraisingForm
+            onCancel={() => {
+              setOpenCreateFundraiserModal((prev) => !prev);
+            }}
+          />
+        </Modal>
 
         <Modal
           open={openFundraiserDetailsModal}

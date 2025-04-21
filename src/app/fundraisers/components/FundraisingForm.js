@@ -2,18 +2,17 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState,useMemo ,useEffect} from "react";
-import { Box, Button, Grid, TextField, Typography ,Alert} from "@mui/material";
+import { useState, useMemo, useEffect } from "react";
+import { Box, Button, Grid, TextField, Typography, Alert } from "@mui/material";
 import { LogoUpload } from "./LogoUpload";
 import { FundraisingSchema } from "../schema";
 import BaseCountry from "./BaseCountry";
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import AcceptedCurrency from "./AcceptedCurrency";
 
-
-const FundraisingForm = ({defaultValues={}, onSubmitHandler}) => {
+const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
   const router = useRouter();
-  
+
   const [logoFile, setLogoFile] = useState(null);
   const [Completed, setCompleted] = useState(false);
   const initialValues = useMemo(
@@ -22,7 +21,7 @@ const FundraisingForm = ({defaultValues={}, onSubmitHandler}) => {
       FundraiserEmail: "",
       FundraiserCentralID: null,
       BaseCountryName: "",
-      FundraiserLogo:  "",
+      FundraiserLogo: "",
       NewCountry: "",
       AcceptedCurrencies: [],
       FacebookLink: "",
@@ -46,38 +45,34 @@ const FundraisingForm = ({defaultValues={}, onSubmitHandler}) => {
     defaultValues: initialValues,
   });
 
- 
-useEffect(() => {
-  if (defaultValues?.FundraiserLogo) {
-    setLogoFile(defaultValues.FundraiserLogo);
-    setValue("FundraiserLogo", defaultValues.FundraiserLogo);
-  }
-}, [defaultValues, setValue]);
+  useEffect(() => {
+    if (defaultValues?.FundraiserLogo) {
+      setLogoFile(defaultValues.FundraiserLogo);
+      setValue("FundraiserLogo", defaultValues.FundraiserLogo);
+    }
+  }, [defaultValues, setValue]);
 
-
-  const handleClose = () => router.back();
   const onSubmit = async (data) => {
-      if(onSubmitHandler){
-        try{
-          onSubmitHandler(data);
-          setCompleted(true);
-            setTimeout(() => {
-              setCompleted(false);
-            }, 5000);
-         
-        }catch(error){
-          console.log("Error:", error);
-          throw new Error("Failed to update fundraiser");
-        }
-
-        return ;
+    if (onSubmitHandler) {
+      try {
+        onSubmitHandler(data);
+        setCompleted(true);
+        setTimeout(() => {
+          setCompleted(false);
+        }, 5000);
+      } catch (error) {
+        console.log("Error:", error);
+        throw new Error("Failed to update fundraiser");
       }
+
+      return;
+    }
     if (data.BaseCountryName === "other" && data.NewCountry) {
       data.BaseCountryName = data.NewCountry.trim();
       delete data.NewCountry;
     }
 
-    try{
+    try {
       //send data to the server
       const response = await fetch("/api/v1/fundraisers/create", {
         method: "POST",
@@ -93,21 +88,17 @@ useEffect(() => {
         setLogoFile(null);
         setCompleted(true);
 
-         setTimeout(() => {
-           setCompleted(false);
-         }, 3000);
+        setTimeout(() => {
+          setCompleted(false);
+        }, 3000);
       } else {
         setCompleted(false);
         throw new Error(result.message);
-        
       }
-
-    }catch(error){
+    } catch (error) {
       console.log("Error:", error);
       throw new Error("Failed to create fundraiser");
     }
-
-
   };
 
   const onError = (errors) => {
@@ -154,7 +145,7 @@ useEffect(() => {
             <TextField
               type="number"
               required
-              label="Fundraiser ID"
+              label="Fundraiser Central ID"
               variant="outlined"
               fullWidth
               {...register("FundraiserCentralID", { valueAsNumber: true })}
@@ -242,7 +233,7 @@ useEffect(() => {
               variant="outlined"
               color="secondary"
               onClick={() => {
-                handleClose();
+                onCancel && onCancel();
               }}
             >
               Cancel
