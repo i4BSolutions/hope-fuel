@@ -1,16 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Box, Button, Modal, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
 import CheckUser from "./checkUser";
 import CreateForm from "./createForm";
 import ExtendForm from "./extendForm";
 import ExtendOrNot from "./extendOrNot";
-import { UserProvider } from "../context/UserContext";
-import { AgentProvider } from "../context/AgentContext";
-import { Avatar, Typography, Box, Modal, Button } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
-import { withAuthenticator } from "@aws-amplify/ui-react";
 
 function CreateOrExtendPage() {
   const [userInfo, setUserInfo] = useState(null);
@@ -50,75 +47,77 @@ function CreateOrExtendPage() {
     }
   };
 
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <CircularProgress />
+      </Box>
+    );
+
   return (
-    <AgentProvider>
-      <UserProvider user={currentUser}>
+    <>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {showExtendOrNot ? (
+          <ExtendOrNot userInfo={userInfo} onConfirm={handleExtendOrNot} />
+        ) : !showCreateForm && !showExtendForm ? (
+          <CheckUser onUserCheck={handleUserCheck} userRole={userRole} />
+        ) : showCreateForm ? (
+          <CreateForm
+            userInfo={userInfo}
+            setloading={setLoading}
+            onSuccess={() => setIsSuccessModalOpen(true)}
+          />
+        ) : (
+          <ExtendForm userInfo={userInfo} setloading={setLoading} />
+        )}
+      </Box>
+
+      <Modal
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        aria-labelledby="success-modal"
+      >
         <Box
           sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 300,
+            bgcolor: "white",
+            borderRadius: "12px",
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
           }}
         >
-          <Typography component="h1" sx={{ fontSize: '23px' }} variant="h5" fontWeight="bold">
-            Customer Membership Registration
+          <LockOutlinedIcon sx={{ fontSize: "50px", color: "green" }} />
+          <Typography
+            sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}
+          >
+            Membership Registration Successful.
           </Typography>
-          {loading ? (
-            <Typography variant="body1">Loading...</Typography>
-          ) : showExtendOrNot ? (
-            <ExtendOrNot userInfo={userInfo} onConfirm={handleExtendOrNot} />
-          ) : !showCreateForm && !showExtendForm ? (
-            <CheckUser onUserCheck={handleUserCheck} userRole={userRole} />
-          ) : showCreateForm ? (
-            <CreateForm
-              userInfo={userInfo}
-              setloading={setLoading}
-              onSuccess={() => setIsSuccessModalOpen(true)}
-            />
-          ) : (
-            <ExtendForm userInfo={userInfo} setloading={setLoading} />
-          )}
-        </Box>
 
-        <Modal
-          open={isSuccessModalOpen}
-          onClose={() => setIsSuccessModalOpen(false)}
-          aria-labelledby="success-modal"
-        >
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 300,
-              bgcolor: "white",
-              borderRadius: "12px",
-              boxShadow: 24,
-              p: 4,
-              textAlign: "center",
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              setIsSuccessModalOpen(false);
+              window.location.reload();
             }}
           >
-            <LockOutlinedIcon sx={{ fontSize: "50px", color: "green" }} />
-            <Typography sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}>
-              Membership Registration Successful.
-            </Typography>
-
-            <Button
-              fullWidth
-              variant="contained"
-              onClick={() => {
-                setIsSuccessModalOpen(false);
-                window.location.reload();
-              }}
-            >
-              OK
-            </Button>
-          </Box>
-        </Modal>
-      </UserProvider>
-    </AgentProvider>
+            OK
+          </Button>
+        </Box>
+      </Modal>
+    </>
   );
 }
 

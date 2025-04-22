@@ -1,26 +1,18 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-  Modal,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import checkUserSubmit from "../utilites/checkUserSubmit";
-import { getCurrentUser } from "aws-amplify/auth";
-import { useUser } from "../context/UserContext";
-import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
-import CustomButton from "../components/Button";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, Modal, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import CustomButton from "../components/Button";
+import { useUser } from "../context/UserContext";
+import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
+import checkUserSubmit from "../utilites/checkUserSubmit";
 
-export default function CheckUser({ onUserCheck, userRole }) {
+export default function CheckUser({ onUserCheck, UserRole }) {
   const [loading, setLoading] = useState(false);
   const [hasPermissionThisMonth, sethasPermissionThisMonth] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(null);
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const { currentUser } = useUser();
@@ -29,6 +21,7 @@ export default function CheckUser({ onUserCheck, userRole }) {
   useEffect(() => {
     const fetchFormStatus = async () => {
       try {
+        setLoading(true);
         const response = await fetch("/api/formOpenClose");
         const result = await response.json();
         setIsFormOpen(result.data[0].IsFormOpen);
@@ -48,7 +41,6 @@ export default function CheckUser({ onUserCheck, userRole }) {
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
-    console.log(currentUser);
     const userRole = currentUser["UserRole"];
 
     // const { username, userId, signInDetails } = await getCurrentUser();
@@ -72,11 +64,6 @@ export default function CheckUser({ onUserCheck, userRole }) {
       body: raw,
       redirect: "follow",
     };
-
-    // console.log("This is my agent role");
-    // let agentRole = await fetch(`/api/getAgent?awsId=${userId}`);
-    // agentRole = await agentRole.json();
-    // console.log(agentRole);
 
     let bool = true;
 
@@ -105,13 +92,19 @@ export default function CheckUser({ onUserCheck, userRole }) {
     setLoading(false);
   };
 
-  return loading ? (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-      <CircularProgress />
-    </Box>
-  ) : (
+  return (
     <>
-      {isFormOpen ? (
+      <Typography
+        component="h1"
+        sx={{ fontSize: "23px", marginTop: 8 }}
+        variant="h5"
+        fontWeight="bold"
+        align="center"
+      >
+        Customer Membership Registration
+      </Typography>
+      {(currentUser && isFormOpen) ||
+      (currentUser && currentUser.UserRole === "Admin") ? (
         <Box
           component="form"
           onSubmit={handleSubmit}
@@ -172,9 +165,10 @@ export default function CheckUser({ onUserCheck, userRole }) {
             text="Check"
           />
         </Box>
-      ) : (
+      ) : currentUser && !isFormOpen ? (
         <ServiceUnavailable />
-      )}
+      ) : null}
+
       {hasPermissionThisMonth == false && (
         <Modal
           open={open}

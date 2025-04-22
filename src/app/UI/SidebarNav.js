@@ -1,35 +1,33 @@
 "use client";
 
-import { useState } from "react";
 import {
+  Box,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  IconButton,
   Toolbar,
-  Box,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 
-import SyncAltRoundedIcon from "@mui/icons-material/SyncAltRounded";
-import LogoutIcon from "@mui/icons-material/Logout";
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import ToggleOnOutlinedIcon from "@mui/icons-material/ToggleOnOutlined";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
-import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import FlagIcon from "@mui/icons-material/Flag";
-import ModeOutlinedIcon from "@mui/icons-material/ModeOutlined";
+import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
+import LogoutIcon from "@mui/icons-material/Logout";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
+import SyncAltRoundedIcon from "@mui/icons-material/SyncAltRounded";
 import Divider from "@mui/material/Divider";
 import { signOut } from "aws-amplify/auth";
 import { useUser } from "../context/UserContext";
 
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const drawerWidth = 250; // Full-width drawer
 const miniDrawerWidth = 80; // Mini sidebar width
