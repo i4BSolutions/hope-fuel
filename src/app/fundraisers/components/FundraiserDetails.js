@@ -133,12 +133,33 @@ const FundraiserDetails = ({
           >
             Accepted Currency
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: "#000000", fontSize: 18, fontWeight: 600 }}
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+              mt: 0.2,
+              alignItems: "center",
+            }}
           >
-            {fundraiserDetails.AcceptedCurrencies[0]}
-          </Typography>
+            {fundraiserDetails.AcceptedCurrencies.map((currency, index) => (
+              <Typography
+                key={index}
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  display: "inline",
+                  whiteSpace: "nowrap",
+                  color: "#0F172A",
+                  fontSize: 12,
+                  fontWeight: 400,
+                }}
+              >
+                {index > 0 ? "• " : ""}
+                {currency}
+              </Typography>
+            ))}
+          </Box>
         </Box>
 
         <Box

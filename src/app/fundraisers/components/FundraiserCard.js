@@ -42,8 +42,28 @@ const FundraiserCard = ({ fundraiser, onClick }) => {
         <Typography sx={{ color: "#0F172A", fontSize: 14, fontWeight: 400 }}>
           {fundraiser.FundraiserCentralID}
         </Typography>
-        {/* <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 0.2 }}>
-          {fundraiser.tags.map((tag, index) => (
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 0.5,
+            mt: 0.2,
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="subtitle1"
+            sx={{
+              display: "inline",
+              whiteSpace: "nowrap",
+              color: "#0F172A",
+              fontSize: 12,
+              fontWeight: 400,
+            }}
+          >
+            {fundraiser.BaseCountryName} -
+          </Typography>
+          {fundraiser.AcceptedCurrencies.map((currency, index) => (
             <Typography
               key={index}
               variant="caption"
@@ -57,10 +77,10 @@ const FundraiserCard = ({ fundraiser, onClick }) => {
               }}
             >
               {index > 0 ? "• " : ""}
-              {tag}
+              {currency}
             </Typography>
           ))}
-        </Box> */}
+        </Box>
       </Box>
     </Card>
   );
