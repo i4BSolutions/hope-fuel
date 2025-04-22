@@ -74,18 +74,9 @@ const saveButtonStyles = {
   },
 };
 
-// Country options memoized
-const countryOptions = [
-  { value: "Myanmar", label: "Myanmar" },
-  { value: "USA", label: "United States" },
-  { value: "India", label: "India" },
-  { value: "Japan", label: "Japan" },
-  { value: "Australia", label: "Australia" },
-  { value: "UK", label: "United Kingdom" },
-];
-
 const CustomerInfoEdit = ({
   customerInfo,
+  countries,
   setCustomerInfo,
   onSave,
   onCancel,
@@ -153,9 +144,9 @@ const CustomerInfoEdit = ({
 
   const countryMenuItems = useMemo(
     () =>
-      countryOptions.map((option) => (
-        <MenuItem key={option.value} value={option.value}>
-          {option.label}
+      countries.map((option) => (
+        <MenuItem key={option.BaseCountryID} value={option.BaseCountryID} selected={option.BaseCountryID === customerInfo.country}>
+          {option.BaseCountryName}
         </MenuItem>
       )),
     []
