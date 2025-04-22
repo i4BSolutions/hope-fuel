@@ -1,11 +1,5 @@
 "use client";
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
 
 // Create AgentContext
