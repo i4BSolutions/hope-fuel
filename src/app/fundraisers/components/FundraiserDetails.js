@@ -198,7 +198,8 @@ const FundraiserDetails = ({
               Email
             </Typography>
             <Link
-              href="mailto:starbucksjp@sbcoffee.com"
+              target="_blank"
+              href={`mailto:${fundraiserDetails.FundraiserEmail}`}
               sx={{
                 color: "#3460DC",
                 fontSize: 18,
@@ -234,6 +235,7 @@ const FundraiserDetails = ({
               Facebook
             </Typography>
             <Link
+              target="_blank"
               href={fundraiserDetails.ContactLinks.FacebookLink}
               sx={{
                 color: "#3460DC",
@@ -270,6 +272,7 @@ const FundraiserDetails = ({
               Telegram
             </Typography>
             <Link
+              target="_blank"
               href={
                 fundraiserDetails.ContactLinks.TelegramLink
                   ? fundraiserDetails.ContactLinks.TelegramLink
@@ -313,6 +316,7 @@ const FundraiserDetails = ({
                 OtherLink1
               </Typography>
               <Link
+                target="_blank"
                 href={fundraiserDetails.ContactLinks.OtherLink1}
                 sx={{
                   color: "#3460DC",
