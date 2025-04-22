@@ -62,9 +62,16 @@ const FundraisingFormPage = () => {
         typeof fundraiser.FundraiserName === "string" &&
         fundraiser.FundraiserName.toLowerCase().includes(query);
 
-      const idMatch = String(fundraiser.FundraiserCentralID).includes(query);
+      const countryNameMatch =
+        fundraiser.BaseCountryName &&
+        typeof fundraiser.BaseCountryName === "string" &&
+        fundraiser.BaseCountryName.toLowerCase().includes(query);
 
-      return nameMatch || idMatch;
+      const idMatch =
+        fundraiser.FundraiserCentralID &&
+        String(fundraiser.FundraiserCentralID).includes(query);
+
+      return nameMatch || countryNameMatch || idMatch;
     });
 
     setFilteredFundraisers(filtered);
