@@ -98,6 +98,11 @@ const Sidebar = () => {
         path: "/hopefuelidlist",
       },
       {
+        text: "Customers List",
+        icon: <PeopleAltOutlinedIcon />,
+        path: "/customerlist",
+      },
+      {
         text: "Fundraisers",
         icon: <FlagIcon />,
         path: "/fundraisers/",
@@ -114,7 +119,16 @@ const Sidebar = () => {
         icon: <SyncAltRoundedIcon />,
         path: "/extendUser",
       },
-      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
+      { 
+        text: "ငွေစစ်ဆေးခြင်း",
+        icon: <AttachMoneyIcon />,
+        path: "/entryForm" 
+      },
+      {
+        text: "Customers List",
+        icon: <PeopleAltOutlinedIcon />,
+        path: "/customerlist",
+      },
     ],
   };
 

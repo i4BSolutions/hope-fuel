@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Button } from "@mui/material";
 import theme from "../../UI/theme";
 
-const UserInfoCard = ({ data, isMobile, onEdit, onViewEditHistory }) => {
+const UserInfoCard = ({ userRole, data, isMobile, onEdit, onViewEditHistory }) => {
   if (!data) {
     return (
       <Box
@@ -67,6 +67,7 @@ const UserInfoCard = ({ data, isMobile, onEdit, onViewEditHistory }) => {
           variant="contained"
           color="error"
           size="small"
+          disabled={userRole !== "Admin"}
         >
           Edit
         </Button>
