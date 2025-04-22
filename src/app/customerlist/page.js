@@ -112,7 +112,7 @@ const CustomerListPage = () => {
         }
 
         const result = await response.json();
-        const newCustomers = result.customers || [];
+        const newCustomers = result.data || [];
 
         if (isNewSearch) {
           setCustomerData(newCustomers);

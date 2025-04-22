@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import db from "../../utilites/db"; 
+import db from "../../utilites/db";
 
-async function fetchCustomers(limit,offset) {
-    const query = `SELECT CustomerId, Name, Email, ManyChatId FROM Customer LIMIT ? OFFSET ?`;
-    const values =[limit, offset];
+async function fetchCustomers(limit, offset) {
+  const query = `SELECT CustomerId, Name, Email, ManyChatId FROM Customer LIMIT ? OFFSET ?`;
+  const values = [limit, offset];
   try {
-
     const result = await db(query, values);
     console.log("result from DB: ", result);
     return result;
@@ -22,21 +21,19 @@ export async function GET(req) {
   const offset = (page - 1) * limit;
 
   try {
-   
-    const  [{total}] = await db(`SELECT COUNT(*) AS total FROM Customer`);
-   // console.log("totalPages::", total);
-
+    const [{ total }] = await db(`SELECT COUNT(*) AS total FROM Customer`);
+    // console.log("totalPages::", total);
 
     const customers = await fetchCustomers(limit, offset);
 
     return NextResponse.json({
+      status: 200,
+      message: "Customer retrieved successfully.",
       totalRecords: total,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      customers,
-    },
-    {status: 200});
-
+      data: customers,
+    });
   } catch (error) {
     console.error("Error fetching customers:", error);
     return NextResponse.json(
