@@ -76,6 +76,11 @@ const Sidebar = () => {
         path: "/hopefuelidlist",
       },
       {
+        text: "Customers List",
+        icon: <PeopleAltOutlinedIcon />,
+        path: "/customerlist",
+      },
+      {
         text: "Fundraisers",
         icon: <FlagIcon />,
         path: "/fundraisers",
@@ -91,11 +96,6 @@ const Sidebar = () => {
         text: "HOPEID List",
         icon: <FormatListBulletedRoundedIcon />,
         path: "/hopefuelidlist",
-      },
-      {
-        text: "Customers List",
-        icon: <PeopleAltOutlinedIcon />,
-        path: "/customerlist",
       },
       {
         text: "Fundraisers",
