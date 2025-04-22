@@ -372,7 +372,7 @@ const CustomerListPage = () => {
         <Grid item xs={12} md={9}>
           {profileDetailData ? (
             <UserInfoCard
-              userRole={currentUser.UserRole}
+              userRole={currentUser?.UserRole}
               data={profileDetailData}
               isMobile={isMobile}
               onEdit={handleOpenEditHistoryModal}
