@@ -16,25 +16,27 @@ async function InsertCustomer(
   customerEmail,
   agentId,
   manyChatId,
+  countryId,
   contactLink,
   month
 ) {
   let currentDay = new Date();
   let nextExpireDate = calculateExpireDate(currentDay, month, true);
   const query = `
-    INSERT INTO Customer (Name, Email, AgentID, ManyChatID, ContactLink, ExpireDate ) VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO Customer (Name, Email, AgentID, ManyChatID, UserCountry, ContactLink, ExpireDate ) VALUES (?, ?, ?, ?, ?, ?)
     `;
   const values = [
     customerName,
     customerEmail,
     agentId,
     manyChatId,
+    countryId,
     contactLink,
     nextExpireDate,
   ];
+
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId; // Retrieve the inserted customer ID
   } catch (error) {
     console.error("Error inserting customer:", error);
@@ -51,10 +53,9 @@ async function createNote(note, agentID) {
   const values = [note, new Date(), agentID];
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId;
   } catch (error) {
-    console.error("Error inserting customer:", error);
+    console.error("Error inserting note:", error);
     return NextResponse.json(
       { error: "Failed to insert customer" },
       { status: 500 }
@@ -263,8 +264,8 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
     let json = await req.json();
-    // console.log(json);
 
     let {
       customerName,
@@ -272,6 +273,7 @@ export async function POST(req) {
       agentId,
       supportRegionId,
       manyChatId,
+      countryId,
       contactLink,
       amount,
       month,
@@ -321,6 +323,7 @@ export async function POST(req) {
       customerEmail,
       agentId,
       manyChatId,
+      countryId,
       contactLink,
       month
     );
@@ -358,13 +361,10 @@ export async function POST(req) {
     const result = await db(query, values);
 
     const transactionId = result.insertId;
-    //console.log("Transaction ID " + transactionId);
     const formStatusId = await InsertFormStatus(transactionId);
-
     const screenShotIds = await createScreenShot(screenShot, transactionId);
     const logId = await InsertTransactionLog(transactionId, agentId);
-    // console.log("Screenshot ids are: " + screenShotIds)
-    console.log("Transaction Result: ", result);
+    
     return NextResponse.json({
       status: "success",
       transactionId,
@@ -372,7 +372,6 @@ export async function POST(req) {
       formStatusId,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { error: error.message || "Something went wrong" },
       { status: 500 }
