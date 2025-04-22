@@ -26,6 +26,7 @@ import EditHistory from "./components/EditHistory";
 import CustomerInfoEdit from "./components/CustomerInfoEdit";
 import { set } from "date-fns";
 import { useAgent } from "../context/AgentContext";
+import { useUser } from "../context/UserContext";
 
 const mockCards = [
   {
@@ -50,6 +51,7 @@ const PAGE_SIZE = 10;
 const CustomerListPage = () => {
   const theme = useTheme();
   const agentId = useAgent();
+  const { setUser, currentUser } = useUser();
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
@@ -370,6 +372,7 @@ const CustomerListPage = () => {
         <Grid item xs={12} md={9}>
           {profileDetailData ? (
             <UserInfoCard
+              userRole={currentUser.UserRole}
               data={profileDetailData}
               isMobile={isMobile}
               onEdit={handleOpenEditHistoryModal}
