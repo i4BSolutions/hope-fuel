@@ -33,6 +33,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   // Form States
   const [wallets, setWallets] = useState([]);
   const [supportRegions, setSupportRegions] = useState([]);
+  const [baseCountryList, setBaseCountryList] = useState([]);
+  const [baseCountry, setBaseCountry] = useState("");
   const [currencies, setCurrencies] = useState([]);
   const [btnDisable, setBtnDisable] = useState(true);
   const [success, setSuccess] = useState(false);
@@ -90,6 +92,20 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     };
 
     fetchSupportRegions();
+  }, []);
+
+  useEffect(() => {
+    const fetchBaseCountry = async () => {
+      try {
+        const response = await fetch("/api/countries");
+        const data = await response.json();
+        setBaseCountryList(data.Countries);
+      } catch (error) {
+        console.error("Error fetching base country:", error);
+      }
+    };
+
+    fetchBaseCountry();
   }, []);
 
   // Fetch Currencies
@@ -173,9 +189,12 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     if (!amount) validationErrors.amount = "Amount required.";
     if (!walletId) validationErrors.wallet = "Wallet required.";
     if (!month) validationErrors.month = "Month required.";
-    if (!supportRegion)
-      validationErrors.supportRegion = "Support region required.";
-    if (!manyChatId) validationErrors.manyChatId = "ManyChat ID required.";
+    if (!supportRegion) validationErrors.supportRegion = "Support region required.";
+    if (!manyChatId) {
+      validationErrors.manyChatId = "ManyChat ID required.";
+    } else if (!/^\d+$/.test(manyChatId)) {
+      validationErrors.manyChatId = "Only numeric values are allowed for ManyChat ID.";
+    }
 
     if (files.length === 0) {
       validationErrors.files = "You must upload at least one file.";
@@ -194,7 +213,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
 
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
-  }, [currency, walletId, files]);
+  }, [currency, walletId, files, manyChatId]);
 
   // Handle File Upload
   const handleDrop = async (acceptedFiles) => {
@@ -235,6 +254,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
         contactLink,
         notes,
         manyChatId,
+        baseCountry,
         walletId,
         amount,
         month
@@ -502,36 +522,26 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
 
             <Box flex={1}>
               {/* Donor Country Selection */}
-              <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
-                Donor Country
+              <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>Donor Country 
                 {/* <span style={{ color: "red" }}>*</span> */}
               </Typography>
-              <Select
-                fullWidth
-                defaultValue=""
-                sx={{
-                  mb: 2,
-                  borderRadius: "12px",
-                  height: "48px",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "rgba(0, 0, 0, 0.23)",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#000",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#1976d2",
-                  },
-                  "& .MuiSelect-select": {
-                    padding: "12px",
-                    display: "flex",
-                    alignItems: "center",
-                    fontSize: "14px",
-                  },
+              <CustomInput
+                mb={2}
+                width="100%"
+                fullWidth={true}
+                type="select"
+                name="donorCountry"
+                id="donorCountry"
+                value={baseCountry}
+                onChange={(e) => {
+                  setBaseCountry(e.target.value);
+                  setErrors((prev) => ({ ...prev, donorCountry: "" }));
                 }}
-              >
-                <MenuItem value="">Select Country</MenuItem>
-              </Select>
+                options={baseCountryList.map((item) => ({
+                  value: item.BaseCountryID,
+                  label: item.BaseCountryName,
+                }))}
+              />
             </Box>
           </Box>
 

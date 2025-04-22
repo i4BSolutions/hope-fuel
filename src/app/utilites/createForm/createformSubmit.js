@@ -16,6 +16,7 @@ export default async function createFormSubmit(
   contactLink,
   note,
   manyChatId,
+  donorCountry,
   walletId,
   amount,
   month
@@ -77,6 +78,7 @@ export default async function createFormSubmit(
     customerEmail: userInfo.email,
     agentId: agentId,
     supportRegionId: supportRegion,
+    countryId: donorCountry,
     manyChatId: manyChatId,
     contactLink: contactLink,
     amount: amount,
