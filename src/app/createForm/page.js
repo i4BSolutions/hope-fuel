@@ -1,6 +1,7 @@
 "use client";
 
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import CircularProgress from "@mui/material/CircularProgress";
 import { Box, Button, Modal, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import getAuthCurrentUser from "../utilites/getAuthCurrentUser";

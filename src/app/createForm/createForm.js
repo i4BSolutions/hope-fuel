@@ -555,14 +555,22 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 mb={2}
                 width="100%"
                 fullWidth={true}
-                type="number"
+                type="text"
                 name="manychatId"
                 id="manychatId"
                 placeholder="ManyChat ID"
                 value={manyChatId}
                 onChange={(e) => {
-                  setManyChatId(e.target.value);
-                  if (manyChatId !== "") errors.manyChatId = "";
+                  const value = e.target.value;
+                  setManyChatId(value);
+
+                  if (value === "") {
+                    setErrors((prev) => ({ ...prev, manyChatId: "ManyChat ID required." }));
+                  } else if (!/^\d+$/.test(value)) {
+                    setErrors((prev) => ({ ...prev, manyChatId: "Only numeric values are allowed for ManyChat ID." }));
+                  } else {
+                    setErrors((prev) => ({ ...prev, manyChatId: "" }));
+                  }
                 }}
               />
               {errors.manyChatId && (
