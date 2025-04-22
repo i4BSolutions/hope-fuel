@@ -501,7 +501,11 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 const value = e.target.value;
                 setManyChatId(value);
               
-                if (value !== "" && /^\d+$/.test(value)) {
+                if (value === "") {
+                  setErrors((prev) => ({ ...prev, manyChatId: "ManyChat ID required." }));
+                } else if (!/^\d+$/.test(value)) {
+                  setErrors((prev) => ({ ...prev, manyChatId: "Only numeric values are allowed for ManyChat ID." }));
+                } else {
                   setErrors((prev) => ({ ...prev, manyChatId: "" }));
                 }
               }}
