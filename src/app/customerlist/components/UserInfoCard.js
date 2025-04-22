@@ -49,7 +49,7 @@ const UserInfoCard = ({ data, isMobile, onEdit, onViewEditHistory }) => {
         <Typography sx={{ fontSize: 18, fontWeight: 600, lineHeight: "22px" }}>
           Country:{" "}
           <span style={{ fontSize: 18, fontWeight: 400, lineHeight: "22px" }}>
-            {data.UserCountry}
+            {data.UserCountryName}
           </span>
         </Typography>
       </Box>

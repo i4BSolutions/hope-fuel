@@ -70,6 +70,7 @@ const CustomerListPage = () => {
     email: "",
     country: "",
   });
+  const [countries, setCountries] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -83,10 +84,12 @@ const CustomerListPage = () => {
     if (!initialLoadRef.current) {
       initialLoadRef.current = true;
       fetchCustomerData(1, true);
+      fetchBaseCountry();
     } else if (debouncedSearch !== undefined) {
       setPage(1);
       setHasMore(true);
       fetchCustomerData(1, true);
+      fetchBaseCountry();
     }
   }, [debouncedSearch]);
 
@@ -150,6 +153,30 @@ const CustomerListPage = () => {
     },
     [debouncedSearch, loading]
   );
+
+  const fetchBaseCountry = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/countries");
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to fetch base country (${response.status})`
+        );
+      }
+
+      const baseCountry = await response.json();
+      setCountries(baseCountry.Countries || []);
+    } catch (err) {
+      console.error("Error fetching base country:", err);
+      setError(`Failed to load base country: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  })
 
   const fetchProfileDetails = useCallback(async (profileId) => {
     if (!profileId) return;
@@ -264,6 +291,10 @@ const CustomerListPage = () => {
             field: "Email",
             newValue: data.email,
           },
+          {
+            field: "UserCountry",
+            newValue: data.country,
+          }
         ],
       });
 
@@ -424,6 +455,7 @@ const CustomerListPage = () => {
       >
         <CustomerInfoEdit
           customerInfo={customerInfo}
+          countries={countries}
           setCustomerInfo={setCustomerInfo}
           onSave={handleSave}
           onCancel={handleCancel}
