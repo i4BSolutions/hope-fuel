@@ -133,12 +133,33 @@ const FundraiserDetails = ({
           >
             Accepted Currency
           </Typography>
-          <Typography
-            variant="body2"
-            sx={{ color: "#000000", fontSize: 18, fontWeight: 600 }}
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 0.5,
+              mt: 0.2,
+              alignItems: "center",
+            }}
           >
-            {fundraiserDetails.AcceptedCurrencies[0]}
-          </Typography>
+            {fundraiserDetails.AcceptedCurrencies.map((currency, index) => (
+              <Typography
+                key={index}
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  display: "inline",
+                  whiteSpace: "nowrap",
+                  color: "#0F172A",
+                  fontSize: 12,
+                  fontWeight: 400,
+                }}
+              >
+                {index > 0 ? "• " : ""}
+                {currency}
+              </Typography>
+            ))}
+          </Box>
         </Box>
 
         <Box
@@ -177,7 +198,8 @@ const FundraiserDetails = ({
               Email
             </Typography>
             <Link
-              href="mailto:starbucksjp@sbcoffee.com"
+              target="_blank"
+              href={`mailto:${fundraiserDetails.FundraiserEmail}`}
               sx={{
                 color: "#3460DC",
                 fontSize: 18,
@@ -213,6 +235,7 @@ const FundraiserDetails = ({
               Facebook
             </Typography>
             <Link
+              target="_blank"
               href={fundraiserDetails.ContactLinks.FacebookLink}
               sx={{
                 color: "#3460DC",
@@ -249,6 +272,7 @@ const FundraiserDetails = ({
               Telegram
             </Typography>
             <Link
+              target="_blank"
               href={
                 fundraiserDetails.ContactLinks.TelegramLink
                   ? fundraiserDetails.ContactLinks.TelegramLink
@@ -292,6 +316,7 @@ const FundraiserDetails = ({
                 OtherLink1
               </Typography>
               <Link
+                target="_blank"
                 href={fundraiserDetails.ContactLinks.OtherLink1}
                 sx={{
                   color: "#3460DC",
