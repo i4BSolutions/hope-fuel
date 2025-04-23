@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
-import db from "../../../../utilites/db"; 
+import db from "../../../../utilites/db";
 
-async function CreatelogEditHistory(agentId, customerId, field, oldValue, newValue) {
-    const query = `
+async function CreatelogEditHistory(
+  agentId,
+  customerId,
+  field,
+  oldValue,
+  newValue
+) {
+  const query = `
     INSERT INTO CustomerAuditLogs (AgentId, CustomerId, FieldChanged, OldValue, NewValue, ChangeDate) 
              VALUES (?, ?, ?, ?, ?, NOW())
     `;
-    const values = [agentId, customerId, field, oldValue, newValue];
+  const values = [agentId, customerId, field, oldValue, newValue];
   try {
     await db(query, values);
   } catch (error) {
@@ -15,26 +21,24 @@ async function CreatelogEditHistory(agentId, customerId, field, oldValue, newVal
   }
 }
 async function fetchCustomerValues(customerId) {
-    const query = `
+  const query = `
     SELECT * FROM Customer where CustomerId = ?
     `;
-    const values = [customerId];
-    try {
-      const customer = await db(query, values);
-      return customer[0];
-    } catch (error) {
-      console.error("[DB] Error fetching customer:", error);
-      throw new Error("Failed to fetch customer");
-}
+  const values = [customerId];
+  try {
+    const customer = await db(query, values);
+    return customer[0];
+  } catch (error) {
+    console.error("[DB] Error fetching customer:", error);
+    throw new Error("Failed to fetch customer");
+  }
 }
 
 async function UpdateCustomerField(customerId, field, newValue) {
- 
-const query = `UPDATE Customer SET ${field} = ? WHERE CustomerId = ?`;
-const values = [ newValue, customerId];
+  const query = `UPDATE Customer SET ${field} = ? WHERE CustomerId = ?`;
+  const values = [newValue, customerId];
   try {
     await db(query, values);
-
   } catch (error) {
     console.error("[DB] Error updating customer field:", error);
     throw new Error("Failed to update customer field");
@@ -42,75 +46,69 @@ const values = [ newValue, customerId];
 }
 
 export async function POST(req, { params }) {
-    const { id } = params;
-    const { agentId, updates } = await req.json();
+  const { id } = params;
+  const { agentId, updates } = await req.json();
 
-    if ( !id || !agentId || !updates) {
+  if (!id || !agentId || !updates) {
+    return NextResponse.json(
+      { message: "Missing required fields in request" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const currentCustomer = await fetchCustomerValues(id);
+    if (!currentCustomer) {
       return NextResponse.json(
-        { message: "Missing required fields in request" },
-        { status: 400 }
+        { message: "Customer not found" },
+        { status: 404 }
       );
     }
+    let changesMade = false;
+    let updateQueries = [];
+    let auditLogs = [];
 
-    try{
-      const currentCustomer = await fetchCustomerValues(id);
-      if (!currentCustomer) {
+    for (const { field, newValue } of updates) {
+      const allowedFields = ["Name", "Email", "UserCountry"]; //allowed fields to be updated
+      if (!allowedFields.includes(field)) {
         return NextResponse.json(
-          { message: "Customer not found" },
-          { status: 404 }
+          { message: `Field not allowed to be updated for ${field}` },
+          { status: 400 }
         );
       }
-      let changesMade = false;
-      let updateQueries = [];
-      let auditLogs = [];
 
-      for (const { field, newValue } of updates) {
-        const allowedFields = ["Name", "Email", "UserCountry"]; //allowed fields to be updated
-        if (!allowedFields.includes(field)) {
-          return NextResponse.json(
-            { message: `Field not allowed to be updated for ${field}` },
-            { status: 400 }
-          );
-        }
+      const oldValue = currentCustomer[field];
 
-        const oldValue = currentCustomer[field];
-
-        if (oldValue !== newValue) {
-          updateQueries.push({ field, newValue });
-          auditLogs.push({ field, oldValue, newValue });
-          changesMade = true;
-        } else {
-          changesMade = false;
-        }
+      if (oldValue !== newValue) {
+        updateQueries.push({ field, newValue });
+        auditLogs.push({ field, oldValue, newValue });
+        changesMade = true;
       }
-      // Apply batch updates
-      for (const { field, newValue } of updateQueries) {
-        await UpdateCustomerField(id, field, newValue);
-      }
-
-      // Log all changes at once
-      for (const { field, oldValue, newValue } of auditLogs) {
-        await CreatelogEditHistory(agentId, id, field, oldValue, newValue);
-      }
-
-      if (changesMade) {
-        return NextResponse.json(
-          { message: "Customer updated successfully" },
-          { status: 200 }
-        );
-      } else {
-        return NextResponse.json(
-          { message: "No changes made" },
-          { status: 200 }
-        );
-      }
-    }catch(error){
-         console.error("[API] Error updating customer:", error);
-         return NextResponse.json(
-           { message: "Internal Server Error" },
-           { status: 500 }
-         );
     }
 
+    // Apply batch updates
+    for (const { field, newValue } of updateQueries) {
+      await UpdateCustomerField(id, field, newValue);
+    }
 
+    // Log all changes at once
+    for (const { field, oldValue, newValue } of auditLogs) {
+      await CreatelogEditHistory(agentId, id, field, oldValue, newValue);
+    }
+
+    if (changesMade) {
+      return NextResponse.json(
+        { message: "Customer updated successfully" },
+        { status: 200 }
+      );
+    } else {
+      return NextResponse.json({ message: "No changes made" }, { status: 200 });
+    }
+  } catch (error) {
+    console.error("[API] Error updating customer:", error);
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
