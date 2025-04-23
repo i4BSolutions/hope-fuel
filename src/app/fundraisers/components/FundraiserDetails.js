@@ -18,6 +18,7 @@ const FundraiserDetails = ({
   onClose,
   onEdit,
   onDelete,
+  userRole,
 }) => {
   return (
     <Paper
@@ -31,32 +32,34 @@ const FundraiserDetails = ({
         m: "auto",
       }}
     >
-      <Box sx={{ p: 1, display: "flex", justifyContent: "space-between" }}>
-        <IconButton onClick={() => onClose && onClose()} size="small">
-          <CloseIcon />
-        </IconButton>
-        <Box>
-          <IconButton
-            onClick={(e) => {
-              e.preventDefault();
-              onDelete && onDelete(fundraiserDetails.FundraiserID);
-            }}
-            size="small"
-            sx={{ color: "#f44336" }}
-          >
-            <DeleteOutlineIcon />
+      {userRole === "Admin" && (
+        <Box sx={{ p: 1, display: "flex", justifyContent: "space-between" }}>
+          <IconButton onClick={() => onClose && onClose()} size="small">
+            <CloseIcon />
           </IconButton>
-          <IconButton
-            onClick={(e) => {
-              e.preventDefault();
-              onEdit && onEdit(fundraiserDetails.FundraiserID);
-            }}
-            size="small"
-          >
-            <EditOutlinedIcon />
-          </IconButton>
+          <Box>
+            <IconButton
+              onClick={(e) => {
+                e.preventDefault();
+                onDelete && onDelete(fundraiserDetails.FundraiserID);
+              }}
+              size="small"
+              sx={{ color: "#f44336" }}
+            >
+              <DeleteOutlineIcon />
+            </IconButton>
+            <IconButton
+              onClick={(e) => {
+                e.preventDefault();
+                onEdit && onEdit(fundraiserDetails.FundraiserID);
+              }}
+              size="small"
+            >
+              <EditOutlinedIcon />
+            </IconButton>
+          </Box>
         </Box>
-      </Box>
+      )}
 
       <Box sx={{ textAlign: "center", mt: 2, mb: 4 }}>
         <Avatar

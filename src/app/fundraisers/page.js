@@ -525,6 +525,7 @@ const FundraisingFormPage = () => {
               onClose={handleCloseFundraiserDetailsModal}
               onEdit={handleEdit}
               onDelete={handleOpenFundraiserDeleteModal}
+              userRole={currentUser?.UserRole}
             />
           )}
         </Modal>
