@@ -57,7 +57,8 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       c.ManyChatId, 
       ts.TransactionStatus, 
       n.Note
-    LIMIT ?  OFFSET ?;
+    ORDER BY t.HopeFuelID DESC
+    LIMIT ? OFFSET ?;
 `;
 
   try {
