@@ -12,10 +12,13 @@ import {
   CircularProgress,
   Container,
   Divider,
+  FormControl,
   Grid2,
   InputAdornment,
+  MenuItem,
   Modal,
   Paper,
+  Select,
   Snackbar,
   TextField,
   Typography,
@@ -23,6 +26,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import SearchIcon from "@mui/icons-material/Search";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import FundraiserDetails from "./components/FundraiserDetails";
 import CustomButton from "../components/Button";
 import FundraisingForm from "./components/FundraisingForm";
@@ -38,6 +42,12 @@ const FundraisingFormPage = () => {
   const [fundraiserDetailLoading, setFundraiserDetailLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const [openFilterModal, setOpenFilterModal] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("");
+  const [availableCountries, setAvailableCountries] = useState([]);
+  const [availableCurrencies, setAvailableCurrencies] = useState([]);
+
   const [openFundraiserDetailsModal, setOpenFundraiserDetailsModal] =
     useState(false);
   const [openFundraiserDeleteModal, setOpenFundraiserDeleteModal] =
@@ -51,31 +61,67 @@ const FundraisingFormPage = () => {
   }, []);
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredFundraisers(fundraisers);
-      return;
+    if (!fundraisers || fundraisers.length === 0) return;
+
+    const countries = [
+      ...new Set(
+        fundraisers
+          .map((f) => f.BaseCountryName)
+          .filter((c) => c && typeof c === "string")
+      ),
+    ];
+
+    const currencyArrays = fundraisers
+      .map((f) => f.AcceptedCurrencies)
+      .filter((arr) => Array.isArray(arr));
+
+    const currencies = [...new Set(currencyArrays.flat())];
+
+    setAvailableCountries(countries);
+    setAvailableCurrencies(currencies);
+  }, [fundraisers]);
+
+  useEffect(() => {
+    if (!fundraisers) return;
+
+    let filtered = [...fundraisers];
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((fundraiser) => {
+        const nameMatch =
+          typeof fundraiser.FundraiserName === "string" &&
+          fundraiser.FundraiserName.toLowerCase().includes(query);
+
+        const countryNameMatch =
+          fundraiser.BaseCountryName &&
+          typeof fundraiser.BaseCountryName === "string" &&
+          fundraiser.BaseCountryName.toLowerCase().includes(query);
+
+        const idMatch =
+          fundraiser.FundraiserCentralID &&
+          String(fundraiser.FundraiserCentralID).includes(query);
+
+        return nameMatch || countryNameMatch || idMatch;
+      });
     }
 
-    const query = searchQuery.toLowerCase().trim();
-    const filtered = fundraisers.filter((fundraiser) => {
-      const nameMatch =
-        typeof fundraiser.FundraiserName === "string" &&
-        fundraiser.FundraiserName.toLowerCase().includes(query);
+    if (selectedCountry) {
+      filtered = filtered.filter(
+        (fundraiser) => fundraiser.BaseCountryName === selectedCountry
+      );
+    }
 
-      const countryNameMatch =
-        fundraiser.BaseCountryName &&
-        typeof fundraiser.BaseCountryName === "string" &&
-        fundraiser.BaseCountryName.toLowerCase().includes(query);
-
-      const idMatch =
-        fundraiser.FundraiserCentralID &&
-        String(fundraiser.FundraiserCentralID).includes(query);
-
-      return nameMatch || countryNameMatch || idMatch;
-    });
+    if (selectedCurrency) {
+      filtered = filtered.filter(
+        (fundraiser) =>
+          Array.isArray(fundraiser.AcceptedCurrencies) &&
+          fundraiser.AcceptedCurrencies.includes(selectedCurrency)
+      );
+    }
 
     setFilteredFundraisers(filtered);
-  }, [searchQuery, fundraisers]);
+  }, [searchQuery, fundraisers, selectedCountry, selectedCurrency]);
 
   const getAllFundraisers = useCallback(async () => {
     if (fetchFundraiserLoading) return;
@@ -197,6 +243,33 @@ const FundraisingFormPage = () => {
     setSearchQuery(event.target.value);
   };
 
+  const handleOpenFilterModal = () => {
+    setOpenFilterModal((prev) => !prev);
+  };
+
+  const handleCloseFilterModal = () => {
+    setOpenFilterModal((prev) => !prev);
+  };
+
+  const handleCountryChange = (event) => {
+    setSelectedCountry(event.target.value);
+  };
+
+  const handleCurrencyChange = (event) => {
+    setSelectedCurrency(event.target.value);
+  };
+
+  const handleApplyFilter = () => {
+    // Filters are already applied via useEffect
+    handleCloseFilterModal();
+  };
+
+  const handleClearFilter = () => {
+    setSelectedCountry("");
+    setSelectedCurrency("");
+    handleCloseFilterModal();
+  };
+
   if (fetchFundraiserLoading) {
     return (
       <Box
@@ -206,7 +279,7 @@ const FundraisingFormPage = () => {
       </Box>
     );
   }
-
+  console.log(availableCurrencies);
   return (
     <>
       <Box
@@ -221,24 +294,44 @@ const FundraisingFormPage = () => {
         <Typography sx={{ color: "#000000", fontSize: 34, fontWeight: 600 }}>
           Fundraiser
         </Typography>
-        <TextField
-          name="search"
-          placeholder="Search"
-          sx={{ width: 642 }}
-          value={searchQuery}
-          onChange={handleSearchQueryChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            ),
-            sx: {
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+          <TextField
+            name="search"
+            placeholder="Search"
+            sx={{ width: 642 }}
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              sx: {
+                borderRadius: 20,
+                height: 40,
+              },
+            }}
+          />
+          <Button
+            onClick={handleOpenFilterModal}
+            variant="outlined"
+            startIcon={<FilterListIcon />}
+            sx={{
               borderRadius: 20,
               height: 40,
-            },
-          }}
-        />
+              textTransform: "none",
+              borderColor: "#E2E8F0",
+              color: "#64748B",
+              "&:hover": {
+                borderColor: "#CBD5E1",
+                backgroundColor: "#F1F5F9",
+              },
+            }}
+          >
+            Filter
+          </Button>
+        </Box>
         <CustomButton
           onClick={() => {
             setOpenCreateFundraiserModal((prev) => !prev);
@@ -287,6 +380,107 @@ const FundraisingFormPage = () => {
             </Typography>
           </Box>
         )}
+
+        <Modal
+          open={openFilterModal}
+          onClose={handleCloseFilterModal}
+          aria-labelledby="filter-modal-title"
+          aria-describedby="filter-modal-description"
+        >
+          <Paper
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 400,
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 4,
+              borderRadius: 2,
+            }}
+          >
+            <Typography
+              id="filter-modal-title"
+              variant="h6"
+              component="h2"
+              sx={{ mb: 3 }}
+            >
+              Filter by
+            </Typography>
+
+            <Box sx={{ mb: 3 }}>
+              <Typography sx={{ mb: 1 }}>Country</Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedCountry}
+                  onChange={handleCountryChange}
+                  displayEmpty
+                  renderValue={
+                    selectedCountry ? undefined : () => "Select Country/ies"
+                  }
+                  sx={{ borderRadius: 2 }}
+                >
+                  {availableCountries.map((country) => (
+                    <MenuItem key={country} value={country}>
+                      {country}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            {/* <Box sx={{ mb: 4 }}>
+              <Typography sx={{ mb: 1 }}>Accepted Currency</Typography>
+              <FormControl fullWidth>
+                <Select
+                  value={selectedCurrency}
+                  onChange={handleCurrencyChange}
+                  displayEmpty
+                  renderValue={
+                    selectedCurrency ? undefined : () => "Select Currency/ies"
+                  }
+                  sx={{ borderRadius: 2 }}
+                >
+                  {availableCurrencies.map((currency) => (
+                    <MenuItem key={currency} value={currency}>
+                      {currency}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box> */}
+
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                onClick={handleClearFilter}
+                sx={{
+                  borderRadius: 20,
+                  width: "45%",
+                  textTransform: "none",
+                  border: "1px solid #E2E8F0",
+                }}
+              >
+                Clear
+              </Button>
+              <Button
+                onClick={handleApplyFilter}
+                variant="contained"
+                sx={{
+                  borderRadius: 20,
+                  width: "45%",
+                  backgroundColor: "#DC2626",
+                  textTransform: "none",
+                  "&:hover": {
+                    backgroundColor: "#B91C1C",
+                  },
+                }}
+              >
+                Apply Filter
+              </Button>
+            </Box>
+          </Paper>
+        </Modal>
 
         <Modal
           open={openCreateFundraiserModal}
