@@ -48,6 +48,12 @@ function CreateOrExtendPage() {
     }
   };
 
+  const handleExtendDecline = () => {
+    setShowExtendOrNot(false);
+    setShowCreateForm(false);
+    setShowExtendForm(false);
+  };
+
   if (loading)
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -66,7 +72,11 @@ function CreateOrExtendPage() {
         }}
       >
         {showExtendOrNot ? (
-          <ExtendOrNot userInfo={userInfo} onConfirm={handleExtendOrNot} />
+          <ExtendOrNot
+            userInfo={userInfo}
+            onConfirm={handleExtendOrNot}
+            onDecline={handleExtendDecline}
+          />
         ) : !showCreateForm && !showExtendForm ? (
           <CheckUser onUserCheck={handleUserCheck} userRole={userRole} />
         ) : showCreateForm ? (
