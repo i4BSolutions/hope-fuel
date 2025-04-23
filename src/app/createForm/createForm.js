@@ -135,7 +135,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       files.length > 0 &&
       !isNaN(amount) &&
       parseFloat(amount) > 0 &&
-      amount == minimumAmount &&
+      amount >= minimumAmount &&
       month >= 1 &&
       month <= 12
     );
