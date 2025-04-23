@@ -30,9 +30,11 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import FundraiserDetails from "./components/FundraiserDetails";
 import CustomButton from "../components/Button";
 import FundraisingForm from "./components/FundraisingForm";
+import { useUser } from "../context/UserContext";
 
 const FundraisingFormPage = () => {
   const router = useRouter();
+  const { currentUser } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [fundraisers, setFundraisers] = useState([]);
   const [filteredFundraisers, setFilteredFundraisers] = useState([]);
@@ -279,7 +281,7 @@ const FundraisingFormPage = () => {
       </Box>
     );
   }
-  console.log(availableCurrencies);
+
   return (
     <>
       <Box
@@ -332,13 +334,15 @@ const FundraisingFormPage = () => {
             Filter
           </Button>
         </Box>
-        <CustomButton
-          onClick={() => {
-            setOpenCreateFundraiserModal((prev) => !prev);
-          }}
-          text="Create New"
-          icon={<AddCircleOutlineOutlinedIcon />}
-        />
+        {currentUser?.UserRole === "Admin" && (
+          <CustomButton
+            onClick={() => {
+              setOpenCreateFundraiserModal((prev) => !prev);
+            }}
+            text="Create New"
+            icon={<AddCircleOutlineOutlinedIcon />}
+          />
+        )}
       </Box>
       <Divider sx={{ mb: 3, mt: 1, backgroundColor: "#E2E8F0", height: 3 }} />
       <Box
