@@ -1,11 +1,9 @@
 "use client";
 
 import { Authenticator } from "@aws-amplify/ui-react";
-import "@aws-amplify/ui-react/styles.css";
 import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
-import "../lib/amplifyClient";
 import Sidebar from "./UI/SidebarNav";
 import theme from "./UI/theme";
 import { AgentProvider } from "./context/AgentContext";
