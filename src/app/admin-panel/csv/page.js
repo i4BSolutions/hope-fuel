@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
-import { Box, Typography } from "@mui/material";
+import { Box, Modal, Paper, Typography } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
@@ -10,9 +10,24 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 
 import moment from "moment-timezone";
 import CustomButton from "../../components/Button";
+import CloseIcon from "@mui/icons-material/Close";
+import CheckIcon from "@mui/icons-material/Check";
 
 const ExportCSVPage = () => {
-  const [date, setDate] = useState(moment(new Date()));
+  const [date, setDate] = useState("");
+  const [openCSVExportModal, setOpenCSVExportModal] = useState(false);
+
+  const handleDateChange = useCallback((newDate) => {
+    setDate(newDate);
+  }, []);
+
+  const handleOpenCSVExportModal = useCallback(() => {
+    setOpenCSVExportModal(true);
+  }, []);
+
+  const handleCloseCSVExportModal = useCallback(() => {
+    setOpenCSVExportModal(false);
+  }, []);
 
   return (
     <Box
@@ -29,23 +44,72 @@ const ExportCSVPage = () => {
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={["DateRangePicker"]}>
-          <DateRangePicker
-            value={date}
-            onChange={(newDate) => {
-              setDate(newDate);
-            }}
-          />
+          <DateRangePicker value={date} onChange={handleDateChange} />
         </DemoContainer>
       </LocalizationProvider>
       <Box sx={{ mt: 3 }}>
         <CustomButton
-          onClick={() => {
-            console.log("Export CSV");
-          }}
+          disabled={!date}
+          onClick={handleOpenCSVExportModal}
           variant="contained"
           text="Export CSV"
         />
       </Box>
+      <Modal
+        open={openCSVExportModal}
+        onClose={handleCloseCSVExportModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        sx={{ alignSelf: "center", justifyItems: "center" }}
+      >
+        <Paper
+          sx={{
+            backgroundColor: "#F8FAFC",
+            width: 280,
+            height: 146,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            borderRadius: 4,
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="h2"
+            sx={{
+              fontWeight: 600,
+              textAlign: "center",
+            }}
+          >
+            Are you sure you want to export?
+          </Typography>
+
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+              mt: 2,
+            }}
+          >
+            <CustomButton
+              icon={<CloseIcon />}
+              color="primary"
+              variant="outlined"
+              text="No"
+              onClick={handleCloseCSVExportModal}
+            />
+
+            <CustomButton
+              icon={<CheckIcon />}
+              color="primary"
+              variant="contained"
+              text="Yes"
+            />
+          </Box>
+        </Paper>
+      </Modal>
     </Box>
   );
 };
