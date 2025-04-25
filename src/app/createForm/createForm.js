@@ -1,9 +1,10 @@
 "use client";
+
 import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-
 import { useAgent } from "../context/AgentContext";
 import { useUser } from "../context/UserContext";
+
 import createFormSubmit from "../utilites/createForm/createformSubmit";
 import filehandler from "../utilites/createForm/fileHandler";
 
@@ -94,6 +95,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     fetchSupportRegions();
   }, []);
 
+  // Fetch Base Country
   useEffect(() => {
     const fetchBaseCountry = async () => {
       try {
@@ -145,6 +147,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     setBtnDisable(!isFormValid());
   }, [currency, amount, walletId, month, supportRegion, manyChatId, files]);
 
+  // Fetch Exchange Rate
   useEffect(() => {
     const fetchExchangeRate = async () => {
       try {
@@ -171,6 +174,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     fetchExchangeRate();
   }, [currency]);
 
+  // Fetch Minimum Amount
   useEffect(() => {
     const fetchCheckMinAmount = async () => {
       try {
