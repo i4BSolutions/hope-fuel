@@ -93,38 +93,20 @@ const ExportCSVPage = () => {
               mt: 2,
             }}
           >
-            <Button
-              startIcon={<CloseIcon />}
-              variant="outlined"
+            <CustomButton
+              icon={<CloseIcon />}
               color="primary"
+              variant="outlined"
+              text="No"
               onClick={handleCloseCSVExportModal}
-              sx={{
-                minWidth: 80,
-                borderColor: "#DC2626",
-                borderRadius: 10,
-                color: "#DC2626",
-              }}
-            >
-              No
-            </Button>
+            />
 
-            <Button
-              startIcon={<CheckIcon />}
+            <CustomButton
+              icon={<CheckIcon />}
+              color="primary"
               variant="contained"
-              color="error"
-              // onClick={handleDeleteFundraiserConfirm}
-              sx={{
-                color: "#F8FAFC",
-                minWidth: 80,
-                backgroundColor: "#DC2626",
-                borderRadius: 10,
-                "&:hover": {
-                  backgroundColor: "#DC2626",
-                },
-              }}
-            >
-              Yes
-            </Button>
+              text="Yes"
+            />
           </Box>
         </Paper>
       </Modal>
