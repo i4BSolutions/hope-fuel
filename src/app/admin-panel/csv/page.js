@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 
-import { Box, Button, Modal, Paper, Typography } from "@mui/material";
+import { Box, Modal, Paper, Typography } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
