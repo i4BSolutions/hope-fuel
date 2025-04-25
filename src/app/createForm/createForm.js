@@ -1,5 +1,5 @@
 "use client";
-import { Box, MenuItem, Select, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
 import { useAgent } from "../context/AgentContext";
@@ -10,8 +10,7 @@ import filehandler from "../utilites/createForm/fileHandler";
 import CustomButton from "../components/Button";
 import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
-
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ErrorMessage from "./components/errorMessage";
 
 const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const user = useUser();
@@ -56,6 +55,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const [submitted, setSubmitted] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [minimumAmount, setMinAmount] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -123,9 +123,27 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     fetchCurrencies();
   }, []);
 
+  const isFormValid = () => {
+    return (
+      currency &&
+      amount &&
+      walletId &&
+      month &&
+      supportRegion &&
+      manyChatId &&
+      /^\d+$/.test(manyChatId) &&
+      files.length > 0 &&
+      !isNaN(amount) &&
+      parseFloat(amount) > 0 &&
+      amount >= minimumAmount &&
+      month >= 1 &&
+      month <= 12
+    );
+  };
+
   useEffect(() => {
-    setBtnDisable(Object.keys(errors).length > 0);
-  }, [errors]);
+    setBtnDisable(!isFormValid());
+  }, [currency, amount, walletId, month, supportRegion, manyChatId, files]);
 
   useEffect(() => {
     const fetchExchangeRate = async () => {
@@ -172,6 +190,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
         );
 
         const data = await response.json();
+        setMinAmount(data.data.minimumAmount);
         setMinAmountError(data.error);
       } catch (error) {
         console.error("Error fetching check minimum amount: ", error);
@@ -189,11 +208,13 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     if (!amount) validationErrors.amount = "Amount required.";
     if (!walletId) validationErrors.wallet = "Wallet required.";
     if (!month) validationErrors.month = "Month required.";
-    if (!supportRegion) validationErrors.supportRegion = "Support region required.";
+    if (!supportRegion)
+      validationErrors.supportRegion = "Support region required.";
     if (!manyChatId) {
       validationErrors.manyChatId = "ManyChat ID required.";
     } else if (!/^\d+$/.test(manyChatId)) {
-      validationErrors.manyChatId = "Only numeric values are allowed for ManyChat ID.";
+      validationErrors.manyChatId =
+        "Only numeric values are allowed for ManyChat ID.";
     }
 
     if (files.length === 0) {
@@ -351,6 +372,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                   onChange={(e) => {
                     setCurrency(e.target.value);
                     errors.currency = "";
+                    // validateForm();
                   }}
                   options={currencies.map((item) => ({
                     value: item.CurrencyCode,
@@ -385,46 +407,22 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                   onChange={(e) => {
                     setAmount(e.target.value);
                     errors.amount = "";
+                    // validateForm();
                   }}
                 />
               </Box>
             </Box>
-
-            {errors.currency && (
-              <Box display="flex" gap={1} sx={{ color: "red" }}>
-                <ErrorOutlineIcon fontSize="xs" />
-                <Typography fontSize="12px">{errors.currency}</Typography>
-              </Box>
-            )}
-
-            {errors.amount && (
-              <Box display="flex" gap={1} sx={{ color: "red" }}>
-                <ErrorOutlineIcon fontSize="xs" />
-                <Typography fontSize="12px">{errors.amount}</Typography>
-              </Box>
-            )}
-
+            <ErrorMessage message={errors.currency} />
+            <ErrorMessage message={errors.amount} />
             {amountValidate && (
-              <Box display="flex" gap={1} sx={{ color: "red" }}>
-                <ErrorOutlineIcon fontSize="xs" />
-                <Typography fontSize="12px">
-                  Amount should be a positive number and up to 2 decimal places.
-                </Typography>
-              </Box>
+              <ErrorMessage message="Amount should be a positive number and up to 2 decimal places." />
             )}
-
-            {minAmountError && (
-              <Box display="flex" gap={1} sx={{ color: "red" }}>
-                <ErrorOutlineIcon fontSize="xs" />
-                <Typography fontSize="12px">{minAmountError}</Typography>
-              </Box>
-            )}
+            {minAmountError && <ErrorMessage message={minAmountError} />}
           </Box>
 
           <Box display="flex" gap={2}>
             {/* Wallet Selection */}
             <Box flex={1}>
-              {/* <FormControl error={!!errors.wallet}> */}
               <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
                 Wallet<span style={{ color: "red" }}>*</span>
               </Typography>
@@ -436,19 +434,16 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 name="wallet"
                 id="wallet"
                 value={walletId || ""}
-                onChange={(e) => setWalletId(e.target.value)}
+                onChange={(e) => {
+                  setWalletId(e.target.value);
+                  // validateForm();
+                }}
                 options={wallets.map((item) => ({
                   value: item.WalletID,
                   label: item.WalletName,
                 }))}
               />
-              {/* </FormControl> */}
-              {errors.wallet && (
-                <Box display="flex" gap={1} sx={{ color: "red" }}>
-                  <ErrorOutlineIcon fontSize="xs" />
-                  <Typography fontSize="12px">{errors.wallet}</Typography>
-                </Box>
-              )}
+              <ErrorMessage message={errors.wallet} />
             </Box>
 
             <Box flex={1}>
@@ -465,7 +460,6 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                   name="month"
                   id="month"
                   value={month}
-                  // error={monthValidate}
                   endAdornment={{
                     decrease: handleDecrease,
                     increase: handleIncrease,
@@ -473,17 +467,11 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                   onChange={(e) => {
                     setMonth(e.target.value);
                     errors.month = "";
+                    // validateForm();
                   }}
-                  // onChange={(e) => setMonthValidate(e.target.value < 1 || e.target.value > 12)}
                 />
               </Box>
-
-              {errors.month && (
-                <Box display="flex" gap={1} sx={{ color: "red" }}>
-                  <ErrorOutlineIcon fontSize="xs" />
-                  <Typography fontSize="12px">{errors.month}</Typography>
-                </Box>
-              )}
+              <ErrorMessage message={errors.month} />
             </Box>
           </Box>
 
@@ -504,25 +492,20 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 onChange={(e) => {
                   setSupportRegion(e.target.value);
                   errors.supportRegion = "";
+                  // validateForm();
                 }}
                 options={supportRegions.map((item) => ({
                   value: item.SupportRegionID,
                   label: item.Region,
                 }))}
               />
-              {errors.supportRegion && (
-                <Box display="flex" gap={1} sx={{ color: "red" }}>
-                  <ErrorOutlineIcon fontSize="xs" />
-                  <Typography fontSize="12px">
-                    {errors.supportRegion}
-                  </Typography>
-                </Box>
-              )}
+              <ErrorMessage message={errors.supportRegion} />
             </Box>
 
             <Box flex={1}>
               {/* Donor Country Selection */}
-              <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>Donor Country 
+              <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
+                Donor Country
                 {/* <span style={{ color: "red" }}>*</span> */}
               </Typography>
               <CustomInput
@@ -536,6 +519,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 onChange={(e) => {
                   setBaseCountry(e.target.value);
                   setErrors((prev) => ({ ...prev, donorCountry: "" }));
+                  // validateForm();
                 }}
                 options={baseCountryList.map((item) => ({
                   value: item.BaseCountryID,
@@ -563,22 +547,25 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 onChange={(e) => {
                   const value = e.target.value;
                   setManyChatId(value);
+                  // validateForm();
 
                   if (value === "") {
-                    setErrors((prev) => ({ ...prev, manyChatId: "ManyChat ID required." }));
+                    setErrors((prev) => ({
+                      ...prev,
+                      manyChatId: "ManyChat ID required.",
+                    }));
                   } else if (!/^\d+$/.test(value)) {
-                    setErrors((prev) => ({ ...prev, manyChatId: "Only numeric values are allowed for ManyChat ID." }));
+                    setErrors((prev) => ({
+                      ...prev,
+                      manyChatId:
+                        "Only numeric values are allowed for ManyChat ID.",
+                    }));
                   } else {
                     setErrors((prev) => ({ ...prev, manyChatId: "" }));
                   }
                 }}
               />
-              {errors.manyChatId && (
-                <Box display="flex" gap={1} sx={{ color: "red" }}>
-                  <ErrorOutlineIcon fontSize="xs" />
-                  <Typography fontSize="12px">{errors.manyChatId}</Typography>
-                </Box>
-              )}
+              <ErrorMessage message={errors.manyChatId} />
             </Box>
 
             {/* Contact Link Input */}
@@ -635,12 +622,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
               handleDrop={handleDrop}
               uploadProgress={uploadProgress}
             />
-            {errors.files && (
-              <Box display="flex" gap={1} sx={{ color: "red" }}>
-                <ErrorOutlineIcon fontSize="xs" />
-                <Typography fontSize="12px">{errors.files}</Typography>
-              </Box>
-            )}
+            <ErrorMessage message={errors.files} />
           </Box>
 
           <Box display="flex" justifyContent="center" gap={2} mt={4} mb={2}>
@@ -658,7 +640,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
               type="submit"
               text="Register"
               fontWeight="normal"
-              disabled={!btnDisable}
+              disabled={btnDisable}
             />
           </Box>
         </Box>

@@ -145,7 +145,11 @@ const CustomerInfoEdit = ({
   const countryMenuItems = useMemo(
     () =>
       countries.map((option) => (
-        <MenuItem key={option.BaseCountryID} value={option.BaseCountryID} selected={option.BaseCountryID === customerInfo.country}>
+        <MenuItem
+          key={option.BaseCountryID}
+          value={option.BaseCountryID}
+          selected={option.BaseCountryID === customerInfo.country}
+        >
           {option.BaseCountryName}
         </MenuItem>
       )),

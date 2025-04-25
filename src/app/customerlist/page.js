@@ -166,7 +166,8 @@ const CustomerListPage = () => {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.message || `Failed to fetch base country (${response.status})`
+          errorData.message ||
+            `Failed to fetch base country (${response.status})`
         );
       }
 
@@ -178,7 +179,7 @@ const CustomerListPage = () => {
     } finally {
       setLoading(false);
     }
-  })
+  });
 
   const fetchProfileDetails = useCallback(async (profileId) => {
     if (!profileId) return;
@@ -296,7 +297,7 @@ const CustomerListPage = () => {
           {
             field: "UserCountry",
             newValue: data.country,
-          }
+          },
         ],
       });
 
