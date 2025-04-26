@@ -1,22 +1,6 @@
 "use client";
 
-import {
-  Alert,
-  Autocomplete,
-  Box,
-  Button,
-  CircularProgress,
-  FormControl,
-  FormControlLabel,
-  FormHelperText,
-  FormLabel,
-  ImageList,
-  ImageListItem,
-  Radio,
-  RadioGroup,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useAgent } from "../context/AgentContext";
 import { useUser } from "../context/UserContext";
@@ -333,6 +317,7 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
 
       if (response.success) {
         setSuccess(true);
+        onSuccess?.();
       } else {
         setSuccess(false);
       }
