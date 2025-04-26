@@ -47,6 +47,8 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState([]);
 
+  const [userCountry, setUserCountry] = useState("");
+
   const [wallets, setWallets] = useState([]);
   const [supportRegions, setSupportRegions] = useState([]);
   const [baseCountryList, setBaseCountryList] = useState([]);
@@ -76,6 +78,31 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
     () => setMonth((prev) => Math.max(1, prev - 1)),
     []
   );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      let myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      let raw = JSON.stringify({
+        name: userInfo.name,
+        email: userInfo.email,
+      });
+
+      let requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+
+      let res = await fetch("/api/InCustomerTable/", requestOptions);
+      let ans = await res.json();
+      setUserCountry(ans.UserCountryName);
+    };
+
+    fetchUser();
+  });
 
   // Fetch Wallets by Currency
   useEffect(() => {
@@ -555,20 +582,11 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
                 mb={2}
                 width="100%"
                 fullWidth={true}
-                type="select"
+                type="text"
                 name="donorCountry"
                 id="donorCountry"
-                selectedValue={baseCountry.BaseCountryID == userInfo.country}
+                value={userCountry}
                 disabled={true}
-                onChange={(e) => {
-                  setBaseCountry(e.target.value);
-                  setErrors((prev) => ({ ...prev, donorCountry: "" }));
-                  // validateForm();
-                }}
-                options={baseCountryList.map((item) => ({
-                  value: item.BaseCountryID,
-                  label: item.BaseCountryName,
-                }))}
               />
             </Box>
           </Box>
