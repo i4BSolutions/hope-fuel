@@ -20,7 +20,7 @@ const ExtendOrNot = ({ userInfo, onConfirm, onDecline }) => {
     <>
       <Typography
         component="h1"
-        sx={{ fontSize: "23px", marginTop: 8 }}
+        sx={{ fontSize: "23px", marginTop: 4 }}
         variant="h5"
         fontWeight="bold"
         align="center"
