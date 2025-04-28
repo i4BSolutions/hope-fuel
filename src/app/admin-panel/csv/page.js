@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
-import { Box, Modal, Paper, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Modal,
+  Pagination,
+  Paper,
+  Snackbar,
+  Typography,
+} from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
@@ -14,38 +23,106 @@ import TransactionList from "../../UI/Components/TransactionList";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 
-const transactions = Array(8)
-  .fill()
-  .map(() => ({
-    hopeId: "HOPEID-1024",
-    name: "Maung Maung",
-    email: "maungmaung@gmail.com",
-    cardId: "12345678",
-    date: "28-11-2024 09:55:00",
-    amount: "600,000",
-    currency: "MMK",
-    period: "3",
-    periodUnit: "Month",
-    manychatId: "77777777",
-  }));
-
 const ExportCSVPage = () => {
   const [date, setDate] = useState("");
+  const [allTransactions, setAllTransactions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const [openCSVExportModal, setOpenCSVExportModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  const bothDateSelected = date && date[0] && date[1];
+
+  const paginatedTransactions = useMemo(() => {
+    if (!allTransactions.length) return [];
+
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return allTransactions.slice(startIndex, endIndex);
+  }, [allTransactions, page, itemsPerPage]);
+
+  const totalPages = useMemo(() => {
+    return Math.ceil(allTransactions.length / itemsPerPage);
+  }, [allTransactions, itemsPerPage]);
+
+  useEffect(() => {
+    if (bothDateSelected) {
+      getCardIssuedTransactions();
+    }
+  }, [date]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [allTransactions]);
 
   const handleDateChange = useCallback((newDate) => {
     setDate(newDate);
   }, []);
 
+  const getCardIssuedTransactions = async () => {
+    if (loading) return;
+    if (!date || !date[0] || !date[1]) return;
+
+    setLoading(true);
+    try {
+      let startDateFormatted, endDateFormatted;
+      try {
+        startDateFormatted = moment(date[0].$d).format("YYYY-MM-DD");
+        endDateFormatted = moment(date[1].$d).format("YYYY-MM-DD");
+      } catch (dateError) {
+        console.error("Date formatting error:", dateError);
+        setError("Invalid date format. Please try again.");
+        setOpenSnackbar(true);
+        setLoading(false);
+        return;
+      }
+
+      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Card Issued`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to fetch data (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+
+      if (!result.data || !Array.isArray(result.data)) {
+        throw new Error("Invalid data format received from server");
+      }
+
+      setAllTransactions(result.data);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setError(error.message || "Failed to fetch transactions");
+      setOpenSnackbar(true);
+      setAllTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleOpenCSVExportModal = useCallback(() => {
-    setOpenCSVExportModal(true);
+    setOpenCSVExportModal((prev) => !prev);
   }, []);
 
   const handleCloseCSVExportModal = useCallback(() => {
-    setOpenCSVExportModal(false);
+    setOpenCSVExportModal((prev) => !prev);
   }, []);
 
-  const bothDateSelected = date && date[0] && date[1];
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar((prev) => !prev);
+  };
 
   return (
     <Box
@@ -62,16 +139,71 @@ const ExportCSVPage = () => {
       </Typography>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DemoContainer components={["DateRangePicker"]}>
-          <DateRangePicker value={date} onChange={handleDateChange} />
+          <DateRangePicker
+            value={date}
+            onChange={handleDateChange}
+            disableFuture
+          />
         </DemoContainer>
       </LocalizationProvider>
-      {bothDateSelected && <TransactionList transactions={transactions} />}
+      {loading && (
+        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+          <CircularProgress />
+        </Box>
+      )}
+
+      {bothDateSelected && !loading && (
+        <>
+          {allTransactions.length > 0 ? (
+            <>
+              <Box sx={{ width: "100%", mt: 4 }}>
+                <TransactionList transactions={paginatedTransactions} />
+              </Box>
+
+              {totalPages > 1 && (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    mt: 3,
+                    mb: 2,
+                  }}
+                >
+                  <Pagination
+                    count={totalPages}
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                    showFirstButton
+                    showLastButton
+                  />
+                </Box>
+              )}
+
+              <Box sx={{ mt: 2, mb: 4 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Showing {paginatedTransactions.length} of{" "}
+                  {allTransactions.length} transactions
+                </Typography>
+              </Box>
+            </>
+          ) : (
+            <Box sx={{ mt: 4, mb: 4 }}>
+              <Typography variant="body1">
+                No transactions found for the selected date range.
+              </Typography>
+            </Box>
+          )}
+        </>
+      )}
       <Box sx={{ mt: 2 }}>
         <CustomButton
-          disabled={!bothDateSelected}
-          onClick={handleOpenCSVExportModal}
+          disabled={
+            !bothDateSelected || loading || allTransactions.length === 0
+          }
           variant="contained"
           text="Export CSV"
+          onClick={handleOpenCSVExportModal}
         />
       </Box>
       <Modal
@@ -129,6 +261,20 @@ const ExportCSVPage = () => {
           </Box>
         </Paper>
       </Modal>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error || "An error occurred"}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
