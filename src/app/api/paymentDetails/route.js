@@ -1,4 +1,5 @@
 import db from "../../utilites/db";
+import prisma from "../../utilites/prisma";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
@@ -9,68 +10,106 @@ export async function GET(request) {
     return NextResponse.json({ error: "Missing HopeFuelID" }, { status: 400 });
   }
 
-  const query = `
-  
-SELECT 
-    t.TransactionID
-    t.HopeFuelID,
-    w.WalletName,
-    t.Month,
-    t.Amount,
-    t.NoteID, 
-    t.TransactionDate,
-    cu.CurrencyCode,
-    c.ManyChatId,
-    sr.Region,
-    n.Note,
-    c.Name,
-    c.Email,
-    c.ExpireDate,
-    c.CardID,
-    a.AwsId,
-    a.AgentId AS PrimaryAwsId, - Primary agent's AWS ID,
-    JSON_ARRAYAGG(ta_agent. AwsId) AS LoggedAwsIds, -- Aggregate AWS IDs from
-TransactionAgent
-    JSON_ARRAYAGG(s.ScreenShotLink) AS ScreenShotLinks,
-    ts.TransactionStatus -- Retrieve the transaction status
-FROM Transactions t
-JOIN Customer c ON t.CustomerID = c.CustomerId
-JOIN Wallet w ON t.WalletID = w.WalletId
-JOIN Currency cu ON cu.CurrencyId = w.CurrencyId
-LEFT JOIN SupportRegion sr ON t.SupportRegionID = sr.SupportRegionID
-LEFT JOIN Note n ON t.NoteID = n.NoteID
-LEFT JOIN ScreenShot s ON t.TransactionID = s.TransactionID
-LEFT JOIN Agent a ON c.AgentId = a.AgentId
-LEFT JOIN FormStatus fs ON t.TransactionID = fs.TransactionID
-LEFT JOIN TransactionStatus ts ON fs.TransactionStatusID = ts.TransactionStatusID
-LEFT JOIN TransactionAgent ta ON t.TransactionID= ta.TransactionID -- Join TransactionAgent table
-LEFT JOIN Agent ta_agent ON ta.AgentID = ta_agent. AgentId -- Join to get AWS IDs for logged agents
-WHERE t.HopeFuelID = ?
-GROUP BY 
-    t.TransactionID,
-    t.HopeFuelID,
-    w.WalletName,
-    t.Month,
-    t.Amount,
-    t.NoteID,
-    t.TransactionDate,
-    cu.CurrencyCode,
-    c.ManyChatId,
-    sr.Region,
-    n.Note,
-    c.Name,
-    c.Email,
-    c.ExpireDate,
-    c.CardID,
-    a.AwsId,
-    ts.TransactionStatus
-  `;
-
   try {
-    const result = await db(query, [HopeFuelID]);
-    console.log(result[0]);
+    const transaction = await prisma.transactions.findFirst({
+      where: {
+        HopeFuelID: parseInt(HopeFuelID, 10),
+      },
+      include: {
+        Customer: {
+          select: {
+            ManyChatId: true,
+            Name: true,
+            Email: true,
+            ExpireDate: true,
+            CardID: true,
+            Agent: {
+              select: {
+                AwsId: true,
+                AgentId: true,
+              },
+            },
+          },
+        },
+        Wallet: {
+          select: {
+            WalletName: true,
+            Currency: {
+              select: {
+                CurrencyCode: true,
+              },
+            },
+          },
+        },
+        SupportRegion: {
+          select: {
+            Region: true,
+          },
+        },
+        Note: {
+          select: {
+            Note: true,
+          },
+        },
+        FormStatus: {
+          select: {
+            TransactionStatus: {
+              select: {
+                TransactionStatus: true,
+              },
+            },
+          },
+        },
+        Screenshot: {
+          select: {
+            ScreenShotLink: true,
+          },
+        },
+        TransactionAgent: {
+          select: {
+            Agent: {
+              select: {
+                AwsId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!transaction) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    const result = {
+      TransactionID: transaction.TransactionID,
+      HopeFuelID: transaction.HopeFuelID,
+      WalletName: transaction.Wallet?.WalletName,
+      Month: transaction.Month,
+      Amount: transaction.Amount,
+      NoteID: transaction.NoteID,
+      TransactionDate: transaction.TransactionDate,
+      CurrencyCode: transaction.Wallet?.Currency?.CurrencyCode,
+      ManyChatId: transaction.Customer?.ManyChatId,
+      Region: transaction.SupportRegion?.Region,
+      Note: transaction.Note?.Note,
+      Name: transaction.Customer?.Name,
+      Email: transaction.Customer?.Email,
+      ExpireDate: transaction.Customer?.ExpireDate,
+      CardID: transaction.Customer?.CardID,
+      AwsId: transaction.Customer?.Agent?.AwsId,
+      PrimaryAwsId: transaction.Customer?.Agent?.AgentId,
+      LoggedAwsIds:
+        transaction.TransactionAgent?.map((agent) => agent.Agent?.AwsId) || [],
+      ScreenShotLinks:
+        transaction.Screenshot?.map((ss) => ss.ScreenShotLink) || [],
+      TransactionStatus:
+        transaction.FormStatus?.TransactionStatus?.TransactionStatus,
+    };
+
     return NextResponse.json(result);
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Database error" }, { status: 500 });
   }
 }

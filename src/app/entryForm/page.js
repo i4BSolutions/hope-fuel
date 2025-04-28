@@ -70,28 +70,22 @@ export default function PaymentDetails() {
         );
         const result = await response.json();
 
-        if (result && result.length > 0) {
-          const transactionData = result[0];
-          console.log("TransactionData:", transactionData);
-          if (transactionData.hasOwnProperty("ScreenShotLinks")) {
-            console.log("Screenshot has been found");
-            let screenShots = transactionData["ScreenShotLinks"];
+        console.log("TransactionData:", result);
+        if (result.hasOwnProperty("ScreenShotLinks")) {
+          console.log("Screenshot has been found");
+          let screenShots = result["ScreenShotLinks"];
 
-            if (Array.isArray(screenShots)) {
-              for (let i = 0; i < screenShots.length; i++) {
-                screenShots[i] = await getScreenShotUrl(screenShots[i]);
-              }
+          if (Array.isArray(screenShots)) {
+            for (let i = 0; i < screenShots.length; i++) {
+              screenShots[i] = await getScreenShotUrl(screenShots[i]);
             }
-            
-            transactionData["ScreenShotLinks"] = screenShots;
           }
-          setData(transactionData);
-          setNote(transactionData.Note || "");
-          setStatus(transactionData.Status || 1);
-        } else {
-          console.error("No data found");
-          setData(null);
+
+          result["ScreenShotLinks"] = screenShots;
         }
+        setData(result);
+        setNote(result.Note || "");
+        setStatus(result.Status || 1);
       } catch (error) {
         console.error("Error fetching payment details:", error);
         setData(null);
@@ -221,7 +215,7 @@ export default function PaymentDetails() {
                       Note: note,
                       Status: status,
                       AgentId: data.AgentId,
-                      TransactionID: data.TransactionID
+                      TransactionID: data.TransactionID,
                     }}
                   />
                 </FormControl>
