@@ -10,8 +10,24 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 
 import moment from "moment-timezone";
 import CustomButton from "../../components/Button";
+import TransactionList from "../../UI/Components/TransactionList";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+
+const transactions = Array(8)
+  .fill()
+  .map(() => ({
+    hopeId: "HOPEID-1024",
+    name: "Maung Maung",
+    email: "maungmaung@gmail.com",
+    cardId: "12345678",
+    date: "28-11-2024 09:55:00",
+    amount: "600,000",
+    currency: "MMK",
+    period: "3",
+    periodUnit: "Month",
+    manychatId: "77777777",
+  }));
 
 const ExportCSVPage = () => {
   const [date, setDate] = useState("");
@@ -28,6 +44,8 @@ const ExportCSVPage = () => {
   const handleCloseCSVExportModal = useCallback(() => {
     setOpenCSVExportModal(false);
   }, []);
+
+  const bothDateSelected = date && date[0] && date[1];
 
   return (
     <Box
@@ -47,9 +65,10 @@ const ExportCSVPage = () => {
           <DateRangePicker value={date} onChange={handleDateChange} />
         </DemoContainer>
       </LocalizationProvider>
-      <Box sx={{ mt: 3 }}>
+      {bothDateSelected && <TransactionList transactions={transactions} />}
+      <Box sx={{ mt: 2 }}>
         <CustomButton
-          disabled={!date}
+          disabled={!bothDateSelected}
           onClick={handleOpenCSVExportModal}
           variant="contained"
           text="Export CSV"
