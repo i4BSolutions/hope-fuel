@@ -7,7 +7,6 @@ async function getPaginatedData(page, selectedWallet) {
   const itemsPerPage = 10;
   const offset = (parseInt(page, 10) - 1) * itemsPerPage;
 
-  // Get current month
   const now = new Date();
   const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const firstDayOfNextMonth = new Date(
@@ -17,57 +16,63 @@ async function getPaginatedData(page, selectedWallet) {
   );
 
   try {
-    const rows = await prisma.Transactions.findMany({
-      where: {
-        FormStatus: {
-          some: {
-            TransactionStatusID: 1,
-          },
-        },
-        Wallet: {
-          WalletName: selectedWallet,
-        },
-        TransactionDate: {
-          gte: firstDayOfMonth,
-          lt: firstDayOfNextMonth,
-        },
-      },
-      include: {
-        Customer: {
-          select: {
-            Name: true,
-          },
-        },
-        Wallet: {
-          select: {
-            Currency: {
-              select: {
-                CurrencyCode: true,
-              },
+    const [rows, totalCount] = await Promise.all([
+      prisma.Transactions.findMany({
+        where: {
+          FormStatus: {
+            some: {
+              TransactionStatusID: 1,
             },
           },
-        },
-        Screenshot: {
-          select: {
-            ScreenShotLink: true,
+          Wallet: {
+            WalletName: selectedWallet,
+          },
+          TransactionDate: {
+            gte: firstDayOfMonth,
+            lt: firstDayOfNextMonth,
           },
         },
-      },
-      orderBy: {
-        TransactionDate: "asc",
-      },
-      skip: offset,
-      take: itemsPerPage,
-    });
+        include: {
+          Customer: { select: { Name: true } },
+          Wallet: { select: { Currency: { select: { CurrencyCode: true } } } },
+          Screenshot: { select: { ScreenShotLink: true } },
+        },
+        orderBy: { TransactionDate: "asc" },
+        skip: offset,
+        take: itemsPerPage,
+      }),
+      prisma.Transactions.count({
+        where: {
+          FormStatus: {
+            some: {
+              TransactionStatusID: 1,
+            },
+          },
+          Wallet: {
+            WalletName: selectedWallet,
+          },
+          TransactionDate: {
+            gte: firstDayOfMonth,
+            lt: firstDayOfNextMonth,
+          },
+        },
+      }),
+    ]);
 
-    // Map it to match your expected structure
     const formattedRows = rows.map((row) => ({
       CurrencyCode: row.Wallet?.Currency?.CurrencyCode || null,
       CustomerName: row.Customer?.Name || null,
       HopeFuelID: row.HopeFuelID || null,
-      ScreenShotLinks: row.ScreenShot?.map((s) => s.ScreenShotLink) || [],
+      ScreenShotLinks: row.Screenshot?.map((s) => s.ScreenShotLink) || [],
     }));
-    return formattedRows;
+
+    return {
+      items: formattedRows,
+      totalItems: totalCount,
+      itemsPerPage: itemsPerPage,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / itemsPerPage),
+    };
   } catch (error) {
     console.error("Error fetching paginated data:", error);
     throw new Error("Error fetching paginated data");
@@ -129,19 +134,31 @@ export async function GET(req) {
   const selectedWallet = searchParams.get("wallet") || " ";
 
   try {
-    let data;
     if (HopeFuelID) {
       const id = parseInt(HopeFuelID, 10);
-      data = await searchByHopeFuelID(id);
+      const found = await searchByHopeFuelID(id);
+
+      if (found.length === 0) {
+        return NextResponse.json({
+          items: [],
+          totalItems: 0,
+          itemsPerPage: 10,
+          currentPage: 1,
+          totalPages: 1,
+        });
+      }
+
+      return NextResponse.json({
+        items: found,
+        totalItems: 1,
+        itemsPerPage: 10,
+        currentPage: 1,
+        totalPages: 1,
+      });
     } else {
-      data = await getPaginatedData(page, selectedWallet);
+      const data = await getPaginatedData(page, selectedWallet);
+      return NextResponse.json(data);
     }
-
-    if (!data || data.length === 0) {
-      return NextResponse.json({ message: "No data found" }, { status: 404 });
-    }
-
-    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
