@@ -11,6 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import moment from "moment-timezone";
 
 const TransactionList = ({ transactions }) => {
   return (
@@ -31,7 +32,7 @@ const TransactionList = ({ transactions }) => {
                       variant="h1"
                       sx={{ fontWeight: 400, fontSize: 14, color: "#000000" }}
                     >
-                      {row.hopeId}
+                      {row.HopeFuelID}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -41,30 +42,13 @@ const TransactionList = ({ transactions }) => {
                     <Typography
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 600 }}
                     >
-                      {row.name}
+                      {row.Name}
                     </Typography>
                     <Typography
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.email}
-                    </Typography>
-                  </Box>
-                </TableCell>
-
-                <TableCell sx={{ borderBottom: "1px solid #eee" }}>
-                  <Box>
-                    <Typography
-                      variant="h1"
-                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
-                    >
-                      Card ID - {row.cardId}
-                    </Typography>
-                    <Typography
-                      variant="h1"
-                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
-                    >
-                      {row.date}
+                      {row.Email}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -75,13 +59,13 @@ const TransactionList = ({ transactions }) => {
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.amount}
+                      Card ID - {row.CardID}
                     </Typography>
                     <Typography
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.currency}
+                      {moment(row.TransactionDate).format("YYYY-MM-DD")}
                     </Typography>
                   </Box>
                 </TableCell>
@@ -92,13 +76,30 @@ const TransactionList = ({ transactions }) => {
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.period}
+                      {row.Amount}
                     </Typography>
                     <Typography
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.periodUnit}
+                      {row.CurrencyCode}
+                    </Typography>
+                  </Box>
+                </TableCell>
+
+                <TableCell sx={{ borderBottom: "1px solid #eee" }}>
+                  <Box>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      {row.Month}
+                    </Typography>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      Month
                     </Typography>
                   </Box>
                 </TableCell>
@@ -115,14 +116,14 @@ const TransactionList = ({ transactions }) => {
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {row.manychatId}
+                      {row.ManyChatId}
                     </Typography>
                   </Box>
                 </TableCell>
 
                 <TableCell sx={{ borderBottom: "1px solid #eee" }}>
                   <Chip
-                    label="ငွေတောင်းမည်"
+                    label={row.TransactionStatus}
                     sx={{
                       borderRadius: 4,
                       backgroundColor: "#34D399",
