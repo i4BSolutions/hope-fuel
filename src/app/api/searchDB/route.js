@@ -17,7 +17,7 @@ async function getPaginatedData(page, selectedWallet) {
   );
 
   try {
-    const rows = await prisma.transactions.findMany({
+    const rows = await prisma.Transactions.findMany({
       where: {
         FormStatus: {
           some: {
