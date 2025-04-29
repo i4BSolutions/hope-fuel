@@ -11,9 +11,12 @@ export async function GET(request) {
   }
 
   try {
-    const transaction = await prisma.transactions.findFirst({
+    const transaction = await prisma.Transactions.findFirst({
       where: {
         HopeFuelID: parseInt(HopeFuelID, 10),
+        FormStatus: {
+          some: {},
+        },
       },
       include: {
         Customer: {
@@ -80,6 +83,7 @@ export async function GET(request) {
     if (!transaction) {
       return NextResponse.json([], { status: 200 });
     }
+    console.log("Transaction data:", transaction.FormStatus?.TransactionStatus);
 
     const result = {
       TransactionID: transaction.TransactionID,
@@ -104,7 +108,8 @@ export async function GET(request) {
       ScreenShotLinks:
         transaction.Screenshot?.map((ss) => ss.ScreenShotLink) || [],
       TransactionStatus:
-        transaction.FormStatus?.TransactionStatus?.TransactionStatus,
+        transaction.FormStatus?.[0]?.TransactionStatus?.TransactionStatus ??
+        null,
     };
 
     return NextResponse.json(result);

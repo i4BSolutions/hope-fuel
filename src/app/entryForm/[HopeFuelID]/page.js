@@ -30,11 +30,9 @@ export default function PaymentDetails() {
   const [status, setStatus] = useState(1);
   const [note, setNote] = useState("");
 
-
   // Fetch data based on HopeFuelID
   useEffect(() => {
     const fetchData = async () => {
-        
       if (!HopeFuelID) return;
 
       try {
@@ -65,7 +63,7 @@ export default function PaymentDetails() {
     return (
       <Box sx={{ display: "flex", height: "100vh" }}>
         <Box sx={{ width: 300, marginRight: 3 }}>
-          <SearchBarForm  url={'/api/entryFormStatus'}/>
+          <SearchBarForm url={"/api/entryFormStatus"} />
         </Box>
         <Box
           sx={{
@@ -89,7 +87,7 @@ export default function PaymentDetails() {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Box sx={{ width: 300, marginRight: 3 }}>
-        <SearchBarForm  url={'/api/entryFormStatus'}/>
+        <SearchBarForm url={"/api/entryFormStatus"} />
       </Box>
       <Box sx={{ flex: 1, padding: 4, backgroundColor: "#f5f5f5" }}>
         <Card sx={{ padding: 3, borderRadius: 5 }}>
@@ -160,10 +158,10 @@ export default function PaymentDetails() {
                     value={status} // Use controlled state
                     onChange={(e) => setStatus(e.target.value)}
                   >
-                    <MenuItem value={1}>၁ - ဖောင်တင်သွင်း</MenuItem>
-                    <MenuItem value={2}>၂ - စစ်ဆေးပြီး</MenuItem>
-                    <MenuItem value={3}>၃ - ပြီးစီး</MenuItem>
-                    <MenuItem value={4}>၄ - ပယ်ဖျက်</MenuItem>
+                    <MenuItem value={1}>1 - Form Entry</MenuItem>
+                    <MenuItem value={2}>2 - Payment Checked</MenuItem>
+                    <MenuItem value={3}>3 - Card Issued</MenuItem>
+                    <MenuItem value={4}>4 - Cancel</MenuItem>
                   </Select>
 
                   <ActionButtons
