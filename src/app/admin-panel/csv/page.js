@@ -80,7 +80,7 @@ const ExportCSVPage = () => {
         return;
       }
 
-      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Card Issued`;
+      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked`;
 
       const response = await fetch(url);
 
@@ -141,6 +141,7 @@ const ExportCSVPage = () => {
         "Currency",
         "Period",
         "ManyChat ID",
+        "Transaction Status",
       ];
 
       let csvContent = headers.join(",") + "\n";
@@ -156,6 +157,7 @@ const ExportCSVPage = () => {
           transaction.CurrencyCode || "",
           transaction.Month + " " + "Month" || "",
           transaction.ManyChatId || "",
+          "Card Issued",
         ];
         const escapedRow = row.map((field) => {
           if (/[",\n\r]/.test(field)) {
