@@ -4,7 +4,7 @@ import prisma from "../../utilites/prisma";
 
 // Function to fetch paginated data
 async function getPaginatedData(page, selectedWallet) {
-  const itemsPerPage = 100;
+  const itemsPerPage = 10;
   const offset = (parseInt(page, 10) - 1) * itemsPerPage;
 
   // Get current month
@@ -56,8 +56,8 @@ async function getPaginatedData(page, selectedWallet) {
       orderBy: {
         TransactionDate: "asc",
       },
-      skip: 0,
-      take: 100,
+      skip: offset,
+      take: itemsPerPage,
     });
 
     // Map it to match your expected structure
@@ -143,7 +143,6 @@ export async function GET(req) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error("API Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
