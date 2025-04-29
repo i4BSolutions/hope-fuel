@@ -2,7 +2,7 @@ import React from "react";
 import { Stack, Box, Button, Typography } from "@mui/material";
 import ItemCard from "./ItemCard";
 
-function ItemList({ items, onItemClick, onLoadMore, hasInput }) {
+function ItemList({ items, onItemClick, onLoadMore, hasInput, hasMore }) {
   return (
     <Box
       sx={{
@@ -31,16 +31,22 @@ function ItemList({ items, onItemClick, onLoadMore, hasInput }) {
       </Stack>
 
       {/* Conditionally show Load More button if there are 10 or more items */}
-      {!hasInput && items.length >= 10 && (
-        <Button
-          fullWidth
-          variant="outlined"
-          sx={{ marginTop: 2 }}
-          onClick={onLoadMore}
-        >
-          Load More...
-        </Button>
-      )}
+      {!hasInput &&
+        items.length > 0 &&
+        (hasMore ? (
+          <Button
+            fullWidth
+            variant="outlined"
+            sx={{ marginTop: 2 }}
+            onClick={onLoadMore}
+          >
+            Load More...
+          </Button>
+        ) : (
+          <Typography variant="body2" sx={{ marginTop: 2, color: "gray" }}>
+            No more items
+          </Typography>
+        ))}
     </Box>
   );
 }

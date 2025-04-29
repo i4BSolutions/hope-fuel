@@ -21,11 +21,12 @@ export default function SearchBarForm() {
   const [searchQuery, setSearchQuery] = useState("");
   const [wallet, setWallet] = useState("");
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchItems = async (query, selectedWallet, currentPage) => {
     setLoading(true);
     setError(null);
-    setNoResults(false);
 
     try {
       const queryParams = new URLSearchParams({
@@ -39,24 +40,41 @@ export default function SearchBarForm() {
 
       const data = await response.json();
 
-      if (Array.isArray(data) && data.length > 0) {
-        for (const item of data) {
-          if (Array.isArray(item.ScreenShotLinks)) {
-            const updatedLinks = await Promise.all(
-              item.ScreenShotLinks.map(
-                async (link) => (await getScreenShotUrl(link)).href
-              )
-            );
-            item.ScreenShotLinks = updatedLinks;
-          }
+      if (Array.isArray(data.items)) {
+        if (data.items.length > 0) {
+          const updatedData = await Promise.all(
+            data.items.map(async (item) => {
+              if (Array.isArray(item.ScreenShotLinks)) {
+                const updatedLinks = await Promise.all(
+                  item.ScreenShotLinks.map(
+                    async (link) => (await getScreenShotUrl(link)).href
+                  )
+                );
+                return { ...item, ScreenShotLinks: updatedLinks };
+              }
+              return item;
+            })
+          );
+
+          setItems((prev) =>
+            currentPage === 1 ? updatedData : [...prev, ...updatedData]
+          );
+          setNoResults(false);
+
+          setTotalPages(data.totalPages);
+          setHasMore(currentPage < data.totalPages);
+        } else if (currentPage === 1) {
+          setItems([]);
+          setNoResults(true);
+          setHasMore(false);
         }
-        setItems((prev) => (currentPage === 1 ? data : [...prev, ...data]));
-      } else if (currentPage === 1) {
-        setNoResults(true);
       }
     } catch (err) {
       console.error("Search Error:", err);
       setError("No item found");
+      setItems([]);
+      setNoResults(true);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -135,6 +153,7 @@ export default function SearchBarForm() {
           hasInput={!!searchQuery}
           onLoadMore={handleLoadMore}
           onItemClick={(HopeFuelID) => console.log("Item clicked:", HopeFuelID)}
+          hasMore={hasMore}
         />
       )}
     </Container>
