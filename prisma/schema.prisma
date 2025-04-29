@@ -219,7 +219,7 @@ model Transactions {
   WalletID         Int?
   Amount           Float?             @db.Float
   PaymentCheck     Boolean?
-  PaymentCheckTime DateTime           @default(now()) @db.Timestamp(0)
+  PaymentCheckTime DateTime?          @db.Timestamp(0)
   NoteID           Int?
   TransactionDate  DateTime           @default(now()) @db.Timestamp(0)
   PaymentDenied    Boolean?
