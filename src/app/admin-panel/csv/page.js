@@ -116,13 +116,81 @@ const ExportCSVPage = () => {
     setOpenCSVExportModal((prev) => !prev);
   }, []);
 
-  const handlePageChange = (event, newPage) => {
+  const handlePageChange = useCallback((event, newPage) => {
     setPage(newPage);
-  };
+  }, []);
 
-  const handleCloseSnackbar = () => {
+  const handleCloseSnackbar = useCallback(() => {
     setOpenSnackbar((prev) => !prev);
-  };
+  }, []);
+
+  const handleExportCSV = useCallback(() => {
+    try {
+      setLoading(true);
+      if (!allTransactions || allTransactions.length === 0) {
+        throw new Error("No data available to export");
+      }
+
+      const headers = [
+        "Hope ID",
+        "Name",
+        "Email",
+        "Card ID",
+        "Date",
+        "Amount",
+        "Currency",
+        "Period",
+        "ManyChat ID",
+      ];
+
+      let csvContent = headers.join(",") + "\n";
+
+      allTransactions.forEach((transaction) => {
+        const row = [
+          transaction.HopeFuelID || "",
+          transaction.Name || "",
+          transaction.Email || "",
+          transaction.CardID || "",
+          moment(transaction.TransactionDate).format("YYYY-MM-DD") || "",
+          transaction.Amount || "",
+          transaction.CurrencyCode || "",
+          transaction.Month + " " + "Month" || "",
+          transaction.ManyChatId || "",
+        ];
+        const escapedRow = row.map((field) => {
+          if (/[",\n\r]/.test(field)) {
+            return `"${field.replace(/"/g, '""')}"`;
+          }
+          return field;
+        });
+        csvContent += escapedRow.join(",") + "\n";
+      });
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      const startDate = moment(date[0].$d).format("YYYY-MM-DD hh:mm");
+      const endDate = moment(date[1].$d).format("YYYY-MM-DD hh:mm");
+      link.href = url;
+      link.download = `ConfirmedPayment_Export_${startDate}_to_${endDate}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      handleCloseCSVExportModal();
+    } catch (error) {
+      console.error("Error exporting CSV:", error);
+      setError(error.message || "Failed to export CSV");
+      setOpenSnackbar(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [allTransactions, date, handleCloseCSVExportModal]);
 
   return (
     <Box
@@ -257,6 +325,7 @@ const ExportCSVPage = () => {
               color="primary"
               variant="contained"
               text="Yes"
+              onClick={handleExportCSV}
             />
           </Box>
         </Paper>
