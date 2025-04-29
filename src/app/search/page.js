@@ -1,6 +1,6 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
-import SearchBar from "../UI/Components/SearchBar";
 import {
   Container,
   Typography,
@@ -8,11 +8,10 @@ import {
   Box,
   Divider,
 } from "@mui/material";
+import SearchBar from "../UI/Components/SearchBar";
 import ItemList from "../UI/Components/ItemList";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
 import WalletSelect from "../UI/Components/GroupWallet";
-
-import { useRouter } from "next/router";
+import getScreenShotUrl from "../utilites/getScreenShotUrl";
 
 export default function SearchBarForm() {
   const [items, setItems] = useState([]);
@@ -20,103 +19,74 @@ export default function SearchBarForm() {
   const [error, setError] = useState(null);
   const [noResults, setNoResults] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [wallet, setWallet] = useState("");
   const [page, setPage] = useState(1);
 
-  //Select Wallet
-
-  const handleSelectedWallet = (wallet) => {
-    console.log("Selcted wallet:", wallet);
-
-    const currentUrl = new URL(window.location.href);
-    console.log(currentUrl);
-
-    currentUrl.searchParams.set("walletId", wallet);
-    window.history.replaceState(null, "", currentUrl);
-
-    setPage(1);
-    handleSearch(searchQuery, wallet);
-  };
-
-  const handleSearch = async (HopeFuelID, wallet) => {
-    if (!wallet && !HopeFuelID) {
-      console.log("Wallet or HopeFuelID required for search");
-      setError("Please select a wallet or provide a HopeFuelID");
-      setNoResults(true);
-      return; // Skip search if neither wallet nor HopeFuelID is provided
-    }
-
-    console.log("HopeID is " + HopeFuelID, "with Wallet: " + wallet);
+  const fetchItems = async (query, selectedWallet, currentPage) => {
     setLoading(true);
     setError(null);
     setNoResults(false);
 
     try {
-      // Construct API URL based on provided parameters
-      const queryParams = new URLSearchParams();
-      if (HopeFuelID) queryParams.append("HopeFuelID", HopeFuelID);
-      if (wallet) queryParams.append("wallet", wallet);
-      queryParams.append("page", page);
+      const queryParams = new URLSearchParams({
+        ...(query && { HopeFuelID: query }),
+        ...(selectedWallet && { wallet: selectedWallet }),
+        page: currentPage,
+      });
 
-      const url = `/api/searchDB?${queryParams.toString()}`;
-
-      const response = await fetch(url);
-      console.log(response);
-
-      if (!response.ok) {
-        throw new Error("No item found");
-      }
+      const response = await fetch(`/api/searchDB?${queryParams}`);
+      if (!response.ok) throw new Error("No item found");
 
       const data = await response.json();
 
-      if (Array.isArray(data)) {
-        for (let i = 0; i < data.length; i++) {
-          if (Array.isArray(data[i]["ScreenShotLinks"])) {
-            for (
-              let screenshot = 0;
-              screenshot < data[i]["ScreenShotLinks"].length;
-              screenshot++
-            ) {
-              let tmp = await getScreenShotUrl(
-                data[i]["ScreenShotLinks"][screenshot]
-              );
-              data[i]["ScreenShotLinks"][screenshot] = tmp.href;
-            }
+      if (Array.isArray(data) && data.length > 0) {
+        for (const item of data) {
+          if (Array.isArray(item.ScreenShotLinks)) {
+            const updatedLinks = await Promise.all(
+              item.ScreenShotLinks.map(
+                async (link) => (await getScreenShotUrl(link)).href
+              )
+            );
+            item.ScreenShotLinks = updatedLinks;
           }
         }
-        if (data.length === 0 && page === 1) {
-          setNoResults(true);
-        } else {
-          setItems((prevItems) =>
-            page === 1 ? data : [...prevItems, ...data]
-          );
-        }
+        setItems((prev) => (currentPage === 1 ? data : [...prev, ...data]));
+      } else if (currentPage === 1) {
+        setNoResults(true);
       }
-    } catch (error) {
-      console.error("Search Error:", error);
+    } catch (err) {
+      console.error("Search Error:", err);
       setError("No item found");
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle search input changes
   const handleSearchChange = (query) => {
     setSearchQuery(query);
-    setPage(1); // Reset to first page on new search
-    handleSearch(query);
+    setPage(1);
+    fetchItems(query, wallet, 1);
   };
 
-  // Load more items when "Load More" is clicked
+  const handleWalletSelect = (selectedWallet) => {
+    setWallet(selectedWallet);
+    const url = new URL(window.location.href);
+    url.searchParams.set("walletId", selectedWallet);
+    window.history.replaceState(null, "", url);
+
+    setPage(1);
+    fetchItems(searchQuery, selectedWallet, 1);
+  };
+
   const handleLoadMore = () => {
-    setPage((prevPage) => prevPage + 1);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchItems(searchQuery, wallet, nextPage);
   };
 
-  // Fetch data when page changes
   useEffect(() => {
-    if (page > 1 || searchQuery === "") {
-      handleSearch(searchQuery);
-    }
-  }, [page]);
+    if (searchQuery === "" && page === 1) fetchItems("", wallet, 1);
+  }, []);
 
   return (
     <Container
@@ -125,42 +95,32 @@ export default function SearchBarForm() {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
         alignItems: "center",
         paddingTop: { xs: "8%", md: "5%" },
-        boxSizing: "border-box",
         textAlign: "center",
       }}
     >
-      {/* Search Bar */}
-      <Box sx={{ width: "100%", marginTop: "3px" }}>
+      <Box sx={{ width: "100%", mt: 1 }}>
         <SearchBar onSearch={handleSearchChange} />
       </Box>
 
-      <Box sx={{ width: "100%", marginY: 2 }}>
-        <Divider sx={{ borderColor: "#e0e0e0", width: "100%" }} />
+      <Box sx={{ width: "100%", my: 2 }}>
+        <Divider sx={{ borderColor: "#e0e0e0" }} />
       </Box>
 
-      {/* wallet select */}
       <Box
         component="section"
         sx={{
           width: 270,
-          paddingLeft: 2,
-          paddingRight: 2,
-
+          px: 2,
           border: "1px solid #e0e0e0",
           borderRadius: "30px",
-          marginBottom: "16px",
+          mb: 2,
         }}
       >
-        <WalletSelect
-          onWalletSelected={(wallet) => handleSelectedWallet(wallet)}
-        />{" "}
-        {/* select wallet from DB*/}
-      `</Box>`
+        <WalletSelect onWalletSelected={handleWalletSelect} />
+      </Box>
 
-      {/* Conditional Rendering */}
       {loading ? (
         <CircularProgress />
       ) : error || noResults ? (
@@ -170,7 +130,7 @@ export default function SearchBarForm() {
       ) : (
         <ItemList
           items={items}
-          hasInput={searchQuery.length > 0}
+          hasInput={!!searchQuery}
           onLoadMore={handleLoadMore}
           onItemClick={(HopeFuelID) => console.log("Item clicked:", HopeFuelID)}
         />
