@@ -3,8 +3,7 @@ import { Select, MenuItem, Typography, Box } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 
 const WalletSelect = ({ onWalletSelected }) => {
-  const [currentWallet, setCurrentWallet] = useState("Select Wallet");
-
+  const [currentWallet, setCurrentWallet] = useState("");
   const [wallets, setWallets] = useState([]);
 
   const searchParams = useSearchParams();
@@ -56,20 +55,20 @@ const WalletSelect = ({ onWalletSelected }) => {
         variant="outlined"
         displayEmpty
         fullWidth
-        renderValue={() => (
+        renderValue={(selected) => (
           <Box
             sx={{
               backgroundColor: "darkred",
               color: "white",
               px: 2,
               py: 0.5,
-              borderRadius: "16px", // Makes it pill-shaped
+              borderRadius: "16px",
               display: "inline-flex",
               alignItems: "center",
               fontWeight: "bold",
             }}
           >
-            {currentWallet || "Select a wallet"}
+            {selected ? selected : "Select a wallet"}
           </Box>
         )}
         sx={{

@@ -85,8 +85,10 @@ export default function SearchBarForm() {
   };
 
   useEffect(() => {
-    if (searchQuery === "" && page === 1) fetchItems("", wallet, 1);
-  }, []);
+    if (wallet !== "") {
+      fetchItems(searchQuery, wallet, 1);
+    }
+  }, [wallet]);
 
   return (
     <Container
