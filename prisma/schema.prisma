@@ -191,6 +191,7 @@ model Screenshot {
   Transactions   Transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "screenshot_ibfk_1")
 
   @@index([TransactionID], map: "TransactionID")
+  @@map("ScreenShot")
 }
 
 model SupportRegion {
