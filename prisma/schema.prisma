@@ -19,6 +19,7 @@ model Agent {
   FormVisibilityStatus FormVisibilityStatus[]
   Note                 Note[]
   TransactionAgent     TransactionAgent[]
+  CSVExportTransactionLogs CSVExportTransactionLogs[]
 
   @@index([UserRoleId], map: "UserRoleId")
 }
@@ -259,6 +260,16 @@ model Wallet {
   Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
+}
+
+model CSVExportTransactionLogs {
+  CSVExportTransactionLogsId Int @id @default(autoincrement())
+  AgentId Int?
+  CSVExportTransactionDateTime DateTime? @db.Timestamp(0)
+  
+  Agent Agent? @relation(fields: [AgentId], references: [AgentId])
+  
+  @@index([AgentId], map: "AgentId")
 }
 
 enum CustomerAuditLogs_FieldChanged {

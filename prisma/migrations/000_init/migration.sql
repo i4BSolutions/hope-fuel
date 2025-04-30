@@ -174,7 +174,7 @@ CREATE TABLE `Platform` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `Screenshot` (
+CREATE TABLE `ScreenShot` (
     `ScreenShotID` INTEGER NOT NULL AUTO_INCREMENT,
     `TransactionID` INTEGER NULL,
     `ScreenShotLink` VARCHAR(2048) NULL,
@@ -211,7 +211,7 @@ CREATE TABLE `Transactions` (
     `WalletID` INTEGER NULL,
     `Amount` FLOAT NULL,
     `PaymentCheck` BOOLEAN NULL,
-    `PaymentCheckTime` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `PaymentCheckTime` TIMESTAMP(0) NULL,
     `NoteID` INTEGER NULL,
     `TransactionDate` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
     `PaymentDenied` BOOLEAN NULL,
@@ -303,7 +303,7 @@ ALTER TABLE `MinimumAmount` ADD CONSTRAINT `minimumamount_ibfk_1` FOREIGN KEY (`
 ALTER TABLE `Note` ADD CONSTRAINT `note_ibfk_1` FOREIGN KEY (`AgentID`) REFERENCES `Agent`(`AgentId`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
-ALTER TABLE `Screenshot` ADD CONSTRAINT `screenshot_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+ALTER TABLE `ScreenShot` ADD CONSTRAINT `screenshot_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 -- AddForeignKey
 ALTER TABLE `TransactionAgent` ADD CONSTRAINT `transactionagent_ibfk_1` FOREIGN KEY (`TransactionID`) REFERENCES `Transactions`(`TransactionID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
