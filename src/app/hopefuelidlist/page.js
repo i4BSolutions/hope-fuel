@@ -8,13 +8,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
-import HopeFuelIDListItem from "./components/HopeFuelIDListItem";
-import HopeFuelIDListDetails from "./components/HopeFuelIDListDetails";
+import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import DetailModal from "../UI/Components/Modal";
-import SubscriptionCard from "../UI/Components/SubscriptionCard";
-import { SUBSCRIPTION_DATA } from "../variables/const";
+import HopeFuelIDListDetails from "./components/HopeFuelIDListDetails";
+import HopeFuelIDListItem from "./components/HopeFuelIDListItem";
 import ImageCarouselModal from "./components/ImageCarousel";
 
 const PAGE_SIZE = 10;
@@ -244,6 +242,7 @@ const HopeFuelIdListPage = () => {
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
+                height: "100vh",
               }}
             >
               <CircularProgress />

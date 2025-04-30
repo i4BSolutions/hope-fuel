@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-import { Modal, Box, IconButton, Typography } from "@mui/material";
 import {
-  Close as CloseIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
 } from "@mui/icons-material";
+import { Box, IconButton, Modal, Typography } from "@mui/material";
+import { useState } from "react";
 
 const ScreenshotCarouselModal = ({ open, onClose, screenshots = [] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -43,18 +42,6 @@ const ScreenshotCarouselModal = ({ open, onClose, screenshots = [] }) => {
           alignItems: "center",
         }}
       >
-        <IconButton
-          onClick={onClose}
-          sx={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            zIndex: 10,
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-
         <Box
           sx={{
             position: "relative",

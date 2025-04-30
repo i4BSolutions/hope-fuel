@@ -1,6 +1,6 @@
 import { Box, Container, Divider, styled, Typography } from "@mui/material";
 import moment from "moment-timezone";
-import React, { useState } from "react";
+import { useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 import ImageCarouselModal from "../components/ImageCarousel";
 
@@ -248,10 +248,33 @@ const HopeFuelIDListDetails = ({ data }) => {
                   fontSize: "18px",
                   lineHeight: "22px",
                   fontWeight: 600,
-                  maxWidth: "50%",
+                  maxWidth: "80%",
                 }}
               >
                 {data.FormFilledPerson}
+              </Value>
+            </InfoRow>
+            <InfoRow>
+              <Label
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  lineHeight: "17px",
+                }}
+              >
+                Note
+              </Label>
+              <Value
+                sx={{
+                  color: "#000000",
+                  fontSize: "18px",
+                  lineHeight: "22px",
+                  fontWeight: 600,
+                  maxWidth: "50%",
+                }}
+              >
+                {data.Note ? data.Note : "-"}
               </Value>
             </InfoRow>
             <InfoRow>
@@ -267,6 +290,7 @@ const HopeFuelIDListDetails = ({ data }) => {
               </Label>
               <CopyableText text={data.ManyChatId} />
             </InfoRow>
+
             <Box mt={3}>
               <ScrollableImageContainer>
                 {data.ScreenShot?.map((image, idx) => (
