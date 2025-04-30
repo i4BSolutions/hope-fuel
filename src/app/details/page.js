@@ -13,6 +13,7 @@ import {
   FormControl,
   InputLabel,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import ActionButtons from "../UI/Components/ActionButtons";
 import AmountDetails from "../UI/Components/AmountDetails";
@@ -23,7 +24,6 @@ import UserInfo from "../UI/Components/UserInfo";
 import HopeFuelIdStatus from "../UI/Components/HopeIdStatus";
 import SearchBarForm from "../search/page";
 import getScreenShotUrl from "../utilites/getScreenShotUrl";
-
 
 export default function PaymentDetails() {
   const searchParams = useSearchParams();
@@ -104,7 +104,12 @@ export default function PaymentDetails() {
   }
 
   // Handle loading state
-  if (data === null) return <Typography>Loading...</Typography>;
+  if (data === null)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
@@ -115,7 +120,6 @@ export default function PaymentDetails() {
       <Box sx={{ flex: 1, padding: 4, backgroundColor: "#f5f5f5" }}>
         <Card sx={{ padding: 3, borderRadius: 5 }}>
           <Stack spacing={2}>
-           
             <HopeFuelIdStatus data={data} />
             <Divider />
 

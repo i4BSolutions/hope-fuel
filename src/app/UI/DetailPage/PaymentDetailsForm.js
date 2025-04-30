@@ -88,7 +88,12 @@ export default function PaymentDetails() {
   };
 
   // Loading state
-  if (loading) return <Typography>Loading...</Typography>;
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   // Display a message if no HopeFuelID is provided
   if (!HopeFuelID) {

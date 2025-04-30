@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FundraisingForm from "../../components/FundraisingForm";
 import { useParams, useRouter } from "next/navigation";
 import Modal from "../../../components/Modal";
+import { Box, CircularProgress } from "@mui/material";
 
 function FundraiserEditPage() {
   const { id } = useParams();
@@ -54,7 +55,9 @@ function FundraiserEditPage() {
           />
         </Modal>
       ) : (
-        <p>Loading...</p>
+        <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+          <CircularProgress />
+        </Box>
       )}
     </>
   );

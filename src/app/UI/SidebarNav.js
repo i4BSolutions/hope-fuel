@@ -11,6 +11,7 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 
@@ -37,12 +38,6 @@ const Sidebar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { setUser, currentUser } = useUser();
-
-  // Show a loading state if user is undefined
-  if (!currentUser) {
-    // console.log("User from Sidebar: ", currentUser.UserRole);
-    return <p>Loading...</p>;
-  }
 
   // Role-Based Sidebar Navigation
   const roleBasedNavItems = {
@@ -117,10 +112,10 @@ const Sidebar = () => {
         icon: <SyncAltRoundedIcon />,
         path: "/extendUser",
       },
-      { 
+      {
         text: "ငွေစစ်ဆေးခြင်း",
         icon: <AttachMoneyIcon />,
-        path: "/entryForm" 
+        path: "/entryForm",
       },
       {
         text: "Customers List",

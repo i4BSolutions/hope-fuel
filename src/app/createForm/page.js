@@ -22,11 +22,15 @@ function CreateOrExtendPage() {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    setLoading(true);
+
     const fetchUser = async () => {
       const user = await getAuthCurrentUser();
       setCurrentUser(user);
     };
+
     fetchUser();
+    setLoading(false);
   }, []);
 
   const userRole = currentUser?.role || "user";
