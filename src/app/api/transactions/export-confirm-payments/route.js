@@ -61,7 +61,12 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
       HopeFuelID: "desc",
     },
     include: {
-      Customer: true,
+      Customer: {
+        include: {
+          BaseCountry: true,
+        },
+      },
+      SupportRegion: true,
       Wallet: {
         include: {
           Currency: true,
@@ -90,7 +95,10 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
     Name: t.Customer?.Name || null,
     Email: t.Customer?.Email || null,
     CardID: t.Customer?.CardID || null,
+    UserCountry: t.Customer?.BaseCountry?.BaseCountryName || null,
+    Region: t.SupportRegion?.Region || null,
     TransactionDate: t.TransactionDate,
+    PaymentCheckTime: t.PaymentCheckTime,
     Amount: t.Amount,
     CurrencyCode: t.Wallet?.Currency?.CurrencyCode || null,
     Month: t.Month,

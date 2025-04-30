@@ -132,32 +132,34 @@ const ExportCSVPage = () => {
       }
 
       const headers = [
-        "Hope ID",
+        "Card ID",
+        "User Country",
         "Name",
         "Email",
-        "Card ID",
-        "Date",
         "Amount",
         "Currency",
-        "Period",
-        "ManyChat ID",
-        "Transaction Status",
+        "Month",
+        "Region",
+        "Hopefuel ID",
+        "Transaction Date",
+        "Payment Check Time",
       ];
 
       let csvContent = headers.join(",") + "\n";
 
       allTransactions.forEach((transaction) => {
         const row = [
-          transaction.HopeFuelID || "",
+          transaction.CardID || "",
+          transaction.UserCountry || "",
           transaction.Name || "",
           transaction.Email || "",
-          transaction.CardID || "",
-          moment(transaction.TransactionDate).format("YYYY-MM-DD") || "",
           transaction.Amount || "",
           transaction.CurrencyCode || "",
           transaction.Month + " " + "Month" || "",
-          transaction.ManyChatId || "",
-          "Card Issued",
+          transaction.Region || "",
+          transaction.HopeFuelID || "",
+          moment(transaction.TransactionDate).format("YYYY-MM-DD") || "",
+          moment(transaction.PaymentCheckTime).format("YYYY-MM-DD") || "",
         ];
         const escapedRow = row.map((field) => {
           if (/[",\n\r]/.test(field)) {
