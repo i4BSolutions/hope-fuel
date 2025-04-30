@@ -143,10 +143,6 @@ export default function SearchBarForm() {
 
       {loading ? (
         <CircularProgress />
-      ) : error || noResults ? (
-        <Typography variant="body1" color="error">
-          No item found
-        </Typography>
       ) : (
         <ItemList
           items={items}
