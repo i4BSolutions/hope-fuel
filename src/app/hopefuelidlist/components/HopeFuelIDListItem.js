@@ -155,7 +155,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   borderRadius: "18px",
                   px: 2,
                   py: 0.5,
-                  minWidth: "120px",
+                  minWidth: "160px",
                   fontSize: "14px",
                   "&:hover": {
                     backgroundColor: "#B91C1C",
@@ -165,7 +165,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
               >
                 View Screenshot
               </Button>
-              <Box sx={{ minWidth: "150px", maxWidth: "200px" }}>
+              <Box sx={{ minWidth: "150px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
