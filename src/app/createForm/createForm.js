@@ -58,6 +58,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const [errors, setErrors] = useState({});
   const [minimumAmount, setMinAmount] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
+  const [donorCountry, setDonorCountry] = useState("");
 
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
@@ -131,6 +132,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       amount &&
       walletId &&
       month &&
+      baseCountry &&
       supportRegion &&
       manyChatId &&
       /^\d+$/.test(manyChatId) &&
@@ -145,7 +147,16 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
 
   useEffect(() => {
     setBtnDisable(!isFormValid());
-  }, [currency, amount, walletId, month, supportRegion, manyChatId, files]);
+  }, [
+    currency,
+    amount,
+    walletId,
+    month,
+    supportRegion,
+    manyChatId,
+    files,
+    baseCountry,
+  ]);
 
   // Fetch Exchange Rate
   useEffect(() => {
@@ -220,6 +231,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       validationErrors.manyChatId =
         "Only numeric values are allowed for ManyChat ID.";
     }
+    if (!baseCountry) validationErrors.donorCountry = "Donor country required.";
 
     if (files.length === 0) {
       validationErrors.files = "You must upload at least one file.";
@@ -238,7 +250,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
 
     setErrors(validationErrors);
     return Object.keys(validationErrors).length === 0;
-  }, [currency, walletId, files, manyChatId]);
+  }, [currency, walletId, files, manyChatId, baseCountry]);
 
   // Handle File Upload
   const handleDrop = async (acceptedFiles) => {
@@ -336,6 +348,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 placeholder="Username"
                 readOnly
                 value={userInfo.name}
+                disabled={true}
               />
             </Box>
 
@@ -354,6 +367,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 placeholder="user@gmail.com"
                 readOnly
                 value={userInfo.email}
+                disabled={true}
               />
             </Box>
           </Box>
@@ -509,8 +523,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
             <Box flex={1}>
               {/* Donor Country Selection */}
               <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
-                Donor Country
-                {/* <span style={{ color: "red" }}>*</span> */}
+                Donor Country <span style={{ color: "red" }}>*</span>
               </Typography>
               <CustomInput
                 mb={2}
@@ -522,7 +535,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 value={baseCountry}
                 onChange={(e) => {
                   setBaseCountry(e.target.value);
-                  setErrors((prev) => ({ ...prev, donorCountry: "" }));
+                  errors.donorCountry = "";
                   // validateForm();
                 }}
                 options={baseCountryList.map((item) => ({
@@ -531,6 +544,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
                 }))}
               />
             </Box>
+            <ErrorMessage message={errors.donorCountry} />
           </Box>
 
           <Box display="flex" gap={2}>
