@@ -90,6 +90,12 @@ const Sidebar = () => {
         icon: <AddCircleOutlineIcon />,
         path: "/createForm",
       },
+      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
+      {
+        text: "သက်တမ်းတိုးခြင်း",
+        icon: <SyncAltRoundedIcon />,
+        path: "/extendUser",
+      },
       {
         text: "HOPEID List",
         icon: <FormatListBulletedRoundedIcon />,
@@ -117,10 +123,10 @@ const Sidebar = () => {
         icon: <SyncAltRoundedIcon />,
         path: "/extendUser",
       },
-      { 
+      {
         text: "ငွေစစ်ဆေးခြင်း",
         icon: <AttachMoneyIcon />,
-        path: "/entryForm" 
+        path: "/entryForm",
       },
       {
         text: "Customers List",

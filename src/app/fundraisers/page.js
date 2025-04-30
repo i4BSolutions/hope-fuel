@@ -434,7 +434,7 @@ const FundraisingFormPage = () => {
               </FormControl>
             </Box>
 
-            {/* <Box sx={{ mb: 4 }}>
+            <Box sx={{ mb: 4 }}>
               <Typography sx={{ mb: 1 }}>Accepted Currency</Typography>
               <FormControl fullWidth>
                 <Select
@@ -453,7 +453,7 @@ const FundraisingFormPage = () => {
                   ))}
                 </Select>
               </FormControl>
-            </Box> */}
+            </Box>
 
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Button
