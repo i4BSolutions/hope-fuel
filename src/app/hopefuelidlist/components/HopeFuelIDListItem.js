@@ -165,7 +165,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
               >
                 View Screenshot
               </Button>
-              <Box sx={{ minWidth: "100px" }}>
+              <Box sx={{ minWidth: "150px", maxWidth: "200px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
