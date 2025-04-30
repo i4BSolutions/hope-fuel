@@ -108,7 +108,13 @@ const Sidebar = ({
             fullWidth
             startIcon={loading && <CircularProgress size={16} />}
           >
-            {loading ? "Loading..." : "Load More"}
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              "Load More"
+            )}
           </Button>
         </Box>
       )}

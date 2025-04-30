@@ -75,8 +75,6 @@ export const AgentProvider = ({ children }) => {
   }, []);
 
   return (
-    <AgentContext.Provider value={agentId}>
-      {isLoading ? <p>Loading...</p> : children}
-    </AgentContext.Provider>
+    <AgentContext.Provider value={agentId}>{children}</AgentContext.Provider>
   );
 };

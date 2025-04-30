@@ -8,6 +8,7 @@ import CustomButton from "../components/Button";
 import { useUser } from "../context/UserContext";
 import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import checkUserSubmit from "../utilites/checkUserSubmit";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function CheckUser({ onUserCheck, UserRole }) {
   const [loading, setLoading] = useState(false);
@@ -91,6 +92,13 @@ export default function CheckUser({ onUserCheck, UserRole }) {
 
     setLoading(false);
   };
+
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <>

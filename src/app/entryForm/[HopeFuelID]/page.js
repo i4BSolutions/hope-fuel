@@ -13,6 +13,7 @@ import {
   FormControl,
   InputLabel,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import ActionButtons from "../../UI/Components/ActionButton";
 import AmountDetails from "../../UI/Components/AmountDetails";
@@ -82,7 +83,12 @@ export default function PaymentDetails() {
   }
 
   // Handle loading state
-  if (data === null) return <Typography>Loading...</Typography>;
+  if (data === null)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
