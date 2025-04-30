@@ -117,10 +117,10 @@ const Sidebar = () => {
         icon: <SyncAltRoundedIcon />,
         path: "/extendUser",
       },
-      { 
+      {
         text: "ငွေစစ်ဆေးခြင်း",
         icon: <AttachMoneyIcon />,
-        path: "/entryForm" 
+        path: "/entryForm",
       },
       {
         text: "Customers List",
@@ -151,6 +151,7 @@ const Sidebar = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            overflowX: "hidden",
           },
         }}
       >
