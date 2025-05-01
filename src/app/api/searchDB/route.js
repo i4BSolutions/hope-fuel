@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import getScreenShotUrl from "../../utilites/getScreenShotUrl";
 import prisma from "../../utilites/prisma";
 
 // Function to fetch paginated data
