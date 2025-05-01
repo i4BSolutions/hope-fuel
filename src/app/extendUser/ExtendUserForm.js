@@ -1,28 +1,26 @@
 "use client";
 
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import {
+  Alert,
+  AlertTitle,
   Box,
   Button,
   CircularProgress,
-  Alert,
-  AlertTitle,
-  Typography,
-  Stack,
   Modal,
+  Stack,
+  Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { useUser } from "../context/UserContext";
-import { useAgent } from "../context/AgentContext";
 import { MuiOtpInput } from "mui-one-time-password-input";
 import { useRouter } from "next/navigation";
-import checkPrfSubmit from "../utilites/ExtendUser/checkPrfSubmit";
-import ExtendOrNot from "../createForm/extendOrNot";
+import { useState } from "react";
+import { useUser } from "../context/UserContext";
 import ExtendForm from "../createForm/extendForm";
+import ExtendOrNot from "../createForm/extendOrNot";
+import checkPrfSubmit from "../utilites/ExtendUser/checkPrfSubmit";
 
 const ExtendUserForm = () => {
   const user = useUser();
-  const agent = useAgent();
   const router = useRouter();
 
   const [otp, setOtp] = useState("");
