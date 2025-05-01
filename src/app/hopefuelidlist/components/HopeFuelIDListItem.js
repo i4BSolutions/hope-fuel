@@ -25,7 +25,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
         data.map((item) => (
           <Card
             onClick={() => onClick && onClick(item.HopeFuelID)}
-            key={item.FormFilledPerson}
+            key={item.HopeFuelID}
             sx={{
               backgroundColor: "#FFFFFF",
               borderRadius: "8px",
@@ -67,7 +67,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   sx={{
                     color: "#000000",
                     fontSize: "14px",
-                    fontWeight: 400,
+                    fontWeight: 600,
                   }}
                 >
                   {item.Name}
@@ -90,7 +90,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                     fontWeight: 500,
                   }}
                 >
-                  Card ID - {item.CardID}
+                  Card ID - {item.CardID ? item.CardID : "Not Issued Yet"}
                 </Typography>
                 <Typography
                   sx={{
@@ -201,7 +201,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                 {item.TransactionStatus}
               </Box>
             </Box>
-            <Divider sx={{ my: "0.5rem", borderColor: "#CBD5E1" }} />
+            <Divider sx={{ my: "1rem", borderColor: "#CBD5E1" }} />
             <Box
               sx={{
                 display: "flex",
@@ -209,7 +209,6 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                 justifyContent: "space-between",
                 alignItems: { xs: "flex-start", sm: "center" },
                 gap: 1,
-                maxWidth: "65%",
               }}
             >
               <Typography
@@ -217,20 +216,22 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   color: "#000000",
                   fontSize: "14px",
                   fontWeight: 400,
-                  minWidth: "fit-content",
+                  width: "50%",
                 }}
               >
                 {item.FormFilledPerson}
               </Typography>
+              <Divider orientation="vertical" flexItem />
               <Typography
                 sx={{
                   color: "#000000",
                   fontSize: "14px",
                   fontWeight: 400,
-                  minWidth: "fit-content",
+                  width: "50%",
+                  px: 4,
                 }}
               >
-                Note: {item.Note}
+                Note: {item.Note ? stringTruncator(item.Note, 100) : "N/A"}
               </Typography>
             </Box>
           </Card>

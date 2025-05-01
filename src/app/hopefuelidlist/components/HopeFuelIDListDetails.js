@@ -1,4 +1,11 @@
-import { Box, Container, Divider, styled, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Divider,
+  styled,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import moment from "moment-timezone";
 import { useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
@@ -24,7 +31,7 @@ const Value = styled(Typography)({
 const ScrollableImageContainer = styled(Box)({
   display: "flex",
   overflowX: "auto",
-  gap: "8px",
+  gap: "24px",
   padding: "4px",
   "&::-webkit-scrollbar": {
     height: "6px",
@@ -52,12 +59,17 @@ const ImageItem = styled("img")({
 
 const HopeFuelIDListDetails = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+
+  // const activeImageHandler = (index) => {
+  //   setActiveImage(index);
+  // };
 
   return (
     <>
       <div key={data.HopeFuelID}>
         <Container>
-          <Box sx={{ maxWidth: 600, margin: "40px auto" }}>
+          <Box sx={{ maxWidth: 600, mt: 8, px: 3 }}>
             <InfoRow>
               <Typography
                 sx={{
@@ -96,14 +108,14 @@ const HopeFuelIDListDetails = ({ data }) => {
             <Divider sx={{ my: 2 }} />
 
             <InfoRow sx={{ mb: 3 }}>
-              <Box>
+              <Box sx={{ height: "100%" }}>
                 <Typography
                   variant="h4"
                   sx={{
                     fontSize: "28px",
-                    lineHeight: "34px",
                     color: "#000000",
                     fontWeight: 700,
+                    mb: 0.5,
                   }}
                 >
                   {data.Name}
@@ -126,6 +138,7 @@ const HopeFuelIDListDetails = ({ data }) => {
                     fontSize: "18px",
                     fontWeight: "bold",
                     lineHeight: "22px",
+                    mb: 2,
                   }}
                 >
                   Card ID
@@ -139,7 +152,11 @@ const HopeFuelIDListDetails = ({ data }) => {
                     fontWeight: 700,
                   }}
                 >
-                  {data.CardID}
+                  {data.CardID ? (
+                    data.CardID
+                  ) : (
+                    <Typography fontWeight={400}>Not Issued Yet</Typography>
+                  )}
                 </Typography>
               </Box>
             </InfoRow>
@@ -263,43 +280,25 @@ const HopeFuelIDListDetails = ({ data }) => {
                   lineHeight: "17px",
                 }}
               >
-                Note
-              </Label>
-              <Value
-                sx={{
-                  color: "#000000",
-                  fontSize: "18px",
-                  lineHeight: "22px",
-                  fontWeight: 600,
-                  maxWidth: "50%",
-                }}
-              >
-                {data.Note ? data.Note : "-"}
-              </Value>
-            </InfoRow>
-            <InfoRow>
-              <Label
-                sx={{
-                  color: "#000000",
-                  fontSize: "14px",
-                  fontWeight: 400,
-                  lineHeight: "17px",
-                }}
-              >
                 Manychat ID
               </Label>
               <CopyableText text={data.ManyChatId} />
             </InfoRow>
 
             <Box mt={3}>
-              <ScrollableImageContainer>
-                {data.ScreenShot?.map((image, idx) => (
-                  <>
+              <Tooltip
+                title="Hold Shift and scroll"
+                arrow
+                disableHoverListener={data.ScreenShot.length <= 2}
+              >
+                <ScrollableImageContainer>
+                  {data.ScreenShot?.map((image, index) => (
                     <ImageItem
                       onClick={() => {
                         setShowModal((prev) => !prev);
+                        setActiveImage(index);
                       }}
-                      key={idx}
+                      key={index}
                       src={image}
                       loading="lazy"
                       sx={{
@@ -309,9 +308,27 @@ const HopeFuelIDListDetails = ({ data }) => {
                         },
                       }}
                     />
-                  </>
-                ))}
-              </ScrollableImageContainer>
+                  ))}
+                </ScrollableImageContainer>
+              </Tooltip>
+            </Box>
+
+            <Box sx={{ mt: 3 }}>
+              <Typography sx={{ fontSize: 18, fontWeight: 600, mb: 1 }}>
+                Note
+              </Typography>
+              <Box
+                sx={{
+                  minHeight: 80,
+                  backgroundColor: "#F1F5F9",
+                  textAlign: "left",
+                  padding: 2,
+                  borderRadius: 2,
+                  wordWrap: "break-word",
+                }}
+              >
+                {data.Note ? data.Note : "-"}
+              </Box>
             </Box>
           </Box>
         </Container>
@@ -320,6 +337,8 @@ const HopeFuelIDListDetails = ({ data }) => {
         open={showModal}
         onClose={() => setShowModal((prev) => !prev)}
         screenshots={data?.ScreenShot}
+        activeImage={activeImage}
+        activeImageHandler={setActiveImage}
       />
     </>
   );

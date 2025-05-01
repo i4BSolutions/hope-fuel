@@ -1,22 +1,14 @@
-import {
-  ArrowBack as ArrowBackIcon,
-  ArrowForward as ArrowForwardIcon,
-} from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, Close } from "@mui/icons-material";
 import { Box, IconButton, Modal, Typography } from "@mui/material";
-import { useState } from "react";
 
-const ScreenshotCarouselModal = ({ open, onClose, screenshots = [] }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  console.log("Ss from list==>", screenshots);
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % screenshots.length);
-  };
-
-  const handlePrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? screenshots.length - 1 : prev - 1));
-  };
-
-  // if (screenshots.length === 0) return null;
+const ScreenshotCarouselModal = ({
+  open,
+  onClose,
+  screenshots = [],
+  activeImage,
+  activeImageHandler,
+}) => {
+  if (screenshots.length === 0) return null;
 
   return (
     <Modal
@@ -44,7 +36,8 @@ const ScreenshotCarouselModal = ({ open, onClose, screenshots = [] }) => {
       >
         <Box
           sx={{
-            position: "relative",
+            position: "absolute",
+            top: 0,
             width: "100%",
             height: "100%",
             display: "flex",
@@ -52,54 +45,64 @@ const ScreenshotCarouselModal = ({ open, onClose, screenshots = [] }) => {
             justifyContent: "center",
           }}
         >
-          {screenshots.length > 1 && (
-            <IconButton
-              onClick={handlePrev}
-              sx={{
-                position: "absolute",
-                left: 0,
-                zIndex: 5,
-              }}
-            >
-              <ArrowBackIcon />
-            </IconButton>
-          )}
-
           <img
-            src={screenshots[currentIndex]}
-            alt={`Screenshot ${currentIndex + 1}`}
+            src={screenshots[activeImage]}
+            alt={`Screenshot ${activeImage + 1}`}
             style={{
               width: "100%",
               height: "100%",
               objectFit: "contain",
             }}
           />
-
-          {screenshots.length > 1 && (
-            <IconButton
-              onClick={handleNext}
-              sx={{
-                position: "absolute",
-                right: 0,
-                zIndex: 5,
-              }}
-            >
-              <ArrowForwardIcon />
-            </IconButton>
-          )}
         </Box>
 
         {screenshots.length > 1 && (
-          <Typography
-            variant="body2"
+          <Box
             sx={{
-              mt: 2,
-              textAlign: "center",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+              color: "white",
+              position: "absolute",
+              bottom: 50,
             }}
           >
-            {`${currentIndex + 1} / ${screenshots.length}`}
-          </Typography>
+            <IconButton
+              onClick={() =>
+                activeImageHandler(
+                  activeImage === 0 ? screenshots.length - 1 : activeImage - 1
+                )
+              }
+            >
+              <ChevronLeft sx={{ color: "white", fontSize: 32 }} />
+            </IconButton>
+            <Typography
+              sx={{
+                textAlign: "center",
+                fontSize: 20,
+                fontWeight: 400,
+              }}
+            >
+              {`${activeImage + 1} / ${screenshots.length}`}
+            </Typography>
+            <IconButton
+              onClick={() =>
+                activeImageHandler(
+                  activeImage === screenshots.length - 1 ? 0 : activeImage + 1
+                )
+              }
+            >
+              <ChevronRight sx={{ color: "white", fontSize: 32 }} />
+            </IconButton>
+          </Box>
         )}
+        <IconButton
+          sx={{ position: "absolute", bottom: -60 }}
+          onClick={onClose}
+        >
+          <Close sx={{ color: "white", fontSize: 32 }} />
+        </IconButton>
       </Box>
     </Modal>
   );

@@ -29,6 +29,7 @@ const HopeFuelIdListPage = () => {
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
+  const [activeImage, setActiveImage] = useState(0);
 
   const [debouncedSearch] = useDebounce(searchText, 100);
 
@@ -83,11 +84,9 @@ const HopeFuelIdListPage = () => {
 
     try {
       const response = await fetch(`/api/hopeFuelList/details/${hopeId}`);
-
       if (!response.ok) {
         throw new Error("Failed to fetch details");
       }
-
       const result = await response.json();
       setDetails(result.data);
     } catch (error) {
@@ -98,7 +97,6 @@ const HopeFuelIdListPage = () => {
   };
 
   const handleOpenScreenshots = (screenshots) => {
-    console.log(typeof screenshots);
     if (!Array.isArray(screenshots)) {
       screenshots = [screenshots];
     }
@@ -147,10 +145,18 @@ const HopeFuelIdListPage = () => {
     setOpenModal((prev) => !prev);
   };
 
-  if (loading) {
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-      <CircularProgress />
-    </Box>;
+  if (!loading && data.length === 0) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Typography sx={{ textAlign: "center" }}>No Details Found</Typography>
+      </Box>
+    );
   }
 
   return (
@@ -187,38 +193,26 @@ const HopeFuelIdListPage = () => {
           borderColor: "#CBD5E1",
         }}
       />
-      {data.length > 0 ? (
-        <>
-          <HopeFuelIDListItem
-            data={data}
-            onClick={handleOpen}
-            onClickScreenShot={handleOpenScreenshots}
-          />
-          {loading && (
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <CircularProgress />
-            </Box>
-          )}
-        </>
-      ) : (
+
+      <HopeFuelIDListItem
+        data={data}
+        onClick={handleOpen}
+        onClickScreenShot={handleOpenScreenshots}
+      />
+      {loading && (
         <Box
           sx={{
             display: "flex",
             justifyContent: "center",
+            alignItems: "center",
+            mt: 2,
+            height: "70vh",
           }}
         >
-          <Typography
-            sx={{
-              color: "#334155",
-              fontSize: "20px",
-              fontWeight: 400,
-              lineHeight: "28px",
-            }}
-          >
-            No Result Found
-          </Typography>
+          <CircularProgress />
         </Box>
       )}
+
       <DetailModal direction="left" open={openModal} onClose={handleClose}>
         <Paper
           sx={{
@@ -247,20 +241,8 @@ const HopeFuelIdListPage = () => {
             >
               <CircularProgress />
             </Box>
-          ) : details ? (
-            <HopeFuelIDListDetails data={details} />
           ) : (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Typography sx={{ textAlign: "center" }}>
-                No Details Found
-              </Typography>
-            </Box>
+            <HopeFuelIDListDetails data={details} />
           )}
           {/* <SubscriptionCard cards={SUBSCRIPTION_DATA} /> */}
         </Paper>
@@ -269,6 +251,8 @@ const HopeFuelIdListPage = () => {
         open={openScreenshotModal}
         onClose={handleCloseScreenshots}
         screenshots={screenshotsLists}
+        activeImage={activeImage}
+        activeImageHandler={setActiveImage}
       />
     </>
   );
