@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `csvexporttransactionlogs` ADD COLUMN `CSVExportTransactionFileName` VARCHAR(255) NULL;
+ALTER TABLE `CSVExportTransactionLogs` ADD COLUMN `CSVExportTransactionFileName` VARCHAR(255) NULL;
