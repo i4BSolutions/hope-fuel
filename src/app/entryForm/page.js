@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Box, Typography, CircularProgress } from "@mui/material";
 import SearchBarForm from "../search/page";
 import getScreenShotUrl from "../utilites/getScreenShotUrl";
-import PaymentDetails from "./[HopeFuelID]/page";
+import PaymentDetails from "./details/page";
 
 export default function EntryForm() {
   const searchParams = useSearchParams();
