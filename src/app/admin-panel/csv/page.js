@@ -6,11 +6,15 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Container,
+  Grid2,
   Modal,
   Pagination,
   Paper,
   Snackbar,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
@@ -20,6 +24,7 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import moment from "moment-timezone";
 import CustomButton from "../../components/Button";
 import TransactionList from "../../UI/Components/TransactionList";
+import TransactionHistoryList from "../../UI/Components/TransactionsHistoryList";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import csvHandler from "../../utilites/exportCSV/csvHandler";
@@ -28,6 +33,9 @@ import { useAgent } from "../../context/AgentContext";
 
 const ExportCSVPage = () => {
   const agent = useAgent();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
 
   const [date, setDate] = useState("");
   const [allTransactions, setAllTransactions] = useState([]);
@@ -36,8 +44,42 @@ const ExportCSVPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [openCSVExportModal, setOpenCSVExportModal] = useState(false);
+  const [openExportHistoryModal, setOpenExportHistoryModal] = useState(false);
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
+  const [transactionHistoryLists] = useState([
+    {
+      id: 1,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 2,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 3,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 4,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 5,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+  ]);
 
   const bothDateSelected = date && date[0] && date[1];
 
@@ -222,159 +264,259 @@ const ExportCSVPage = () => {
     }
   }, [allTransactions, date, handleCloseCSVExportModal]);
 
+  const handleOpenExportHistoryModal = useCallback(() => {
+    setOpenExportHistoryModal((prev) => !prev);
+  }, []);
+
+  const handleCloseExportHistoryModal = useCallback(() => {
+    setOpenExportHistoryModal((prev) => !prev);
+  }, []);
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        mt: 5,
-      }}
-    >
-      <Typography sx={{ color: "#0F172A", fontSize: 16, fontWeight: "600" }}>
-        Set Date Range
-      </Typography>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={["DateRangePicker"]}>
-          <DateRangePicker
-            value={date}
-            onChange={handleDateChange}
-            disableFuture
-          />
-        </DemoContainer>
-      </LocalizationProvider>
-      {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
-
-      {bothDateSelected && !loading && (
-        <>
-          {allTransactions.length > 0 ? (
-            <>
-              <Box sx={{ width: "100%", mt: 4 }}>
-                <TransactionList transactions={paginatedTransactions} />
-              </Box>
-
-              {totalPages > 1 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 3,
-                    mb: 2,
-                  }}
-                >
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary"
-                    showFirstButton
-                    showLastButton
-                  />
-                </Box>
-              )}
-
-              <Box sx={{ mt: 2, mb: 4 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Showing {paginatedTransactions.length} of{" "}
-                  {allTransactions.length} transactions
-                </Typography>
-              </Box>
-            </>
-          ) : (
-            <Box sx={{ mt: 4, mb: 4 }}>
-              <Typography variant="body1">
-                No transactions found for the selected date range.
-              </Typography>
-            </Box>
-          )}
-        </>
-      )}
-      <Box sx={{ mt: 2 }}>
-        <CustomButton
-          disabled={
-            !bothDateSelected || loading || allTransactions.length === 0
-          }
-          variant="contained"
-          text="Export CSV"
-          onClick={handleOpenCSVExportModal}
-        />
-      </Box>
-      <Modal
-        open={openCSVExportModal}
-        onClose={handleCloseCSVExportModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{ alignSelf: "center", justifyItems: "center" }}
+    <Container maxWidth="xl">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          mt: { xs: 2, sm: 3, md: 5 },
+          px: { xs: 1, sm: 2 },
+        }}
       >
-        <Paper
+        <Typography
           sx={{
-            backgroundColor: "#F8FAFC",
-            width: 280,
-            height: 146,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            borderRadius: 4,
+            color: "#0F172A",
+            fontSize: { xs: 14, sm: 16 },
+            fontWeight: "600",
+            mb: 1,
           }}
         >
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              textAlign: "center",
-            }}
-          >
-            Are you sure you want to export?
-          </Typography>
+          Set Date Range
+        </Typography>
 
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 2,
-              mt: 2,
-            }}
-          >
-            <CustomButton
-              icon={<CloseIcon />}
-              color="primary"
-              variant="outlined"
-              text="No"
-              onClick={handleCloseCSVExportModal}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={["DateRangePicker"]}>
+            <DateRangePicker
+              value={date}
+              onChange={handleDateChange}
+              disableFuture
             />
+          </DemoContainer>
+        </LocalizationProvider>
 
-            <CustomButton
-              icon={<CheckIcon />}
-              color="primary"
-              variant="contained"
-              text="Yes"
-              onClick={handleExportCSV}
-            />
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+            <CircularProgress />
           </Box>
-        </Paper>
-      </Modal>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ width: "100%" }}
+        )}
+
+        {bothDateSelected && !loading && (
+          <>
+            {allTransactions.length > 0 ? (
+              <>
+                <Box sx={{ width: "100%", mt: 4, overflowX: "auto" }}>
+                  <TransactionList transactions={paginatedTransactions} />
+                </Box>
+
+                {totalPages > 1 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      mt: 3,
+                      mb: 2,
+                      width: "100%",
+                      overflowX: "auto",
+                    }}
+                  >
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="primary"
+                      showFirstButton
+                      showLastButton
+                      size={isMobile ? "small" : "medium"}
+                    />
+                  </Box>
+                )}
+
+                <Box sx={{ mt: 2, mb: 4 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="center"
+                  >
+                    Showing {paginatedTransactions.length} of{" "}
+                    {allTransactions.length} transactions
+                  </Typography>
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="body1" align="center">
+                  No transactions found for the selected date range.
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
+
+        <Grid2
+          container
+          spacing={2}
+          sx={{
+            mt: 2,
+            mb: 4,
+            justifyContent: { xs: "center", sm: "center" },
+            flexDirection: { xs: "column", sm: "row" },
+          }}
         >
-          {error || "An error occurred"}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Grid2 item xs={12} sm="auto">
+            <CustomButton
+              disabled={
+                !bothDateSelected || loading || allTransactions.length === 0
+              }
+              variant="contained"
+              text="Export CSV"
+              btnWidth={isMobile ? "100%" : 160}
+              onClick={handleOpenCSVExportModal}
+              fullWidth={isMobile}
+            />
+          </Grid2>
+          <Grid2 item xs={12} sm="auto">
+            <CustomButton
+              variant="outlined"
+              text="View Export History"
+              onClick={handleOpenExportHistoryModal}
+              btnWidth={isMobile ? "100%" : "auto"}
+              fullWidth={isMobile}
+            />
+          </Grid2>
+        </Grid2>
+
+        <Modal
+          open={openCSVExportModal}
+          onClose={handleCloseCSVExportModal}
+          aria-labelledby="export-csv-modal-title"
+          aria-describedby="export-csv-modal-description"
+          sx={{
+            alignSelf: "center",
+            justifyContent: "center",
+            display: "flex",
+          }}
+        >
+          <Paper
+            sx={{
+              backgroundColor: "#F8FAFC",
+              width: 280,
+              height: 146,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              borderRadius: 4,
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{
+                fontWeight: 600,
+                textAlign: "center",
+                fontSize: { xs: 16, sm: 20 },
+              }}
+              id="export-csv-modal-title"
+            >
+              Are you sure you want to export?
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                mt: 2,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
+              <CustomButton
+                icon={<CloseIcon />}
+                color="primary"
+                variant="outlined"
+                text="No"
+                onClick={handleCloseCSVExportModal}
+                fullWidth={isMobile}
+              />
+
+              <CustomButton
+                icon={<CheckIcon />}
+                color="primary"
+                variant="contained"
+                text="Yes"
+                onClick={handleExportCSV}
+                fullWidth={isMobile}
+              />
+            </Box>
+          </Paper>
+        </Modal>
+
+        <Modal
+          open={openExportHistoryModal}
+          onClose={handleCloseExportHistoryModal}
+          aria-labelledby="export-history-modal-title"
+          sx={{
+            alignSelf: "center",
+            justifyContent: "center",
+            display: "flex",
+          }}
+        >
+          <Paper
+            sx={{
+              backgroundColor: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              borderRadius: 4,
+              width: 1000,
+              p: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              id="export-history-modal-title"
+              align="center"
+              sx={{ mb: 2, fontWeight: 600 }}
+            >
+              Export History
+            </Typography>
+            <Box sx={{ overflowX: "auto", width: "100%" }}>
+              <TransactionHistoryList
+                transactionHistoryLists={transactionHistoryLists}
+              />
+            </Box>
+          </Paper>
+        </Modal>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {error || "An error occurred"}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Container>
   );
 };
 

@@ -1,19 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  CircularProgress,
-  Box,
-  Divider,
-} from "@mui/material";
-import SearchBar from "../UI/Components/SearchBar";
-import ItemList from "../UI/Components/ItemList";
-import WalletSelect from "../UI/Components/GroupWallet";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
+import { Container, CircularProgress, Box, Divider } from "@mui/material";
+import SearchBar from "../../UI/Components/SearchBar";
+import ItemList from "./ItemList";
+import WalletSelect from "../../UI/Components/GroupWallet";
+import getScreenShotUrl from "../../utilites/getScreenShotUrl";
 
-export default function SearchBarForm() {
+export default function SearchBarForm({ onItemClick }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -148,7 +142,7 @@ export default function SearchBarForm() {
           items={items}
           hasInput={!!searchQuery}
           onLoadMore={handleLoadMore}
-          onItemClick={(HopeFuelID) => console.log("Item clicked:", HopeFuelID)}
+          onItemClick={(HopeFuelID) => onItemClick(HopeFuelID)}
           hasMore={hasMore}
         />
       )}

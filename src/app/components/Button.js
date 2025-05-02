@@ -14,6 +14,7 @@ const CustomButton = ({
   type,
   disabled = false,
   borderColor,
+  btnWidth,
 }) => {
   return (
     <Button
@@ -24,6 +25,7 @@ const CustomButton = ({
       type={type ? type : "button"}
       disabled={disabled}
       sx={{
+        width: btnWidth,
         color: color,
         borderColor: disabled ? "#ccc" : borderColor,
         backgroundColor: disabled ? "#ccc" : color,

@@ -1,58 +1,16 @@
 import React from "react";
 import { Stack, Button, Typography } from "@mui/material";
-import { Router } from "next/router";
-import { useRouter } from "next/navigation";
-
-import { redirect } from "next/dist/server/api-utils";
 import { useAgent } from "../../context/AgentContext";
 
-const ActionButtons = ({ data }) => {
+const ActionButtons = ({ data, onActionComplete }) => {
   const [loading, setLoading] = React.useState(false);
   const [confirmDenyFlag, setConfirmDenyFlag] = React.useState(null);
-  const route = useRouter();
-  const agentId = useAgent
+  const agentId = useAgent;
 
   if (!data || !data.HopeFuelID) {
     console.error("Invalid data passed to ActionButtons:", data);
     return null;
   }
-
-  const handleAction = async (denied) => {
-    setLoading(true);
-
-    const payload = {
-      denied,
-      HopeFuelID: data.HopeFuelID,
-      note: data.Note,
-      formStatus: data.Status,
-      AgentId: data.AgentId,
-    };
-
-    try {
-      const response = await fetch("/api/paymentConfirmOrDeined", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log(
-          `Payment ${denied ? "Denied" : "Confirmed"} successfully`,
-          result
-        );
-        setConfirmDenyFlag(denied ? "denied" : "confirmed");
-      } else {
-        console.error("Failed to process payment");
-        setConfirmDenyFlag("error");
-      }
-    } catch (error) {
-      console.error("Error processing payment:", error);
-      setConfirmDenyFlag("error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -62,18 +20,17 @@ const ActionButtons = ({ data }) => {
     };
 
     try {
-      const response = await fetch("/api/confirmTransaction", {
+      await fetch("/api/confirmTransaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      setLoading(false);
-      location.reload();
+      onActionComplete?.();
     } catch (error) {
       console.error("error updating the confirm status");
+    } finally {
+      setLoading(false);
     }
-    route.push("/entryForm");
-    location.reload();
   };
 
   const handleDenied = async () => {
@@ -84,17 +41,17 @@ const ActionButtons = ({ data }) => {
     };
 
     try {
-      const response = await fetch("/api/deniedTransaction", {
+      await fetch("/api/deniedTransaction", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      setLoading(false);
+      onActionComplete?.();
     } catch (error) {
       console.error("error updating the deny status");
+    } finally {
+      setLoading(false);
     }
-    route.push("/entryForm");
-    location.reload();
   };
 
   return (

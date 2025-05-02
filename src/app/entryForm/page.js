@@ -1,70 +1,29 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
-import {
-  Box,
-  Typography,
-  TextField,
-  Card,
-  Stack,
-  FormControl,
-  Chip,
-  Button,
-  Divider,
-  CircularProgress,
-} from "@mui/material";
-import ActionButtons from "../UI/Components/ActionButton";
-import AmountDetails from "../UI/Components/AmountDetails";
-import CardsIssuedList from "../UI/Components/CardIssuedList";
-import CreatorInfo from "../UI/Components/CreatorInfo";
-import SupportRegion from "../UI/Components/SupportRegion";
-import UserInfo from "../UI/Components/UserInfo";
-import HopeFuelIdStatus from "../UI/Components/HopeIdStatus";
-import SearchBarForm from "../search/page";
+import { useSearchParams, useRouter } from "next/navigation";
+import { Box, Typography, CircularProgress } from "@mui/material";
+import SearchBarForm from "./components/searchList";
 import getScreenShotUrl from "../utilites/getScreenShotUrl";
+import PaymentDetails from "./components/paymentDetails";
 
-export default function PaymentDetails() {
-  const [isEditing, setIsEditing] = useState(false);
+export default function EntryForm() {
   const searchParams = useSearchParams();
-  const HopeFuelID = searchParams.get("HopeFuelID");
+  let [hopeFuelID, setHopeFuelID] = useState(searchParams.get("HopeFuelID"));
   const [data, setData] = useState(null);
   const [status, setStatus] = useState(1);
   const [note, setNote] = useState("");
+  const walletId = searchParams.get("walletId");
 
-  // Fetch data based on HopeFuelID
-
-  async function handleNoteSave() {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    const raw = JSON.stringify({
-      note: note,
-      noteId: data["NoteID"],
-    });
-
-    const requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
-
-    await fetch("/api/updateNote", requestOptions)
-      .then((response) => response.text())
-      .then((result) => console.log(result))
-      .catch((error) => console.error(error));
-
-    setIsEditing(false);
-  }
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!HopeFuelID) return;
+      if (!hopeFuelID) return;
 
       try {
         const response = await fetch(
-          `/api/paymentDetails?HopeFuelID=${HopeFuelID}`
+          `/api/paymentDetails?HopeFuelID=${hopeFuelID}`
         );
         const result = await response.json();
 
@@ -90,14 +49,21 @@ export default function PaymentDetails() {
       }
     };
     fetchData();
-  }, [HopeFuelID]);
+  }, [hopeFuelID]);
 
   // Handle case where no HopeFuelID is selected
-  if (!HopeFuelID) {
+  if (!hopeFuelID) {
     return (
       <Box sx={{ display: "flex", height: "100vh" }}>
         <Box sx={{ width: 300, marginRight: 3 }}>
-          <SearchBarForm url={"/api/entryFormStatus"} />
+          <SearchBarForm
+            key={hopeFuelID === null ? Date.now() : "active"}
+            url={"/api/entryFormStatus"}
+            onItemClick={(id) => {
+              router.push(`/entryForm?HopeFuelID=${id}&walletId=${walletId}`);
+              setHopeFuelID(id);
+            }}
+          />
         </Box>
         <Box
           sx={{
@@ -126,109 +92,22 @@ export default function PaymentDetails() {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <Box sx={{ width: 300, marginRight: 3 }}>
-        <SearchBarForm url={"/api/entryFormStatus"} />
+        <SearchBarForm
+          key={hopeFuelID === null ? Date.now() : "active"}
+          url={"/api/entryFormStatus"}
+          onItemClick={(id) => {
+            router.push(`/entryForm?HopeFuelID=${id}&walletId=${walletId}`);
+            setHopeFuelID(id);
+          }}
+        />
       </Box>
-      <Box sx={{ flex: 1, padding: 4, backgroundColor: "#f5f5f5" }}>
-        <Card sx={{ padding: 3, borderRadius: 5 }}>
-          <Stack spacing={2}>
-            <HopeFuelIdStatus data={data} />
-            <Divider />
-
-            <Stack direction="row" spacing={4}>
-              {data.ScreenShotLinks && data.ScreenShotLinks.length > 0 ? (
-                <Stack
-                  direction={{ xs: "column", sm: "column" }}
-                  spacing={{ xs: 1, sm: 2, md: 4 }}
-                >
-                  {data.ScreenShotLinks.map((link, index) => (
-                    <Box
-                      key={index}
-                      component="img"
-                      src={link}
-                      alt={`Screenshot ${index + 1}`}
-                      sx={{
-                        width: 200,
-                        height: 200,
-                        borderRadius: 2,
-                        boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
-                      }}
-                      onClick={() => window.open(link, "_blank")}
-                    />
-                  ))}
-                </Stack>
-              ) : (
-                <Typography>No screenshots available</Typography>
-              )}
-              <Stack spacing={2} sx={{ flex: 1 }}>
-                <Card variant="outlined" sx={{ padding: 2 }}>
-                  <UserInfo user={data} />
-                </Card>
-
-                <Card variant="outlined" sx={{ padding: 2 }}>
-                  <AmountDetails amount={data} />
-                </Card>
-
-                <Card variant="outlined" sx={{ padding: 2 }}>
-                  {data.Region ? (
-                    <SupportRegion region={data} />
-                  ) : (
-                    <Typography variant="body1">
-                      No Region Data Available
-                    </Typography>
-                  )}
-                </Card>
-
-                <Card variant="outlined" sx={{ padding: 2 }}>
-                  <CreatorInfo creator={data} />
-                </Card>
-
-                <Stack spacing={2}>
-                  <TextField
-                    fullWidth
-                    label="Note"
-                    multiline
-                    rows={3}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    disabled={!isEditing} // Disable text field when not editing
-                    sx={{ marginBottom: 2 }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={
-                      isEditing ? handleNoteSave : () => setIsEditing(true)
-                    }
-                  >
-                    {isEditing ? "Save" : "Edit"}
-                  </Button>
-                </Stack>
-                <Chip
-                  label={`${data.TransactionStatus} `}
-                  sx={{
-                    backgroundColor: "#ffd700",
-                    color: "#000",
-                    fontWeight: "bold",
-                    padding: "4px 8px",
-                  }}
-                />
-                <FormControl fullWidth>
-                  <ActionButtons
-                    data={{
-                      HopeFuelID: data.HopeFuelID,
-                      Note: note,
-                      Status: status,
-                      AgentId: data.AgentId,
-                      TransactionID: data.TransactionID,
-                    }}
-                  />
-                </FormControl>
-              </Stack>
-            </Stack>
-
-            <CardsIssuedList data={data} />
-          </Stack>
-        </Card>
-      </Box>
+      <PaymentDetails
+        data={data}
+        clearHopeFuelID={() => {
+          setHopeFuelID(null);
+          router.replace(`/entryForm?walletId=${walletId}`);
+        }}
+      />
     </Box>
   );
 }

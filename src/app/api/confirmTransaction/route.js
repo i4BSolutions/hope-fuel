@@ -58,12 +58,12 @@ export async function POST(req) {
     );
 
     // Return success response
-    return NextResponse.json({
-      message: "all is ok",
-      // transactionResult,
-      // noteResult,
-      // formStatusResult,
-    });
+    return NextResponse.json(
+      { status: 200 },
+      {
+        message: "Payment status updated successfully",
+      }
+    );
   } catch (error) {
     console.error("[Error] Failed to update payment status:", error);
     return NextResponse.json(
