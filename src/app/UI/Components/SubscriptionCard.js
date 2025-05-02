@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import moment from "moment-timezone";
-import formatAmount from "../../../libs/FormatAmount";
+import formatAmount from "../../../lib/formatAmount";
 
 const DateContainer = styled(Box)(({ theme }) => ({
   display: "flex",
