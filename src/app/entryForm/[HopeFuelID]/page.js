@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   Box,
   Typography,
   TextField,
   Card,
   Stack,
-  MenuItem,
-  Select,
   FormControl,
-  InputLabel,
   Divider,
-  CircularProgress,
+  Button,
+  Chip,
+  Modal,
 } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ActionButtons from "../../UI/Components/ActionButton";
 import AmountDetails from "../../UI/Components/AmountDetails";
 import CardsIssuedList from "../../UI/Components/CardIssuedList";
@@ -22,80 +21,41 @@ import CreatorInfo from "../../UI/Components/CreatorInfo";
 import SupportRegion from "../../UI/Components/SupportRegion";
 import UserInfo from "../../UI/Components/UserInfo";
 import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
-import SearchBarForm from "../../search/page";
 
-export default function PaymentDetails() {
-  const searchParams = useSearchParams();
-  const HopeFuelID = searchParams.get("HopeFuelID");
-  const [data, setData] = useState(null);
+export default function PaymentDetails({ data, clearHopeFuelID }) {
   const [status, setStatus] = useState(1);
   const [note, setNote] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   // Fetch data based on HopeFuelID
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!HopeFuelID) return;
+  async function handleNoteSave() {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-      try {
-        const response = await fetch(
-          `/api/paymentDetails?HopeFuelID=${HopeFuelID}`
-        );
-        const result = await response.json();
+    const raw = JSON.stringify({
+      note: note,
+      noteId: data["NoteID"],
+    });
 
-        if (result && result.length > 0) {
-          const transactionData = result[0];
-          setData(transactionData);
-          setNote(transactionData.Note || "");
-          setStatus(transactionData.Status || 1);
-        } else {
-          console.error("No data found");
-          setData(null);
-        }
-      } catch (error) {
-        console.error("Error fetching payment details:", error);
-        setData(null);
-      }
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
     };
-    fetchData();
-  }, [HopeFuelID]);
 
-  // Handle case where no HopeFuelID is selected
-  if (!HopeFuelID) {
-    return (
-      <Box sx={{ display: "flex", height: "100vh" }}>
-        <Box sx={{ width: 300, marginRight: 3 }}>
-          <SearchBarForm url={"/api/entryFormStatus"} />
-        </Box>
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h6">
-            Please select a transaction to view details
-          </Typography>
-        </Box>
-      </Box>
-    );
+    await fetch("/api/updateNote", requestOptions)
+      .then((response) => response.text())
+      .then((result) => console.log(result))
+      .catch((error) => console.error(error));
+
+    setIsEditing(false);
   }
 
-  // Handle loading state
-  if (data === null)
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-        <CircularProgress />
-      </Box>
-    );
-
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      <Box sx={{ width: 300, marginRight: 3 }}>
-        <SearchBarForm url={"/api/entryFormStatus"} />
-      </Box>
-      <Box sx={{ flex: 1, padding: 4, backgroundColor: "#f5f5f5" }}>
+    <>
+      <Box sx={{ flex: 1 }}>
         <Card sx={{ padding: 3, borderRadius: 5 }}>
           <Stack spacing={2}>
             <HopeFuelIdStatus data={data} />
@@ -149,34 +109,45 @@ export default function PaymentDetails() {
                   <CreatorInfo creator={data} />
                 </Card>
 
-                <TextField
-                  fullWidth
-                  label="Note"
-                  multiline
-                  rows={3}
-                  value={note} // Use controlled state
-                  onChange={(e) => setNote(e.target.value)}
-                  sx={{ marginBottom: 2 }}
+                <Stack spacing={2}>
+                  <TextField
+                    fullWidth
+                    label="Note"
+                    multiline
+                    rows={3}
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    disabled={!isEditing} // Disable text field when not editing
+                    sx={{ marginBottom: 2 }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={
+                      isEditing ? handleNoteSave : () => setIsEditing(true)
+                    }
+                  >
+                    {isEditing ? "Save" : "Edit"}
+                  </Button>
+                </Stack>
+                <Chip
+                  label={`${data.TransactionStatus} `}
+                  sx={{
+                    backgroundColor: "#ffd700",
+                    color: "#000",
+                    fontWeight: "bold",
+                    padding: "4px 8px",
+                  }}
                 />
                 <FormControl fullWidth>
-                  <InputLabel>Status</InputLabel>
-                  <Select
-                    value={status} // Use controlled state
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <MenuItem value={1}>1 - Form Entry</MenuItem>
-                    <MenuItem value={2}>2 - Payment Checked</MenuItem>
-                    <MenuItem value={3}>3 - Card Issued</MenuItem>
-                    <MenuItem value={4}>4 - Cancel</MenuItem>
-                  </Select>
-
                   <ActionButtons
                     data={{
                       HopeFuelID: data.HopeFuelID,
                       Note: note,
                       Status: status,
                       AgentId: data.AgentId,
+                      TransactionID: data.TransactionID,
                     }}
+                    onActionComplete={() => setIsSuccessModalOpen(true)}
                   />
                 </FormControl>
               </Stack>
@@ -186,6 +157,44 @@ export default function PaymentDetails() {
           </Stack>
         </Card>
       </Box>
-    </Box>
+      <Modal
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        aria-labelledby="success-modal"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 300,
+            bgcolor: "white",
+            borderRadius: "12px",
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
+          }}
+        >
+          <CheckCircleIcon color="success" sx={{ fontSize: "50px" }} />
+          <Typography
+            sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}
+          >
+            Payment Status Updated Successfully.
+          </Typography>
+
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              setIsSuccessModalOpen(false);
+              clearHopeFuelID();
+            }}
+          >
+            OK
+          </Button>
+        </Box>
+      </Modal>
+    </>
   );
 }
