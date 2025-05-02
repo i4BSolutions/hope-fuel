@@ -69,7 +69,7 @@ const HopeFuelIDListDetails = ({ data }) => {
     <>
       <div key={data.HopeFuelID}>
         <Container>
-          <Box sx={{ maxWidth: 600, mt: 8, px: 3 }}>
+          <Box sx={{ maxWidth: 600, mt: 4, px: 3 }}>
             <InfoRow>
               <Typography
                 sx={{

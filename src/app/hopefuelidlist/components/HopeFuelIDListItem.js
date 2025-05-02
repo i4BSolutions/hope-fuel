@@ -29,7 +29,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
             sx={{
               backgroundColor: "#FFFFFF",
               borderRadius: "8px",
-              mx: { xs: "1rem", sm: "2rem", md: "5rem" },
+              mx: { md: "1rem", lg: "2rem", xl: "4rem" },
               py: "1rem",
               px: "1rem",
               boxShadow: "2px 2px 2px 2px rgba(0, 0, 0, 0.1)",
@@ -62,7 +62,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
               >
                 HOPEFUEL ID - {item.HopeFuelID}
               </Typography>
-              <Box sx={{ minWidth: "200px" }}>
+              <Box sx={{ minWidth: "120px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
@@ -82,7 +82,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   {item.Email}
                 </Typography>
               </Box>
-              <Box sx={{ minWidth: "150px" }}>
+              <Box sx={{ minWidth: "180px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
@@ -102,7 +102,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   {moment(item.TransactionDate).format("DD-MM-YYYY HH:mm:ss")}
                 </Typography>
               </Box>
-              <Box sx={{ minWidth: "80px" }}>
+              <Box sx={{ minWidth: "60px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
@@ -155,7 +155,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   borderRadius: "18px",
                   px: 2,
                   py: 0.5,
-                  minWidth: "160px",
+                  minWidth: "150px",
                   fontSize: "14px",
                   "&:hover": {
                     backgroundColor: "#B91C1C",
@@ -165,7 +165,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
               >
                 View Screenshot
               </Button>
-              <Box sx={{ minWidth: "150px" }}>
+              <Box sx={{ minWidth: "120px" }}>
                 <Typography
                   sx={{
                     color: "#000000",
@@ -231,7 +231,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   px: 4,
                 }}
               >
-                Note: {item.Note ? stringTruncator(item.Note, 100) : "N/A"}
+                Note: {item.Note ? stringTruncator(item.Note, 80) : "N/A"}
               </Typography>
             </Box>
           </Card>
