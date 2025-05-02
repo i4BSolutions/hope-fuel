@@ -185,7 +185,7 @@ model Platform {
   PlatformName String @unique(map: "PlatformName") @db.VarChar(191)
 }
 
-model Screenshot {
+model ScreenShot {
   ScreenShotID   Int           @id @default(autoincrement())
   TransactionID  Int?
   ScreenShotLink String?       @db.VarChar(2048)
@@ -227,7 +227,7 @@ model Transactions {
   Month            Int?
   HopeFuelID       Int?
   FormStatus       FormStatus[]
-  Screenshot       Screenshot[]
+  Screenshot       ScreenShot[]
   TransactionAgent TransactionAgent[]
   Customer         Customer?          @relation(fields: [CustomerID], references: [CustomerId], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_1")
   SupportRegion    SupportRegion?     @relation(fields: [SupportRegionID], references: [SupportRegionID], onDelete: Restrict, onUpdate: Restrict, map: "transactions_ibfk_2")

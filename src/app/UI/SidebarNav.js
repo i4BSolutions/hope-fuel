@@ -152,6 +152,7 @@ const Sidebar = () => {
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            overflowX: "hidden",
           },
         }}
       >
