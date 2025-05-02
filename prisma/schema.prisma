@@ -10,15 +10,15 @@ datasource db {
 }
 
 model Agent {
-  AgentId              Int                    @id @default(autoincrement())
-  AwsId                String?                @db.VarChar(255)
-  UserRoleId           Int?
-  UserRole             UserRole?              @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
-  Customer             Customer[]
-  CustomerAuditlogs    CustomerAuditLogs[]
-  FormVisibilityStatus FormVisibilityStatus[]
-  Note                 Note[]
-  TransactionAgent     TransactionAgent[]
+  AgentId                  Int                        @id @default(autoincrement())
+  AwsId                    String?                    @db.VarChar(255)
+  UserRoleId               Int?
+  UserRole                 UserRole?                  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
+  Customer                 Customer[]
+  CustomerAuditlogs        CustomerAuditLogs[]
+  FormVisibilityStatus     FormVisibilityStatus[]
+  Note                     Note[]
+  TransactionAgent         TransactionAgent[]
   CSVExportTransactionLogs CSVExportTransactionLogs[]
 
   @@index([UserRoleId], map: "UserRoleId")
@@ -263,12 +263,13 @@ model Wallet {
 }
 
 model CSVExportTransactionLogs {
-  CSVExportTransactionLogsId Int @id @default(autoincrement())
-  AgentId Int?
+  CSVExportTransactionLogsId   Int       @id @default(autoincrement())
+  AgentId                      Int?
   CSVExportTransactionDateTime DateTime? @db.Timestamp(0)
-  
+  CSVExportTransactionFileName String?   @db.VarChar(255)
+
   Agent Agent? @relation(fields: [AgentId], references: [AgentId])
-  
+
   @@index([AgentId], map: "AgentId")
 }
 

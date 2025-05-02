@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "../../../../../utilites/db";
 
-
- async function EditHistoryByCustomerId(id) {
-
- const query = `
+async function EditHistoryByCustomerId(id) {
+  const query = `
  SELECT 
     c.LogId,
     c.ChangeDate AS timestamp,
@@ -16,22 +14,18 @@ FROM CustomerAuditLogs c
 JOIN Agent a ON c.AgentId = a.AgentId
 WHERE c.CustomerId = ?
 ORDER BY c.ChangeDate DESC;`;
-    const values = [id];
+  const values = [id];
 
-    try{
-        const rows = await db(query, values);
-        return rows;
-
-    }catch(e){
-        console.log(e);
-        throw new Error("Error in EditHistoryByCustomerId query");
-    }
+  try {
+    const rows = await db(query, values);
+    return rows;
+  } catch (e) {
+    console.log(e);
+    throw new Error("Error in EditHistoryByCustomerId query");
+  }
 }
 
-
 export async function GET(req, { params }) {
- 
-
   if (!params || !params.id) {
     return NextResponse.json(
       { message: "Missing customer ID in request" },
@@ -54,6 +48,3 @@ export async function GET(req, { params }) {
     );
   }
 }
-
-
-
