@@ -22,7 +22,7 @@ import CreatorInfo from "../../UI/Components/CreatorInfo";
 import SupportRegion from "../../UI/Components/SupportRegion";
 import UserInfo from "../../UI/Components/UserInfo";
 import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
-import SearchBarForm from "../../search/page";
+import SearchBarForm from "../../entryForm/components/searchList";
 
 export default function PaymentDetails() {
   const searchParams = useSearchParams();
