@@ -24,7 +24,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 import csvHandler from "../../utilites/exportCSV/csvHandler";
 
+import { useAgent } from "../../context/AgentContext";
+
 const ExportCSVPage = () => {
+  const agent = useAgent();
+
   const [date, setDate] = useState("");
   const [allTransactions, setAllTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -181,6 +185,8 @@ const ExportCSVPage = () => {
       link.download = `ConfirmedPayment_Export_${startDate}_to_${endDate}.csv`;
       document.body.appendChild(link);
       link.click();
+
+      // Upload the CSV file to the s3 bucket
       const uploadedUrl = await csvHandler(blob, allTransactions);
       console.log("Uploaded URL:", uploadedUrl);
       document.body.removeChild(link);
@@ -188,6 +194,23 @@ const ExportCSVPage = () => {
       setTimeout(() => {
         URL.revokeObjectURL(url);
       }, 100);
+
+      // Save the CSV export transaction log to the database
+      const requestBody = {
+        AgentId: agent,
+        CSVExportTransactionDateTime: new Date(),
+        CSVExportTransactionFileName: uploadedUrl,
+      };
+
+      const logResponse = await fetch("/api/v1/csv-logs", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log("Log response:", logResponse);
 
       handleCloseCSVExportModal();
     } catch (error) {
