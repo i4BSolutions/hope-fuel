@@ -1,17 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Typography,
-  CircularProgress,
-  Box,
-  Divider,
-} from "@mui/material";
-import SearchBar from "../UI/Components/SearchBar";
-import ItemList from "./components/ItemList";
-import WalletSelect from "../UI/Components/GroupWallet";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
+import { Container, CircularProgress, Box, Divider } from "@mui/material";
+import SearchBar from "../../UI/Components/SearchBar";
+import ItemList from "./ItemList";
+import WalletSelect from "../../UI/Components/GroupWallet";
+import getScreenShotUrl from "../../utilites/getScreenShotUrl";
 
 export default function SearchBarForm({ onItemClick }) {
   const [items, setItems] = useState([]);

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Box, Typography, CircularProgress } from "@mui/material";
-import SearchBarForm from "../search/page";
+import SearchBarForm from "./components/searchList";
 import getScreenShotUrl from "../utilites/getScreenShotUrl";
 import PaymentDetails from "./components/paymentDetails";
 
