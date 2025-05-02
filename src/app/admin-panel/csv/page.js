@@ -22,6 +22,7 @@ import CustomButton from "../../components/Button";
 import TransactionList from "../../UI/Components/TransactionList";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
+import csvHandler from "../../utilites/exportCSV/csvHandler";
 
 const ExportCSVPage = () => {
   const [date, setDate] = useState("");
@@ -124,7 +125,7 @@ const ExportCSVPage = () => {
     setOpenSnackbar((prev) => !prev);
   }, []);
 
-  const handleExportCSV = useCallback(() => {
+  const handleExportCSV = useCallback(async () => {
     try {
       setLoading(true);
       if (!allTransactions || allTransactions.length === 0) {
@@ -180,6 +181,8 @@ const ExportCSVPage = () => {
       link.download = `ConfirmedPayment_Export_${startDate}_to_${endDate}.csv`;
       document.body.appendChild(link);
       link.click();
+      const uploadedUrl = await csvHandler(blob, allTransactions);
+      console.log("Uploaded URL:", uploadedUrl);
       document.body.removeChild(link);
 
       setTimeout(() => {
