@@ -6,11 +6,15 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Container,
+  Grid2,
   Modal,
   Pagination,
   Paper,
   Snackbar,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
@@ -25,6 +29,10 @@ import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 
 const ExportCSVPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+
   const [date, setDate] = useState("");
   const [allTransactions, setAllTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -240,190 +248,250 @@ const ExportCSVPage = () => {
   }, []);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        mt: 5,
-      }}
-    >
-      <Typography sx={{ color: "#0F172A", fontSize: 16, fontWeight: "600" }}>
-        Set Date Range
-      </Typography>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DemoContainer components={["DateRangePicker"]}>
-          <DateRangePicker
-            value={date}
-            onChange={handleDateChange}
-            disableFuture
-          />
-        </DemoContainer>
-      </LocalizationProvider>
-      {loading && (
-        <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
+    <Container maxWidth="xl">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          mt: { xs: 2, sm: 3, md: 5 },
+          px: { xs: 1, sm: 2 },
+        }}
+      >
+        <Typography
+          sx={{
+            color: "#0F172A",
+            fontSize: { xs: 14, sm: 16 },
+            fontWeight: "600",
+            mb: 1,
+          }}
+        >
+          Set Date Range
+        </Typography>
 
-      {bothDateSelected && !loading && (
-        <>
-          {allTransactions.length > 0 ? (
-            <>
-              <Box sx={{ width: "100%", mt: 4 }}>
-                <TransactionList transactions={paginatedTransactions} />
-              </Box>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={["DateRangePicker"]}>
+            <DateRangePicker
+              value={date}
+              onChange={handleDateChange}
+              disableFuture
+            />
+          </DemoContainer>
+        </LocalizationProvider>
 
-              {totalPages > 1 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    mt: 3,
-                    mb: 2,
-                  }}
-                >
-                  <Pagination
-                    count={totalPages}
-                    page={page}
-                    onChange={handlePageChange}
-                    color="primary"
-                    showFirstButton
-                    showLastButton
-                  />
+        {loading && (
+          <Box sx={{ display: "flex", justifyContent: "center", my: 4 }}>
+            <CircularProgress />
+          </Box>
+        )}
+
+        {bothDateSelected && !loading && (
+          <>
+            {allTransactions.length > 0 ? (
+              <>
+                <Box sx={{ width: "100%", mt: 4, overflowX: "auto" }}>
+                  <TransactionList transactions={paginatedTransactions} />
                 </Box>
-              )}
 
-              <Box sx={{ mt: 2, mb: 4 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Showing {paginatedTransactions.length} of{" "}
-                  {allTransactions.length} transactions
+                {totalPages > 1 && (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      mt: 3,
+                      mb: 2,
+                      width: "100%",
+                      overflowX: "auto",
+                    }}
+                  >
+                    <Pagination
+                      count={totalPages}
+                      page={page}
+                      onChange={handlePageChange}
+                      color="primary"
+                      showFirstButton
+                      showLastButton
+                      size={isMobile ? "small" : "medium"}
+                    />
+                  </Box>
+                )}
+
+                <Box sx={{ mt: 2, mb: 4 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    align="center"
+                  >
+                    Showing {paginatedTransactions.length} of{" "}
+                    {allTransactions.length} transactions
+                  </Typography>
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="body1" align="center">
+                  No transactions found for the selected date range.
                 </Typography>
               </Box>
-            </>
-          ) : (
-            <Box sx={{ mt: 4, mb: 4 }}>
-              <Typography variant="body1">
-                No transactions found for the selected date range.
-              </Typography>
-            </Box>
-          )}
-        </>
-      )}
-      <Box sx={{ mt: 2, display: "flex", flexDirection: "row" }}>
-        <CustomButton
-          disabled={
-            !bothDateSelected || loading || allTransactions.length === 0
-          }
-          variant="contained"
-          text="Export CSV"
-          btnWidth={160}
-          onClick={handleOpenCSVExportModal}
-        />
-        <Box sx={{ px: 1 }} />
-        <CustomButton
-          variant="outlined"
-          text="View Export History"
-          onClick={handleOpenExportHistoryModal}
-        />
-      </Box>
-      <Modal
-        open={openCSVExportModal}
-        onClose={handleCloseCSVExportModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{ alignSelf: "center", justifyItems: "center" }}
-      >
-        <Paper
+            )}
+          </>
+        )}
+
+        <Grid2
+          container
+          spacing={2}
           sx={{
-            backgroundColor: "#F8FAFC",
-            width: 280,
-            height: 146,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            borderRadius: 4,
+            mt: 2,
+            mb: 4,
+            justifyContent: { xs: "center", sm: "center" },
+            flexDirection: { xs: "column", sm: "row" },
           }}
         >
-          <Typography
-            variant="h6"
-            component="h2"
-            sx={{
-              fontWeight: 600,
-              textAlign: "center",
-            }}
-          >
-            Are you sure you want to export?
-          </Typography>
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              gap: 2,
-              mt: 2,
-            }}
-          >
+          <Grid2 item xs={12} sm="auto">
             <CustomButton
-              icon={<CloseIcon />}
-              color="primary"
-              variant="outlined"
-              text="No"
-              onClick={handleCloseCSVExportModal}
-            />
-
-            <CustomButton
-              icon={<CheckIcon />}
-              color="primary"
+              disabled={
+                !bothDateSelected || loading || allTransactions.length === 0
+              }
               variant="contained"
-              text="Yes"
-              onClick={handleExportCSV}
+              text="Export CSV"
+              btnWidth={isMobile ? "100%" : 160}
+              onClick={handleOpenCSVExportModal}
+              fullWidth={isMobile}
             />
-          </Box>
-        </Paper>
-      </Modal>
-      <Modal
-        open={openExportHistoryModal}
-        onClose={handleCloseExportHistoryModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{ alignSelf: "center", justifyItems: "center" }}
-      >
-        <Paper
+          </Grid2>
+          <Grid2 item xs={12} sm="auto">
+            <CustomButton
+              variant="outlined"
+              text="View Export History"
+              onClick={handleOpenExportHistoryModal}
+              btnWidth={isMobile ? "100%" : "auto"}
+              fullWidth={isMobile}
+            />
+          </Grid2>
+        </Grid2>
+
+        <Modal
+          open={openCSVExportModal}
+          onClose={handleCloseCSVExportModal}
+          aria-labelledby="export-csv-modal-title"
+          aria-describedby="export-csv-modal-description"
           sx={{
-            backgroundColor: "#FFFFFF",
-            display: "flex",
-            alignItems: "center",
+            alignSelf: "center",
             justifyContent: "center",
-            flexDirection: "column",
-            borderRadius: 4,
-            width: 1000,
-            p: 2,
+            display: "flex",
           }}
         >
-          <Typography>Export History</Typography>
-          <TransactionHistoryList
-            transactionHistoryLists={transactionHistoryLists}
-          />
-        </Paper>
-      </Modal>
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity="error"
-          sx={{ width: "100%" }}
+          <Paper
+            sx={{
+              backgroundColor: "#F8FAFC",
+              width: 280,
+              height: 146,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              borderRadius: 4,
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              sx={{
+                fontWeight: 600,
+                textAlign: "center",
+                fontSize: { xs: 16, sm: 20 },
+              }}
+              id="export-csv-modal-title"
+            >
+              Are you sure you want to export?
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                gap: 2,
+                mt: 2,
+                flexDirection: isMobile ? "column" : "row",
+              }}
+            >
+              <CustomButton
+                icon={<CloseIcon />}
+                color="primary"
+                variant="outlined"
+                text="No"
+                onClick={handleCloseCSVExportModal}
+                fullWidth={isMobile}
+              />
+
+              <CustomButton
+                icon={<CheckIcon />}
+                color="primary"
+                variant="contained"
+                text="Yes"
+                onClick={handleExportCSV}
+                fullWidth={isMobile}
+              />
+            </Box>
+          </Paper>
+        </Modal>
+
+        <Modal
+          open={openExportHistoryModal}
+          onClose={handleCloseExportHistoryModal}
+          aria-labelledby="export-history-modal-title"
+          sx={{
+            alignSelf: "center",
+            justifyContent: "center",
+            display: "flex",
+          }}
         >
-          {error || "An error occurred"}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Paper
+            sx={{
+              backgroundColor: "#FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              borderRadius: 4,
+              width: 1000,
+              p: 2,
+            }}
+          >
+            <Typography
+              variant="h6"
+              component="h2"
+              id="export-history-modal-title"
+              align="center"
+              sx={{ mb: 2, fontWeight: 600 }}
+            >
+              Export History
+            </Typography>
+            <Box sx={{ overflowX: "auto", width: "100%" }}>
+              <TransactionHistoryList
+                transactionHistoryLists={transactionHistoryLists}
+              />
+            </Box>
+          </Paper>
+        </Modal>
+
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity="error"
+            sx={{ width: "100%" }}
+          >
+            {error || "An error occurred"}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Container>
   );
 };
 
