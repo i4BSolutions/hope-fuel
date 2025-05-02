@@ -20,6 +20,7 @@ import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import moment from "moment-timezone";
 import CustomButton from "../../components/Button";
 import TransactionList from "../../UI/Components/TransactionList";
+import TransactionHistoryList from "../../UI/Components/TransactionsHistoryList";
 import CloseIcon from "@mui/icons-material/Close";
 import CheckIcon from "@mui/icons-material/Check";
 
@@ -31,8 +32,42 @@ const ExportCSVPage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const [openCSVExportModal, setOpenCSVExportModal] = useState(false);
+  const [openExportHistoryModal, setOpenExportHistoryModal] = useState(false);
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
+
+  const [transactionHistoryLists] = useState([
+    {
+      id: 1,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 2,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 3,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 4,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+    {
+      id: 5,
+      timestamp: "2025-4-28 09:55:00",
+      filename: "ConfirmedPayment_Export_20250428_0955.csv",
+      dateRange: { from: "2025-4-1", to: "2025-4-28" },
+    },
+  ]);
 
   const bothDateSelected = date && date[0] && date[1];
 
@@ -196,6 +231,14 @@ const ExportCSVPage = () => {
     }
   }, [allTransactions, date, handleCloseCSVExportModal]);
 
+  const handleOpenExportHistoryModal = useCallback(() => {
+    setOpenExportHistoryModal((prev) => !prev);
+  }, []);
+
+  const handleCloseExportHistoryModal = useCallback(() => {
+    setOpenExportHistoryModal((prev) => !prev);
+  }, []);
+
   return (
     <Box
       sx={{
@@ -268,14 +311,21 @@ const ExportCSVPage = () => {
           )}
         </>
       )}
-      <Box sx={{ mt: 2 }}>
+      <Box sx={{ mt: 2, display: "flex", flexDirection: "row" }}>
         <CustomButton
           disabled={
             !bothDateSelected || loading || allTransactions.length === 0
           }
           variant="contained"
           text="Export CSV"
+          btnWidth={160}
           onClick={handleOpenCSVExportModal}
+        />
+        <Box sx={{ px: 1 }} />
+        <CustomButton
+          variant="outlined"
+          text="View Export History"
+          onClick={handleOpenExportHistoryModal}
         />
       </Box>
       <Modal
@@ -332,6 +382,31 @@ const ExportCSVPage = () => {
               onClick={handleExportCSV}
             />
           </Box>
+        </Paper>
+      </Modal>
+      <Modal
+        open={openExportHistoryModal}
+        onClose={handleCloseExportHistoryModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        sx={{ alignSelf: "center", justifyItems: "center" }}
+      >
+        <Paper
+          sx={{
+            backgroundColor: "#FFFFFF",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            borderRadius: 4,
+            width: 1000,
+            p: 2,
+          }}
+        >
+          <Typography>Export History</Typography>
+          <TransactionHistoryList
+            transactionHistoryLists={transactionHistoryLists}
+          />
         </Paper>
       </Modal>
       <Snackbar
