@@ -9,7 +9,7 @@ import {
   Divider,
 } from "@mui/material";
 import SearchBar from "../UI/Components/SearchBar";
-import ItemList from "../UI/Components/ItemList";
+import ItemList from "./components/ItemList";
 import WalletSelect from "../UI/Components/GroupWallet";
 import getScreenShotUrl from "../utilites/getScreenShotUrl";
 
