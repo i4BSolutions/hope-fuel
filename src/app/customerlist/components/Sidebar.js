@@ -26,7 +26,15 @@ const Sidebar = ({
   hasMore = false,
 }) => {
   return (
-    <Paper sx={{ p: 2, height: "100%" }}>
+    <Paper
+      sx={{
+        p: 2,
+        height: "100vh",
+        overflowY: "auto",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Box sx={{ backgroundColor: "#F1F5F9" }}>
         <TextField
           size="small"
