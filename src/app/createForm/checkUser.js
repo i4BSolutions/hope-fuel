@@ -3,12 +3,12 @@
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Box, Modal, TextField, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect, useState } from "react";
 import CustomButton from "../components/Button";
 import { useUser } from "../context/UserContext";
 import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import checkUserSubmit from "../utilites/checkUserSubmit";
-import CircularProgress from "@mui/material/CircularProgress";
 
 export default function CheckUser({ onUserCheck, UserRole }) {
   const [loading, setLoading] = useState(false);
@@ -95,7 +95,14 @@ export default function CheckUser({ onUserCheck, UserRole }) {
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
         <CircularProgress />
       </Box>
     );

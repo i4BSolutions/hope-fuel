@@ -1,8 +1,9 @@
 "use client";
 
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import CircularProgress from "@mui/material/CircularProgress";
 import { Box, Button, Modal, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
 import CheckUser from "./checkUser";
@@ -17,6 +18,7 @@ function CreateOrExtendPage() {
   const [showExtendForm, setShowExtendForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const router = useRouter();
 
   // Fetch the current authenticated user and their role
   const [currentUser, setCurrentUser] = useState(null);
@@ -60,7 +62,7 @@ function CreateOrExtendPage() {
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", height: "100vh" }}>
         <CircularProgress />
       </Box>
     );
@@ -129,7 +131,7 @@ function CreateOrExtendPage() {
             variant="contained"
             onClick={() => {
               setIsSuccessModalOpen(false);
-              window.location.reload();
+              router.push("/");
             }}
           >
             OK
