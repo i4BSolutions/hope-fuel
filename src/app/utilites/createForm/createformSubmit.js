@@ -22,7 +22,7 @@ export default async function createFormSubmit(
   month
 ) {
   event.preventDefault();
-  
+
   // Reset validation states
   setAmountValidate(false);
   setmonthValidate(false);
@@ -35,8 +35,8 @@ export default async function createFormSubmit(
     setloading(false);
     return {
       success: false,
-      error: 'Invalid amount',
-      status: 400
+      error: "Invalid amount",
+      status: 400,
     };
   }
 
@@ -45,8 +45,8 @@ export default async function createFormSubmit(
     setloading(false);
     return {
       success: false,
-      error: 'Invalid month',
-      status: 400
+      error: "Invalid month",
+      status: 400,
     };
   }
 
@@ -55,8 +55,8 @@ export default async function createFormSubmit(
     setloading(false);
     return {
       success: false,
-      error: 'Invalid ManyChat ID',
-      status: 400
+      error: "Invalid ManyChat ID",
+      status: 400,
     };
   }
 
@@ -65,8 +65,8 @@ export default async function createFormSubmit(
     setloading(false);
     return {
       success: false,
-      error: 'No files uploaded',
-      status: 400
+      error: "No files uploaded",
+      status: 400,
     };
   }
 
@@ -85,7 +85,7 @@ export default async function createFormSubmit(
     month: month,
     note: note,
     walletId: walletId,
-    screenShot: files.map((url) => ({ url: url.href })),
+    screenShot: files.map((file) => ({ url: file.url.href })),
   });
 
   const requestOptions = {
@@ -94,7 +94,7 @@ export default async function createFormSubmit(
     body: raw,
     redirect: "follow",
   };
-  
+
   try {
     const response = await fetch("/api/submitPayment/", requestOptions);
 
@@ -104,22 +104,22 @@ export default async function createFormSubmit(
       return {
         success: false,
         status: 400,
-        errorMsg: data.error
-      }
+        errorMsg: data.error,
+      };
     }
 
     setloading(false);
 
     return {
       success: true,
-      status: 200
-    }
+      status: 200,
+    };
   } catch (error) {
     console.error("Error submitting payment", error);
 
     return {
       success: false,
-      status: 500
-    }
+      status: 500,
+    };
   }
 }
