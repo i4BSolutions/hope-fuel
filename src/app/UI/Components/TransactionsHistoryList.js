@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DownloadIcon from "@mui/icons-material/Download";
+import moment from "moment-timezone";
 
 const TransactionsHistoryList = ({ transactionHistoryLists }) => {
   const theme = useTheme();
@@ -18,13 +19,19 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
 
   const handleDownload = (filename) => {
     console.log(`Downloading ${filename}`);
+    const link = document.createElement("a");
+    link.href = filename;
+    link.download = filename.split("/").pop();
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={0} sx={{ overflow: "hidden", borderRadius: 2 }}>
         {transactionHistoryLists.map((history, index) => (
-          <Box key={history.id}>
+          <Box key={history.CSVExportTransactionLogsId}>
             <Box
               sx={{
                 display: "flex",
@@ -45,10 +52,12 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  {history.timestamp}
+                  {moment(history.CSVExportTransactionDateTime).format(
+                    "YYYY-MM-DD hh:mm"
+                  )}
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  {history.filename}
+                  {history.CSVExportTransactionFileName.split("/").pop()}
                 </Typography>
               </Box>
 
@@ -62,9 +71,7 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                 }}
               >
                 <CalendarMonthIcon size={16} />
-                <Typography variant="body2">
-                  {history.dateRange.from} ⟶ {history.dateRange.to}
-                </Typography>
+                <Typography variant="body2">2025-04-01 ⟶ 2025-04-30</Typography>
               </Box>
 
               <Button
@@ -76,7 +83,9 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                   textTransform: "none",
                   px: 3,
                 }}
-                onClick={() => handleDownload(history.filename)}
+                onClick={() =>
+                  handleDownload(history.CSVExportTransactionFileName)
+                }
               >
                 Download CSV
               </Button>

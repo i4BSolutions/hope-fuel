@@ -353,7 +353,16 @@ const CustomerListPage = () => {
   };
 
   return (
-    <Box sx={{ p: 2, bgcolor: "background.default", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        p: 0,
+        m: 0,
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        bgcolor: "background.default",
+      }}
+    >
       <Grid container spacing={2}>
         <Grid item xs={12} md={3}>
           <Sidebar
