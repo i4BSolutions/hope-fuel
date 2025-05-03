@@ -39,7 +39,9 @@ const ExportCSVPage = () => {
 
   const [date, setDate] = useState("");
   const [allTransactions, setAllTransactions] = useState([]);
+  const [transactionLogsHistory, setTransactionLogsHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [error, setError] = useState(null);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
@@ -47,39 +49,6 @@ const ExportCSVPage = () => {
   const [openExportHistoryModal, setOpenExportHistoryModal] = useState(false);
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
-
-  const [transactionHistoryLists] = useState([
-    {
-      id: 1,
-      timestamp: "2025-4-28 09:55:00",
-      filename: "ConfirmedPayment_Export_20250428_0955.csv",
-      dateRange: { from: "2025-4-1", to: "2025-4-28" },
-    },
-    {
-      id: 2,
-      timestamp: "2025-4-28 09:55:00",
-      filename: "ConfirmedPayment_Export_20250428_0955.csv",
-      dateRange: { from: "2025-4-1", to: "2025-4-28" },
-    },
-    {
-      id: 3,
-      timestamp: "2025-4-28 09:55:00",
-      filename: "ConfirmedPayment_Export_20250428_0955.csv",
-      dateRange: { from: "2025-4-1", to: "2025-4-28" },
-    },
-    {
-      id: 4,
-      timestamp: "2025-4-28 09:55:00",
-      filename: "ConfirmedPayment_Export_20250428_0955.csv",
-      dateRange: { from: "2025-4-1", to: "2025-4-28" },
-    },
-    {
-      id: 5,
-      timestamp: "2025-4-28 09:55:00",
-      filename: "ConfirmedPayment_Export_20250428_0955.csv",
-      dateRange: { from: "2025-4-1", to: "2025-4-28" },
-    },
-  ]);
 
   const bothDateSelected = date && date[0] && date[1];
 
@@ -104,6 +73,10 @@ const ExportCSVPage = () => {
   useEffect(() => {
     setPage(1);
   }, [allTransactions]);
+
+  useEffect(() => {
+    getTransactionsLogsHistoryLists();
+  }, []);
 
   const handleDateChange = useCallback((newDate) => {
     setDate(newDate);
@@ -152,6 +125,37 @@ const ExportCSVPage = () => {
       setAllTransactions([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getTransactionsLogsHistoryLists = async () => {
+    if (historyLoading) return;
+
+    setHistoryLoading(true);
+    try {
+      const response = await fetch("api/v1/csv-logs");
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to fetch data (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+
+      if (!result.data || !Array.isArray(result.data)) {
+        throw new Error("Error fetching at logs history api.");
+      }
+
+      setTransactionLogsHistory(result.data);
+    } catch (error) {
+      console.error("Error fetching transactions logs history:", error);
+      setError(error.message || "Failed to fetch transactions logs history");
+      setOpenSnackbar(true);
+      setTransactionLogsHistory([]);
+    } finally {
+      setHistoryLoading(false);
     }
   };
 
@@ -253,7 +257,7 @@ const ExportCSVPage = () => {
       });
 
       console.log("Log response:", logResponse);
-
+      getTransactionsLogsHistoryLists();
       handleCloseCSVExportModal();
     } catch (error) {
       console.error("Error exporting CSV:", error);
@@ -495,7 +499,7 @@ const ExportCSVPage = () => {
             </Typography>
             <Box sx={{ overflowX: "auto", width: "100%" }}>
               <TransactionHistoryList
-                transactionHistoryLists={transactionHistoryLists}
+                transactionHistoryLists={transactionLogsHistory}
               />
             </Box>
           </Paper>
