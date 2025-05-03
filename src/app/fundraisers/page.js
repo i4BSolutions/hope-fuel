@@ -47,6 +47,8 @@ const FundraisingFormPage = () => {
   const [openFilterModal, setOpenFilterModal] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState("");
+  const [tempSelectedCountry, setTempSelectedCountry] = useState("");
+  const [tempSelectedCurrency, setTempSelectedCurrency] = useState("");
   const [availableCountries, setAvailableCountries] = useState([]);
   const [availableCurrencies, setAvailableCurrencies] = useState([]);
 
@@ -246,6 +248,8 @@ const FundraisingFormPage = () => {
   };
 
   const handleOpenFilterModal = () => {
+    setTempSelectedCountry(selectedCountry);
+    setTempSelectedCurrency(selectedCurrency);
     setOpenFilterModal((prev) => !prev);
   };
 
@@ -254,19 +258,22 @@ const FundraisingFormPage = () => {
   };
 
   const handleCountryChange = (event) => {
-    setSelectedCountry(event.target.value);
+    setTempSelectedCountry(event.target.value);
   };
 
   const handleCurrencyChange = (event) => {
-    setSelectedCurrency(event.target.value);
+    setTempSelectedCurrency(event.target.value);
   };
 
   const handleApplyFilter = () => {
-    // Filters are already applied via useEffect
+    setSelectedCountry(tempSelectedCountry);
+    setSelectedCurrency(tempSelectedCurrency);
     handleCloseFilterModal();
   };
 
   const handleClearFilter = () => {
+    setTempSelectedCountry("");
+    setTempSelectedCurrency("");
     setSelectedCountry("");
     setSelectedCurrency("");
     handleCloseFilterModal();
@@ -417,11 +424,11 @@ const FundraisingFormPage = () => {
               <Typography sx={{ mb: 1 }}>Country</Typography>
               <FormControl fullWidth>
                 <Select
-                  value={selectedCountry}
+                  value={tempSelectedCountry}
                   onChange={handleCountryChange}
                   displayEmpty
                   renderValue={
-                    selectedCountry ? undefined : () => "Select Country/ies"
+                    tempSelectedCountry ? undefined : () => "Select Country/ies"
                   }
                   sx={{ borderRadius: 2 }}
                 >
@@ -438,11 +445,13 @@ const FundraisingFormPage = () => {
               <Typography sx={{ mb: 1 }}>Accepted Currency</Typography>
               <FormControl fullWidth>
                 <Select
-                  value={selectedCurrency}
+                  value={tempSelectedCurrency}
                   onChange={handleCurrencyChange}
                   displayEmpty
                   renderValue={
-                    selectedCurrency ? undefined : () => "Select Currency/ies"
+                    tempSelectedCurrency
+                      ? undefined
+                      : () => "Select Currency/ies"
                   }
                   sx={{ borderRadius: 2 }}
                 >
