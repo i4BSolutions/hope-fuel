@@ -2,16 +2,16 @@ import { NextResponse } from "next/server";
 import db from "../../../utilites/db";
 
 async function SearchCustomers(searchTerm) {
-  const query = `SELECT c.* ,t.HopeFuelID
+  const query = `SELECT DISTINCT c.*
     FROM Customer c
     LEFT JOIN Transactions t ON c.CustomerId = t.CustomerID
     WHERE 
-    c.Name LIKE CONCAT('%', ?, '%') 
-    OR c.Email LIKE CONCAT('%', ?, '%') 
-    OR t.HopeFuelID LIKE CONCAT('%', ?, '%') 
-    OR c.CardID LIKE CONCAT('%', ?, '%') 
-    OR c.ManyChatId LIKE CONCAT('%', ?, '%') 
-`;
+      c.Name LIKE ? 
+      OR c.Email LIKE ? 
+      OR t.HopeFuelID LIKE ? 
+      OR c.CardID LIKE ? 
+      OR c.ManyChatId LIKE ?
+  `;
 
   const searchPattern = `%${searchTerm}%`;
   const values = Array(5).fill(searchPattern);
