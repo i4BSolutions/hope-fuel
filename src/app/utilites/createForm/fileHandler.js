@@ -1,7 +1,6 @@
 //Update the setFile to a bunch of file
 //input is setfile functions and files
-import { uploadData } from "aws-amplify/storage";
-import { getUrl } from "aws-amplify/storage";
+import { getUrl, uploadData } from "aws-amplify/storage";
 import { v4 as uuidv4 } from "uuid";
 
 export default async function filehandler(
@@ -17,7 +16,9 @@ export default async function filehandler(
   for (let i = 0; i < files.length; i++) {
     try {
       const file = files[i];
-      setUploadProgress(`Uploading ${file.name} (${i + 1} of ${files.length})...`);
+      setUploadProgress(
+        `Uploading ${file.name} (${i + 1} of ${files.length})...`
+      );
 
       const result = await uploadData({
         key: uuidv4() + file.name,
@@ -29,7 +30,7 @@ export default async function filehandler(
               setUploadProgress(`Uploading ${file.name}: ${progress}`);
             }
           },
-          contentType: "image/png",
+          contentType: file.type,
           contentDisposition: "inline",
         },
       }).result;
