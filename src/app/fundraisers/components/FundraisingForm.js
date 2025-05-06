@@ -1,14 +1,14 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useMemo, useEffect } from "react";
-import { Box, Button, Grid, TextField, Typography, Alert } from "@mui/material";
-import { LogoUpload } from "./LogoUpload";
-import { FundraisingSchema } from "../schema";
-import BaseCountry from "./BaseCountry";
+import { Alert, Box, Button, Grid, TextField } from "@mui/material";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FundraisingSchema } from "../schema";
 import AcceptedCurrency from "./AcceptedCurrency";
+import BaseCountry from "./BaseCountry";
+import { LogoUpload } from "./LogoUpload";
 
 const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
   const router = useRouter();
@@ -64,7 +64,6 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
         console.log("Error:", error);
         throw new Error("Failed to update fundraiser");
       }
-
       return;
     }
     if (data.BaseCountryName === "other" && data.NewCountry) {
