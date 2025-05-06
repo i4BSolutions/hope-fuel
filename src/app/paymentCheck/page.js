@@ -1,22 +1,20 @@
 "use client";
-import React, { useContext } from "react";
+import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
+import React from "react";
 
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
-import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
 
 const PaymentTeam = () => {
   // State for holding the row that's being confirmed/denied
@@ -56,20 +54,20 @@ const PaymentTeam = () => {
 
   const rows = Array.isArray(data)
     ? data.map((row) => {
-      return createData(
-        row["HopeFuelID"],
-        row["CurrencyCode"],
-        row["Amount"],
-        row["WalletName"],
-        row["Name"],
-        row["AWSID"],
-        row["Month"],
-        row["ScreenShots"] || [],
-        row["ManyChatID"],
-        "Pending",
-        row["Email"]
-      );
-    })
+        return createData(
+          row["HopeFuelID"],
+          row["CurrencyCode"],
+          row["Amount"],
+          row["WalletName"],
+          row["Name"],
+          row["AWSID"],
+          row["Month"],
+          row["ScreenShots"] || [],
+          row["ManyChatID"],
+          "Pending",
+          row["Email"]
+        );
+      })
     : [];
 
   const handleScreenShotClick = async (url) => {

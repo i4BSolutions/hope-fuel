@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Box, Typography, CircularProgress } from "@mui/material";
-import SearchBarForm from "./components/searchList";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
+import { Box, CircularProgress, Typography } from "@mui/material";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import PaymentDetails from "./components/paymentDetails";
+import SearchBarForm from "./components/searchList";
 
 export default function EntryForm() {
   const searchParams = useSearchParams();
@@ -26,20 +25,18 @@ export default function EntryForm() {
           `/api/paymentDetails?HopeFuelID=${hopeFuelID}`
         );
         const result = await response.json();
+        // if (result.hasOwnProperty("ScreenShotLinks")) {
+        //   console.log("Screenshot has been found");
+        //   let screenShots = result["ScreenShotLinks"];
 
-        console.log("TransactionData:", result);
-        if (result.hasOwnProperty("ScreenShotLinks")) {
-          console.log("Screenshot has been found");
-          let screenShots = result["ScreenShotLinks"];
+        //   if (Array.isArray(screenShots)) {
+        //     for (let i = 0; i < screenShots.length; i++) {
+        //       screenShots[i] = await getScreenShotUrl(screenShots[i]);
+        //     }
+        //   }
 
-          if (Array.isArray(screenShots)) {
-            for (let i = 0; i < screenShots.length; i++) {
-              screenShots[i] = await getScreenShotUrl(screenShots[i]);
-            }
-          }
-
-          result["ScreenShotLinks"] = screenShots;
-        }
+        //   result["ScreenShotLinks"] = screenShots;
+        // }
         setData(result);
         setNote(result.Note || "");
         setStatus(result.Status || 1);

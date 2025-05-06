@@ -1,29 +1,28 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import {
   Box,
-  Typography,
-  TextField,
   Card,
-  Stack,
-  MenuItem,
-  Select,
+  CircularProgress,
+  Divider,
   FormControl,
   InputLabel,
-  Divider,
-  CircularProgress,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import ActionButtons from "../UI/Components/ActionButtons";
 import AmountDetails from "../UI/Components/AmountDetails";
 import CardsIssuedList from "../UI/Components/CardIssuedList";
-import CreatorInfo from "../UI/DetailPage/CreatorInfo";
+import HopeFuelIdStatus from "../UI/Components/HopeIdStatus";
 import SupportRegion from "../UI/Components/SupportRegion";
 import UserInfo from "../UI/Components/UserInfo";
-import HopeFuelIdStatus from "../UI/Components/HopeIdStatus";
+import CreatorInfo from "../UI/DetailPage/CreatorInfo";
 import SearchBarForm from "../entryForm/components/searchList";
-import getScreenShotUrl from "../utilites/getScreenShotUrl";
 
 export default function PaymentDetails() {
   const searchParams = useSearchParams();
@@ -42,27 +41,22 @@ export default function PaymentDetails() {
           `/api/paymentDetails?HopeFuelID=${HopeFuelID}`
         );
         const result = await response.json();
-        console.log(result);
 
-        for (let i = 0; i < result.length; i++) {
-          if (Array.isArray(result[i]["ScreenShotLinks"])) {
-            console.log(result[i]["ScreenShotLinks"].length);
-            for (
-              let screenshot = 0;
-              screenshot < result[i]["ScreenShotLinks"].length;
-              screenshot++
-            ) {
-              console.log();
-              let tmp = await getScreenShotUrl(
-                result[i]["ScreenShotLinks"][screenshot]
-              );
-              result[i]["ScreenShotLinks"][screenshot] = tmp.href;
-            }
-          }
-        }
+        // for (let i = 0; i < result.length; i++) {
+        //   if (Array.isArray(result[i]["ScreenShotLinks"])) {
+        //     for (
+        //       let screenshot = 0;
+        //       screenshot < result[i]["ScreenShotLinks"].length;
+        //       screenshot++
+        //     ) {
+        //       let tmp = await getScreenShotUrl(
+        //         result[i]["ScreenShotLinks"][screenshot]
+        //       );
+        //       result[i]["ScreenShotLinks"][screenshot] = tmp.href;
+        //     }
+        //   }
+        // }
 
-        console.log("this is my data awesome");
-        console.log(result);
         if (result && result.length > 0) {
           const transactionData = result[0];
           setData(transactionData);

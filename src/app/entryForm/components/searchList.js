@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Container, CircularProgress, Box, Divider } from "@mui/material";
+import { Box, CircularProgress, Container, Divider } from "@mui/material";
+import { useEffect, useState } from "react";
+import WalletSelect from "../../UI/Components/GroupWallet";
 import SearchBar from "../../UI/Components/SearchBar";
 import ItemList from "./ItemList";
-import WalletSelect from "../../UI/Components/GroupWallet";
-import getScreenShotUrl from "../../utilites/getScreenShotUrl";
 
 export default function SearchBarForm({ onItemClick }) {
   const [items, setItems] = useState([]);
@@ -36,20 +35,20 @@ export default function SearchBarForm({ onItemClick }) {
 
       if (Array.isArray(data.items)) {
         if (data.items.length > 0) {
-          const updatedData = await Promise.all(
-            data.items.map(async (item) => {
-              if (Array.isArray(item.ScreenShotLinks)) {
-                const updatedLinks = await Promise.all(
-                  item.ScreenShotLinks.map(
-                    async (link) => (await getScreenShotUrl(link)).href
-                  )
-                );
-                return { ...item, ScreenShotLinks: updatedLinks };
-              }
-              return item;
-            })
-          );
-
+          // const updatedData = await Promise.all(
+          //   data.items.map(async (item) => {
+          //     if (Array.isArray(item.ScreenShotLinks)) {
+          //       const updatedLinks = await Promise.all(
+          //         item.ScreenShotLinks.map(
+          //           async (link) => (await getScreenShotUrl(link)).href
+          //         )
+          //       );
+          //       return { ...item, ScreenShotLinks: updatedLinks };
+          //     }
+          //     return item;
+          //   })
+          // );
+          const updatedData = data.items;
           setItems((prev) =>
             currentPage === 1 ? updatedData : [...prev, ...updatedData]
           );
