@@ -181,6 +181,24 @@ const CustomerListPage = () => {
     }
   });
 
+  const fetchSubscriptionByHopeFuelID = async (hopeFuelId) => {
+    try {
+      const response = await fetch(
+        `/api/hopeFuelList/details/${hopeFuelId}/subscription`
+      );
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch subscription for HopeFuelID ${hopeFuelId}`
+        );
+      }
+      const result = await response.json();
+      return result.data;
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  };
+
   const fetchProfileDetails = useCallback(async (profileId) => {
     if (!profileId) return;
 
@@ -199,7 +217,18 @@ const CustomerListPage = () => {
       }
 
       const profileDetails = await response.json();
-      setProfileDetailData(profileDetails.customer);
+      const customer = profileDetails.customer;
+      console.log(customer);
+      const hopeFuelId = customer?.HopeFuelID;
+      let subscriptionData = [];
+
+      if (hopeFuelId) {
+        subscriptionData = await fetchSubscriptionByHopeFuelID(hopeFuelId);
+      }
+      setProfileDetailData({
+        ...customer,
+        subscriptions: subscriptionData,
+      });
     } catch (err) {
       console.error("Error fetching profile details:", err);
       setError(`Failed to load profile details: ${err.message}`);
@@ -418,7 +447,9 @@ const CustomerListPage = () => {
                 <CardInfo data={profileDetailData} />
               </Box>
               <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
-                <SubscriptionCard cards={SUBSCRIPTION_DATA} />
+                <SubscriptionCard
+                  cards={profileDetailData.subscriptions || []}
+                />
               </Grid>
 
               <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
