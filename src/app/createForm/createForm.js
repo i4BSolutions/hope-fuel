@@ -13,6 +13,8 @@ import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
 import ErrorMessage from "./components/errorMessage";
 
+import { remove } from "aws-amplify/storage";
+
 const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const user = useUser();
   const agent = useAgent();
@@ -266,6 +268,33 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     await filehandler(acceptedFiles, setFiles, files, setUploadProgress);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
+  };
+
+  // Handle File Deletion
+  const handleDeleteFile = async (fileName) => {
+    try {
+      const fileToDelete = files.find((file) => file.name === fileName);
+
+      if (!fileToDelete) {
+        console.warn("File not found in state:", fileName);
+        return;
+      }
+
+      setUploadProgress(`Deleting ${fileName}...`);
+
+      await remove({ key: fileToDelete.key });
+
+      setFiles((prevFiles) =>
+        prevFiles.filter((file) => file.name !== fileName)
+      );
+
+      setUploadedFiles((prev) => prev.filter((file) => file.name !== fileName));
+
+      setUploadProgress("File deleted.");
+    } catch (error) {
+      console.error("Delete error:", error);
+      setUploadProgress("Error deleting file.");
+    }
   };
 
   // form submission
@@ -639,6 +668,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
             <CustomDropzone
               handleDrop={handleDrop}
               uploadProgress={uploadProgress}
+              files={uploadedFiles}
+              onDelete={handleDeleteFile}
             />
             <ErrorMessage message={errors.files} />
           </Box>
