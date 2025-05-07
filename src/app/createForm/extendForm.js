@@ -8,11 +8,12 @@ import { useUser } from "../context/UserContext";
 import filehandler from "../utilites/createForm/fileHandler";
 import extendFormSubmit from "../utilites/extendForm/extendFormSubmit";
 
-import Dropzone from "react-dropzone";
 import CustomButton from "../components/Button";
 import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
 import ErrorMessage from "./components/errorMessage";
+
+import { remove } from "aws-amplify/storage";
 
 const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
   const user = useUser();
@@ -282,6 +283,33 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
     await filehandler(acceptedFiles, setFiles, files, setUploadProgress);
     setFileExist(acceptedFiles.length > 0);
     setIsUploading(false);
+  };
+
+  // Handle File Deletion
+  const handleDeleteFile = async (fileName) => {
+    try {
+      const fileToDelete = files.find((file) => file.name === fileName);
+
+      if (!fileToDelete) {
+        console.warn("File not found in state:", fileName);
+        return;
+      }
+
+      setUploadProgress(`Deleting ${fileName}...`);
+
+      await remove({ key: fileToDelete.key });
+
+      setFiles((prevFiles) =>
+        prevFiles.filter((file) => file.name !== fileName)
+      );
+
+      setUploadedFiles((prev) => prev.filter((file) => file.name !== fileName));
+
+      setUploadProgress("File deleted.");
+    } catch (error) {
+      console.error("Delete error:", error);
+      setUploadProgress("Error deleting file.");
+    }
   };
 
   // form submission
@@ -668,6 +696,8 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
             <CustomDropzone
               handleDrop={handleDrop}
               uploadProgress={uploadProgress}
+              files={uploadedFiles}
+              onDelete={handleDeleteFile}
             />
             <ErrorMessage message={errors.files} />
           </Box>

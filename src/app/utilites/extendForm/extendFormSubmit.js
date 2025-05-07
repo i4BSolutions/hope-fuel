@@ -91,9 +91,7 @@ export default async function extendFormSubmit(
       noteId: note["id"],
       transactionDate: new Date(),
       month: month,
-      screenShot: files.map((url) => {
-        return { url: url.href };
-      }),
+      screenShot: files.map((file) => ({ url: file.url.href })),
       cardId: cardId,
       manyChatId: manyChatId,
     });
@@ -149,9 +147,7 @@ export default async function extendFormSubmit(
       month: month,
       note: notes,
       walletId: walletId,
-      screenShot: files.map((url) => {
-        return { url: url.href };
-      }),
+      screenShot: files.map((file) => ({ url: file.url.href })),
       expireDate: expireDate,
       cardId: cardId,
     });
