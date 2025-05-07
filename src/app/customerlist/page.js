@@ -408,9 +408,9 @@ const CustomerListPage = () => {
             </Box>
           )}
 
-          {/* <Box sx={{ mt: theme.spacing(2) }}>
+          <Grid container spacing={2} sx={{ pt: theme.spacing(3) }}>
             <SubscriptionCard cards={SUBSCRIPTION_DATA} />
-          </Box>
+          </Grid>
 
           <Grid container spacing={2} sx={{ px: 2, pt: theme.spacing(3) }}>
             {mockCards.map((card, index) => (
@@ -422,7 +422,7 @@ const CustomerListPage = () => {
                 />
               </Grid>
             ))}
-          </Grid> */}
+          </Grid>
         </Grid>
       </Grid>
       <Modal
