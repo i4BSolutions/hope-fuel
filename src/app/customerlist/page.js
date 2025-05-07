@@ -408,11 +408,11 @@ const CustomerListPage = () => {
             </Box>
           )}
 
-          <Grid container spacing={2} sx={{ pt: theme.spacing(3) }}>
+          <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
             <SubscriptionCard cards={SUBSCRIPTION_DATA} />
           </Grid>
 
-          <Grid container spacing={2} sx={{ px: 2, pt: theme.spacing(3) }}>
+          <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
             {mockCards.map((card, index) => (
               <Grid item key={card.id || index}>
                 <CardDisplay
