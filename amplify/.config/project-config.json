@@ -9,8 +9,8 @@
     "framework": "react",
     "config": {
       "SourceDir": "src",
-      "DistributionDir": "src/",
-      "BuildCommand": "",
+      "DistributionDir": ".next",
+      "BuildCommand": "npm run-script build",
       "StartCommand": "npm run-script start"
     }
   }
