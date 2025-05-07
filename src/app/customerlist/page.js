@@ -380,49 +380,81 @@ const CustomerListPage = () => {
         </Grid>
 
         <Grid item xs={12} md={9}>
-          {profileDetailData ? (
-            <UserInfoCard
-              userRole={currentUser?.UserRole}
-              data={profileDetailData}
-              isMobile={isMobile}
-              onEdit={handleOpenEditHistoryModal}
-              onViewEditHistory={handleViewEditHistory}
-            />
-          ) : (
-            <Box sx={{ p: 2, border: "1px solid #E2E8F0", borderRadius: 1 }}>
-              <Typography variant="body1" align="center">
-                {profileLoading ? "Loading profile..." : "No profile selected"}
+          {profileLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          ) : customerData.length === 0 && debouncedSearch ? (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "50vh",
+              }}
+            >
+              <Typography variant="h5" gutterBottom>
+                No customers found
               </Typography>
             </Box>
-          )}
-
-          {profileDetailData ? (
-            <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
-              <CardInfo data={profileDetailData} />
-            </Box>
-          ) : (
-            <Box sx={{ p: 2, border: "1px solid #E2E8F0", borderRadius: 1 }}>
-              <Typography variant="body1" align="center">
-                {profileLoading ? "Loading profile..." : "No profile selected"}
-              </Typography>
-            </Box>
-          )}
-
-          <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
-            <SubscriptionCard cards={SUBSCRIPTION_DATA} />
-          </Grid>
-
-          <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
-            {mockCards.map((card, index) => (
-              <Grid item key={card.id || index}>
-                <CardDisplay
-                  id={card.id}
-                  name={card.name}
-                  status={card.status}
-                />
+          ) : profileDetailData ? (
+            <>
+              <UserInfoCard
+                userRole={currentUser?.UserRole}
+                data={profileDetailData}
+                isMobile={isMobile}
+                onEdit={handleOpenEditHistoryModal}
+                onViewEditHistory={handleViewEditHistory}
+              />
+              <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
+                <CardInfo data={profileDetailData} />
+              </Box>
+              <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
+                <SubscriptionCard cards={SUBSCRIPTION_DATA} />
               </Grid>
-            ))}
-          </Grid>
+
+              <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
+                {mockCards.map((card, index) => (
+                  <Grid item key={card.id || index}>
+                    <CardDisplay
+                      id={card.id}
+                      name={card.name}
+                      status={card.status}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                minHeight: "50vh",
+                p: 3,
+              }}
+            >
+              <Typography variant="h5" color="text.secondary">
+                {error || "No customer data available"}
+              </Typography>
+              {error && (
+                <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                  Please try again later or contact support
+                </Typography>
+              )}
+            </Box>
+          )}
         </Grid>
       </Grid>
       <Modal
