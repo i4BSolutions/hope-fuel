@@ -7,7 +7,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import moment from "moment-timezone";
 import formatAmount from "../../../lib/formatAmount";
 
@@ -17,7 +17,7 @@ const DateContainer = styled(Box)(({ theme }) => ({
   alignItems: "center",
   position: "relative",
   width: "100%",
-  padding: "10px 0",
+  padding: "0px 0px",
   "&::after": {
     content: '""',
     position: "absolute",
@@ -43,7 +43,7 @@ const ScrollContainer = styled(Box)({
 
 const SubscriptionCard = ({ cards }) => {
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ m: 0, p: 0 }}>
       <Typography
         variant="h6"
         sx={{ fontWeight: 600, fontSize: "18px", lineHeight: "22px" }}
@@ -55,14 +55,14 @@ const SubscriptionCard = ({ cards }) => {
         {cards.map((card, index) => (
           <Card
             key={index}
-            elevation={1}
             sx={{
-              minWidth: 200,
-              maxWidth: 200,
+              minWidth: 155,
               mr: 2,
               mb: 1,
-              borderRadius: 1,
+              borderRadius: 3,
               "&:last-child": { mr: 0 },
+              border: 0.5,
+              borderColor: "#E2E8F0",
             }}
           >
             <CardContent sx={{ p: 2 }}>
@@ -81,7 +81,7 @@ const SubscriptionCard = ({ cards }) => {
                       lineHeight: "20px",
                     }}
                   >
-                    {moment(card.ValidFromDate).format("MMMM D YYYY h:mm:ss A")}
+                    {moment(card.ValidFromDate).format("MMMM D,YYYY")}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -96,9 +96,7 @@ const SubscriptionCard = ({ cards }) => {
                       lineHeight: "20px",
                     }}
                   >
-                    {moment(card.ValidThroughDate).format(
-                      "MMMM D YYYY h:mm:ss A"
-                    )}
+                    {moment(card.ValidThroughDate).format("MMMM D,YYYY")}
                   </Typography>
                 </DateContainer>
 
