@@ -5,7 +5,7 @@ import { useAgent } from "../../context/AgentContext";
 const ActionButtons = ({ data, onActionComplete }) => {
   const [loading, setLoading] = React.useState(false);
   const [confirmDenyFlag, setConfirmDenyFlag] = React.useState(null);
-  const agentId = useAgent;
+  const agentId = useAgent();
 
   if (!data || !data.HopeFuelID) {
     console.error("Invalid data passed to ActionButtons:", data);
@@ -35,6 +35,7 @@ const ActionButtons = ({ data, onActionComplete }) => {
 
   const handleDenied = async () => {
     setLoading(true);
+
     const payload = {
       transactionId: data.TransactionID,
       agentId: agentId,
