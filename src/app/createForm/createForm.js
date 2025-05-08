@@ -142,8 +142,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       !isNaN(amount) &&
       parseFloat(amount) > 0 &&
       amount >= minimumAmount &&
-      month >= 1 &&
-      month <= 12
+      month >= 1
     );
   };
 
@@ -246,8 +245,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       validationErrors.amount = "Amount must be a positive number.";
     }
 
-    if (isNaN(month) || month < 1 || month > 12) {
-      validationErrors.month = "Month should be between 1 and 12.";
+    if (isNaN(month) || month < 1) {
+      validationErrors.month = "Month should be at least 1";
     }
 
     setErrors(validationErrors);
