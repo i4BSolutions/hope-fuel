@@ -302,6 +302,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
 
     if (!validateForm()) return;
 
+    setBtnDisable(true);
+
     try {
       const response = await createFormSubmit(
         event,
@@ -333,6 +335,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       }
     } catch (error) {
       console.error("form submitted error: ", error);
+    } finally {
+      setBtnDisable(false);
     }
   };
 

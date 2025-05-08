@@ -317,6 +317,8 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
 
     if (!validateForm()) return;
 
+    setBtnDisable(true);
+
     try {
       const response = await extendFormSubmit(
         event,
@@ -350,6 +352,8 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
       }
     } catch (error) {
       console.error("Error during form submission:", error);
+    } finally {
+      setBtnDisable(false);
     }
   };
 
