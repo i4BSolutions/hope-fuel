@@ -42,13 +42,14 @@ const ScrollContainer = styled(Box)({
 });
 
 const SubscriptionCard = ({ cards }) => {
+  if (!cards) return null;
   return (
     <Container maxWidth="lg" sx={{ m: 0, p: 0 }}>
       <Typography
         variant="h6"
         sx={{ fontWeight: 600, fontSize: "18px", lineHeight: "22px" }}
       >
-        List of Cards Issued
+        {cards.length !== 0 && "List of Cards Issued"}
       </Typography>
 
       <ScrollContainer>

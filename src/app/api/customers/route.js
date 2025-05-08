@@ -2,7 +2,22 @@ import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
 async function fetchCustomers(limit, offset) {
-  const query = `SELECT CustomerId, Name, Email, ManyChatId FROM Customer LIMIT ? OFFSET ?`;
+  const query = `
+    SELECT 
+      c.CustomerId, 
+      c.Name, 
+      c.Email, 
+      c.ManyChatId,
+      (
+        SELECT t.HopeFuelID
+        FROM Transactions t
+        WHERE t.CustomerID = c.CustomerId
+        ORDER BY t.TransactionDate DESC
+        LIMIT 1
+      ) AS HopeFuelID
+    FROM Customer c
+    LIMIT ? OFFSET ?;
+  `;
   const values = [limit, offset];
   try {
     const result = await db(query, values);
