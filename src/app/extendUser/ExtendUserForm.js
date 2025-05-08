@@ -14,13 +14,14 @@ import {
 import { MuiOtpInput } from "mui-one-time-password-input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useUser } from "../context/UserContext";
+import { AGENT_ROLE } from "../../lib/constants";
+import { useAgentStore } from "../../stores/agentStore";
 import ExtendForm from "../createForm/extendForm";
 import ExtendOrNot from "../createForm/extendOrNot";
 import checkPrfSubmit from "../utilites/ExtendUser/checkPrfSubmit";
 
 const ExtendUserForm = () => {
-  const user = useUser();
+  const { agent } = useAgentStore();
   const router = useRouter();
 
   const [otp, setOtp] = useState("");
@@ -42,7 +43,7 @@ const ExtendUserForm = () => {
       setIsChecking,
       setUserInfo,
       setHasPermissionThisMonth,
-      user?.currentUser?.UserRole
+      agent.roleId
     );
     setIsChecking(false);
   };
@@ -113,8 +114,7 @@ const ExtendUserForm = () => {
 
       {userExist && checkInputComplete && !isChecking && (
         <>
-          {!hasPermissionThisMonth &&
-          user?.currentUser?.UserRole !== "Admin" ? (
+          {!hasPermissionThisMonth && agent.roleId !== AGENT_ROLE.ADMIN ? (
             <Typography>
               ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက် စာရင်းသွင်းထားပြီးပါပြီ။
               ထူးခြားဖြစ်စဥ် ဖြစ်ပါက Admin ကိုဆက်သွယ်ပါ

@@ -5,11 +5,10 @@ import "@aws-amplify/ui-react/styles.css";
 import { Box } from "@mui/material";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
+import AuthGuard from "../lib/AuthGuard";
 import "../lib/amplifyClient";
 import Sidebar from "./UI/SidebarNav";
 import theme from "./UI/theme";
-import { AgentProvider } from "./context/AgentContext";
-import { UserProvider } from "./context/UserContext";
 
 export default function RootLayout({ children }) {
   return (
@@ -19,18 +18,15 @@ export default function RootLayout({ children }) {
           {({ signOut, user }) => (
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <AgentProvider>
-                <UserProvider>
-                  <Sidebar />
-                  <Box
-                    component="main"
-                    sx={{ flexGrow: 1, marginLeft: "80px", padding: 3 }}
-                  >
-                    {children}
-                  </Box>
-                  {console.log(user)}
-                </UserProvider>
-              </AgentProvider>
+              <AuthGuard>
+                <Sidebar />
+                <Box
+                  component="main"
+                  sx={{ flexGrow: 1, marginLeft: "80px", padding: 3 }}
+                >
+                  {children}
+                </Box>
+              </AuthGuard>
             </ThemeProvider>
           )}
         </Authenticator>

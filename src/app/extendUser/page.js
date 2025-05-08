@@ -3,7 +3,8 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Avatar, Box, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useUser } from "../context/UserContext";
+import { AGENT_ROLE } from "../../lib/constants";
+import { useAgentStore } from "../../stores/agentStore";
 import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import ExtendUserForm from "./ExtendUserForm";
 
@@ -11,7 +12,7 @@ const ExtendUserPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const { currentUser } = useUser();
+  const { agent } = useAgentStore();
 
   useEffect(() => {
     const fetchFormStatus = async () => {
@@ -28,11 +29,9 @@ const ExtendUserPage = () => {
     fetchFormStatus();
   }, []);
 
-  if (!currentUser) return null;
-
   return (
     <>
-      {isFormOpen || currentUser.UserRole === "Admin" ? (
+      {isFormOpen || agent.roleId === AGENT_ROLE.ADMIN ? (
         <Box
           sx={{
             marginTop: 8,

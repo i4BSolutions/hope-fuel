@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import { set } from "date-fns";
-import { useRouter } from "next/navigation";
-import FundraiserCard from "./components/FundraiserCard";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Alert,
   Box,
@@ -23,18 +23,18 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
-import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import FundraiserDetails from "./components/FundraiserDetails";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { AGENT_ROLE } from "../..//lib/constants";
+import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
+import FundraiserCard from "./components/FundraiserCard";
+import FundraiserDetails from "./components/FundraiserDetails";
 import FundraisingForm from "./components/FundraisingForm";
-import { useUser } from "../context/UserContext";
 
 const FundraisingFormPage = () => {
   const router = useRouter();
-  const { currentUser } = useUser();
+  const { agent } = useAgentStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [fundraisers, setFundraisers] = useState([]);
   const [filteredFundraisers, setFilteredFundraisers] = useState([]);
@@ -341,7 +341,7 @@ const FundraisingFormPage = () => {
             Filter
           </Button>
         </Box>
-        {currentUser?.UserRole === "Admin" && (
+        {agent.roleId === AGENT_ROLE.ADMIN && (
           <CustomButton
             onClick={() => {
               setOpenCreateFundraiserModal((prev) => !prev);
@@ -534,7 +534,7 @@ const FundraisingFormPage = () => {
               onClose={handleCloseFundraiserDetailsModal}
               onEdit={handleEdit}
               onDelete={handleOpenFundraiserDeleteModal}
-              userRole={currentUser?.UserRole}
+              userRole={agent.roleId}
             />
           )}
         </Modal>

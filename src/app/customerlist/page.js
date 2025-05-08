@@ -6,27 +6,23 @@ import {
   CircularProgress,
   Grid,
   Modal,
-  Paper,
   Snackbar,
-  TextField,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Sidebar from "./components/Sidebar";
-import UserInfoCard from "./components/UserInfoCard";
-import CardInfo from "./components/CardInfo";
-import DetailModal from "../UI/Components/Modal";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { useAgentStore } from "../../stores/agentStore";
+import { useAgent } from "../context/AgentContext";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import { SUBSCRIPTION_DATA } from "../variables/const";
 import CardDisplay from "./components/CardDisplay";
-import { useDebounce } from "use-debounce";
-import EditHistory from "./components/EditHistory";
+import CardInfo from "./components/CardInfo";
 import CustomerInfoEdit from "./components/CustomerInfoEdit";
-import { set } from "date-fns";
-import { useAgent } from "../context/AgentContext";
-import { useUser } from "../context/UserContext";
+import EditHistory from "./components/EditHistory";
+import Sidebar from "./components/Sidebar";
+import UserInfoCard from "./components/UserInfoCard";
 
 const mockCards = [
   {
@@ -51,7 +47,7 @@ const PAGE_SIZE = 10;
 const CustomerListPage = () => {
   const theme = useTheme();
   const agentId = useAgent();
-  const { setUser, currentUser } = useUser();
+  const { agent } = useAgentStore();
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
@@ -382,7 +378,7 @@ const CustomerListPage = () => {
         <Grid item xs={12} md={9}>
           {profileDetailData ? (
             <UserInfoCard
-              userRole={currentUser?.UserRole}
+              userRole={agent.roleId}
               data={profileDetailData}
               isMobile={isMobile}
               onEdit={handleOpenEditHistoryModal}

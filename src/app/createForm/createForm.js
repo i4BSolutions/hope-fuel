@@ -2,22 +2,18 @@
 
 import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { useAgent } from "../context/AgentContext";
-import { useUser } from "../context/UserContext";
 
 import createFormSubmit from "../utilites/createForm/createformSubmit";
 import filehandler from "../utilites/createForm/fileHandler";
 
+import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
 import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
 import ErrorMessage from "./components/errorMessage";
 
 const CreateForm = ({ userInfo, setloading, onSuccess }) => {
-  const user = useUser();
-  const agent = useAgent();
-
-  const formFillingPerson = user?.Name || "Unknown User";
+  const { agent } = useAgentStore();
 
   // Form Fields
   const [currency, setCurrency] = useState();
@@ -281,13 +277,13 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
         files,
         userInfo,
         setloading,
-        formFillingPerson,
+        agent.username,
         setAmountValidate,
         setMonthValidate,
         setManyChatValidate,
         fileExist,
         setFileExist,
-        agent,
+        agent.id,
         contactLink,
         notes,
         manyChatId,
