@@ -14,6 +14,8 @@ import DetailModal from "../UI/Components/Modal";
 import HopeFuelIDListDetails from "./components/HopeFuelIDListDetails";
 import HopeFuelIDListItem from "./components/HopeFuelIDListItem";
 import ImageCarouselModal from "./components/ImageCarousel";
+import SubscriptionCard from "../UI/Components/SubscriptionCard";
+import theme from "../UI/theme";
 
 const PAGE_SIZE = 10;
 
@@ -26,6 +28,7 @@ const HopeFuelIdListPage = () => {
   const [hasMore, setHasMore] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [details, setDetails] = useState({});
+  const [subscriptions, setSubscriptions] = useState([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
@@ -96,6 +99,29 @@ const HopeFuelIdListPage = () => {
     }
   };
 
+  const fetchSubscriptionByHopeFuelID = async (hopeId) => {
+    console.log(hopeId);
+    setLoadingDetails(true);
+    setScreenshotsLists([]);
+
+    try {
+      const response = await fetch(
+        `/api/hopeFuelList/details/${hopeId}/subscription`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch subscription for HopeFuelID ${hopeFuelId}`
+        );
+      }
+      const result = await response.json();
+      setSubscriptions(result.data);
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
   const handleOpenScreenshots = (screenshots) => {
     if (!Array.isArray(screenshots)) {
       screenshots = [screenshots];
@@ -138,6 +164,7 @@ const HopeFuelIdListPage = () => {
 
   const handleOpen = (hopeFuelId) => {
     fetchDetails(hopeFuelId);
+    fetchSubscriptionByHopeFuelID(hopeFuelId);
     setOpenModal((prev) => !prev);
   };
 
@@ -245,7 +272,9 @@ const HopeFuelIdListPage = () => {
           ) : (
             <HopeFuelIDListDetails data={details} />
           )}
-          {/* <SubscriptionCard cards={SUBSCRIPTION_DATA} /> */}
+          <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
+            <SubscriptionCard cards={subscriptions} />
+          </Box>
         </Paper>
       </DetailModal>
       <ImageCarouselModal
