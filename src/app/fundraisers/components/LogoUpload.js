@@ -51,23 +51,25 @@ export const LogoUpload = ({ logoFile, setLogoFile, errors, clearErrors }) => {
         justifyContent: "center",
       }}
     >
-      {/* Clickable Circular Avatar Button */}
-      <Avatar
-        sx={{
-          width: 120,
-          height: 120,
-          cursor: "pointer",
-          bgcolor: "#d1d5db",
-          fontSize: "16px",
-          fontWeight: "bold",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        src={logoPreview}
-      >
-        {!logoPreview && "Add Logo"}
-      </Avatar>
+      <label htmlFor="logo-upload">
+        {/* Clickable Circular Avatar Button */}
+        <Avatar
+          sx={{
+            width: 120,
+            height: 120,
+            cursor: "pointer",
+            bgcolor: "#d1d5db",
+            fontSize: "16px",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          src={logoPreview}
+        >
+          {!logoPreview && "Add Logo"}
+        </Avatar>
+      </label>
 
       {/* Hidden File Input */}
       <Input
