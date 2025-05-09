@@ -14,7 +14,6 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useAgentStore } from "../../stores/agentStore";
-import { useAgent } from "../context/AgentContext";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import { SUBSCRIPTION_DATA } from "../variables/const";
 import CardDisplay from "./components/CardDisplay";
@@ -46,7 +45,6 @@ const PAGE_SIZE = 10;
 
 const CustomerListPage = () => {
   const theme = useTheme();
-  const agentId = useAgent();
   const { agent } = useAgentStore();
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
@@ -280,7 +278,7 @@ const CustomerListPage = () => {
       var myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
       let raw = JSON.stringify({
-        agentId,
+        agentId: agent.id,
         updates: [
           {
             field: "Name",
@@ -334,7 +332,7 @@ const CustomerListPage = () => {
         setOpenEditHistoryModal((prev) => !prev);
       }
     },
-    [selectedEditId, agentId, fetchProfileDetails, selectedProfileId]
+    [selectedEditId, agent.id , fetchProfileDetails, selectedProfileId]
   );
 
   const handleCancel = () => {

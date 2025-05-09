@@ -32,90 +32,67 @@ import { useAgentStore } from "../../stores/agentStore";
 const drawerWidth = 250; // Full-width drawer
 const miniDrawerWidth = 80; // Mini sidebar width
 
+const navItems = {
+  createForm: {
+    text: "အသစ်သွင်းခြင်း",
+    icon: <AddCircleOutlineIcon />,
+    path: "/createForm",
+  },
+  extendUser: {
+    text: "သက်တမ်းတိုးခြင်း",
+    icon: <SyncAltRoundedIcon />,
+    path: "/extendUser",
+  },
+  entryForm: {
+    text: "ငွေစစ်ဆေးခြင်း",
+    icon: <AttachMoneyIcon />,
+    path: "/entryForm",
+  },
+  hopefuelidlist: {
+    text: "HOPEID List",
+    icon: <FormatListBulletedRoundedIcon />,
+    path: "/hopefuelidlist",
+  },
+  customerlist: {
+    text: "Customers List",
+    icon: <PeopleAltOutlinedIcon />,
+    path: "/customerlist",
+  },
+  fundraisers: {
+    text: "Fundraisers",
+    icon: <FlagIcon />,
+    path: "/fundraisers",
+  },
+  adminPanel: {
+    text: "Admin Panel",
+    icon: <ManageAccountsIcon />,
+    path: "/admin-panel",
+  },
+  logout: {
+    text: "Logout",
+    icon: <LogoutIcon />,
+    path: "/logout",
+  },
+};
+
 const roleBasedNavItems = {
-  2: [
-    {
-      text: "အသစ်သွင်းခြင်း",
-      icon: <AddCircleOutlineIcon />,
-      path: "/createForm",
-    },
-    {
-      text: "သက်တမ်းတိုးခြင်း",
-      icon: <SyncAltRoundedIcon />,
-      path: "/extendUser",
-    },
-    { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
-    {
-      text: "Admin Panel",
-      icon: <ManageAccountsIcon />,
-      path: "/admin-panel",
-    },
-    {
-      text: "HOPEID List",
-      icon: <FormatListBulletedRoundedIcon />,
-      path: "/hopefuelidlist",
-    },
-    {
-      text: "Customers List",
-      icon: <PeopleAltOutlinedIcon />,
-      path: "/customerlist",
-    },
-    {
-      text: "Fundraisers",
-      icon: <FlagIcon />,
-      path: "/fundraisers",
-    },
-  ],
   1: [
-    {
-      text: "အသစ်သွင်းခြင်း",
-      icon: <AddCircleOutlineIcon />,
-      path: "/createForm",
-    },
-    { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
-    {
-      text: "သက်တမ်းတိုးခြင်း",
-      icon: <SyncAltRoundedIcon />,
-      path: "/extendUser",
-    },
-    {
-      text: "HOPEID List",
-      icon: <FormatListBulletedRoundedIcon />,
-      path: "/hopefuelidlist",
-    },
-    {
-      text: "Customers List",
-      icon: <PeopleAltOutlinedIcon />,
-      path: "/customerlist",
-    },
-    {
-      text: "Fundraisers",
-      icon: <FlagIcon />,
-      path: "/fundraisers/",
-    },
+    navItems.createForm,
+    navItems.extendUser,
+    navItems.hopefuelidlist,
+    navItems.customerlist,
+    navItems.fundraisers,
   ],
-  3: [
-    {
-      text: "အသစ်သွင်းခြင်း",
-      icon: <AddCircleOutlineIcon />,
-      path: "/createForm",
-    },
-    {
-      text: "သက်တမ်းတိုးခြင်း",
-      icon: <SyncAltRoundedIcon />,
-      path: "/extendUser",
-    },
-    {
-      text: "ငွေစစ်ဆေးခြင်း",
-      icon: <AttachMoneyIcon />,
-      path: "/entryForm",
-    },
-    {
-      text: "Customers List",
-      icon: <PeopleAltOutlinedIcon />,
-      path: "/customerlist",
-    },
+  2: [
+    navItems.createForm,
+    navItems.extendUser,
+    navItems.entryForm,
+    navItems.hopefuelidlist,
+    navItems.customerlist,
+    navItems.fundraisers,
+    navItems.adminPanel,
   ],
+  3: [navItems.entryForm, navItems.customerlist, navItems.hopefuelidlist],
 };
 
 const Sidebar = () => {
@@ -123,7 +100,7 @@ const Sidebar = () => {
   const [menuItems, setMenuItems] = useState([]);
   const router = useRouter();
   const pathname = usePathname();
-  const { agent } = useAgentStore();
+  const { agent, setHasHydrated } = useAgentStore();
 
   useEffect(() => {
     if (agent) {
@@ -221,7 +198,7 @@ const Sidebar = () => {
               onClick={async () => {
                 await fetch("/api/auth/logout", { method: "POST" });
                 signOut({ global: true });
-                router.push("/");
+                setHasHydrated(false);
               }}
               sx={{
                 marginX: "15px",
@@ -338,9 +315,10 @@ const Sidebar = () => {
         <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => {
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
                 signOut({ global: true });
-                router.push("/");
+                setHasHydrated(false);
               }}
               sx={{
                 marginX: "15px",

@@ -7,7 +7,7 @@ import { useAgentStore } from "../stores/agentStore";
 import { COOKIE_KEY } from "./constants";
 
 export default function AuthGuard({ children }) {
-  const { hasHydrated, clearAgentInfo, setAgent } = useAgentStore();
+  const { hasHydrated, setHasHydrated, setAgent } = useAgentStore();
 
   useEffect(() => {
     console.log("AuthGuard mounted");
@@ -16,8 +16,10 @@ export default function AuthGuard({ children }) {
     const cookie = getCookie(COOKIE_KEY);
     if (cookie) {
       setAgent(JSON.parse(cookie));
+      setHasHydrated(true);
       return;
     }
+
     console.log("Cookie not found, calling checkAgent API");
     const callCheckOrCreate = async () => {
       try {
@@ -39,9 +41,9 @@ export default function AuthGuard({ children }) {
         }
         const cookie = getCookie(COOKIE_KEY);
         setAgent(JSON.parse(cookie));
+        setHasHydrated(true);
       } catch (error) {
         console.error("[AuthGuard] Auth fallback failed:", error);
-        // clearAgentInfo();
       }
     };
 
