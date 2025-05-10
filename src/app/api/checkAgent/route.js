@@ -1,8 +1,10 @@
 import { serialize } from "cookie";
+import { SignJWT } from "jose";
 import { NextResponse } from "next/server";
 import prisma from "../../utilites/prisma";
 
 export const dynamic = "force-dynamic";
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function POST(req) {
   try {
@@ -37,6 +39,10 @@ export async function POST(req) {
       username: email.split("@")[0],
       email,
     };
+    const token = new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1d")
+      .sign(secret);
 
     const secure = process.env.NODE_ENV === "production";
 
@@ -47,7 +53,7 @@ export async function POST(req) {
 
     res.headers.append(
       "Set-Cookie",
-      serialize("hopefuel-server", JSON.stringify(payload), {
+      serialize("hopefuel-server", token, {
         httpOnly: true,
         secure,
         sameSite: "Strict",

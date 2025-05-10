@@ -1,6 +1,6 @@
+import { jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
 import { AGENT_ROLE } from "./lib/constants";
 
 const restrictedRoutes = {
@@ -10,25 +10,27 @@ const restrictedRoutes = {
 };
 
 const publicApiRoutes = ["/checkAgent"];
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export function middleware(request) {
   const serverCookie = cookies().get("hopefuel-server");
+  const verifiedToken = serverCookie
+    ? jwtVerify(serverCookie.value, JWT_SECRET)
+    : null;
   const pathname = request.nextUrl.pathname;
 
   const isPublicApi = publicApiRoutes.some((route) =>
     pathname.startsWith(`/api${route}`)
   );
 
-  if (pathname.startsWith("/api/") && !isPublicApi && !serverCookie) {
+  if (pathname.startsWith("/api/") && !isPublicApi && !verifiedToken) {
     return NextResponse.json(
       { message: "Agent not authorized" },
       { status: 401 }
     );
   }
 
-  const currentRole = serverCookie
-    ? JSON.parse(serverCookie.value).roleId
-    : null;
+  const currentRole = verifiedToken ? verifiedToken.roleId : null;
 
   if (currentRole === AGENT_ROLE.PAYMENT_PROCESSOR && pathname === "/") {
     return NextResponse.redirect(new URL("/entryForm", request.url));
