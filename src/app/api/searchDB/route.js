@@ -14,23 +14,28 @@ async function getPaginatedData(page, selectedWallet) {
     1
   );
 
+  const baseWhere = {
+    FormStatus: {
+      some: {
+        TransactionStatusID: 1,
+      },
+    },
+    TransactionDate: {
+      gte: firstDayOfMonth,
+      lt: firstDayOfNextMonth,
+    },
+  };
+
+  if (selectedWallet !== "All Wallets") {
+    baseWhere["Wallet"] = {
+      WalletName: selectedWallet,
+    };
+  }
+
   try {
     const [rows, totalCount] = await Promise.all([
       prisma.Transactions.findMany({
-        where: {
-          FormStatus: {
-            some: {
-              TransactionStatusID: 1,
-            },
-          },
-          Wallet: {
-            WalletName: selectedWallet,
-          },
-          TransactionDate: {
-            gte: firstDayOfMonth,
-            lt: firstDayOfNextMonth,
-          },
-        },
+        where: baseWhere,
         include: {
           Customer: { select: { Name: true } },
           Wallet: { select: { Currency: { select: { CurrencyCode: true } } } },
@@ -41,20 +46,7 @@ async function getPaginatedData(page, selectedWallet) {
         take: itemsPerPage,
       }),
       prisma.Transactions.count({
-        where: {
-          FormStatus: {
-            some: {
-              TransactionStatusID: 1,
-            },
-          },
-          Wallet: {
-            WalletName: selectedWallet,
-          },
-          TransactionDate: {
-            gte: firstDayOfMonth,
-            lt: firstDayOfNextMonth,
-          },
-        },
+        where: baseWhere,
       }),
     ]);
 
@@ -68,7 +60,7 @@ async function getPaginatedData(page, selectedWallet) {
     return {
       items: formattedRows,
       totalItems: totalCount,
-      itemsPerPage: itemsPerPage,
+      itemsPerPage,
       currentPage: page,
       totalPages: Math.ceil(totalCount / itemsPerPage),
     };

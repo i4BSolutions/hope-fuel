@@ -20,22 +20,29 @@ const WalletSelect = ({ onWalletSelected }) => {
       try {
         const response = await fetch(`/api/loadWalletByCurrency`);
         const result = await response.json();
-        console.log("Wallets from DB:", result);
+
         setWallets(result);
 
+        // Allow "all_wallet" to be selected from query param
+        if (walletId === "All Wallets") {
+          setCurrentWallet("All Wallets");
+          onWalletSelected("All Wallets");
+        }
         // Check if walletId exists and is valid
-        const walletFromParam = result.find(
-          (wallet) => wallet.WalletName === walletId
-        );
+        else {
+          const walletFromParam = result.find(
+            (wallet) => wallet.WalletName === walletId
+          );
 
-        if (walletFromParam) {
-          setCurrentWallet(walletFromParam.WalletName); // Set wallet from query param
-          onWalletSelected(walletFromParam.WalletName);
-        } else if (result.length > 0) {
-          setCurrentWallet(result[0].WalletName); // Set default wallet
-          onWalletSelected(result[0].WalletName); // Notify parent
-        } else {
-          onWalletSelected(""); // Notify parent of no wallets
+          if (walletFromParam) {
+            setCurrentWallet(walletFromParam.WalletName); // Set wallet from query param
+            onWalletSelected(walletFromParam.WalletName);
+          } else if (result.length > 0) {
+            setCurrentWallet("All Wallets"); // Set default wallet
+            onWalletSelected("All Wallets");
+          } else {
+            onWalletSelected(""); // Notify parent of no wallets
+          }
         }
       } catch (error) {
         console.error("Cannot fetch wallets from API");
@@ -81,6 +88,7 @@ const WalletSelect = ({ onWalletSelected }) => {
           },
         }}
       >
+        <MenuItem value="All Wallets">All Wallets</MenuItem>
         {wallets.length > 0 ? (
           wallets.map((wallet, index) => (
             <MenuItem key={index} value={wallet.WalletName}>
