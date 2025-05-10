@@ -15,7 +15,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useAgentStore } from "../../stores/agentStore";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
-import { SUBSCRIPTION_DATA } from "../variables/const";
 import CardDisplay from "./components/CardDisplay";
 import CardInfo from "./components/CardInfo";
 import CustomerInfoEdit from "./components/CustomerInfoEdit";
@@ -46,48 +45,53 @@ const PAGE_SIZE = 10;
 const CustomerListPage = () => {
   const theme = useTheme();
   const { agent } = useAgentStore();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [hoveredProfileId, setHoveredProfileId] = useState(null);
   const [customerData, setCustomerData] = useState([]);
   const [profileDetailData, setProfileDetailData] = useState(null);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [profileLoading, setProfileLoading] = useState(false);
-  const [editHistoryLoading, setEditHistoryLoading] = useState(false);
   const [editHistory, setEditHistory] = useState([]);
-  const [error, setError] = useState(null);
-  const [page, setPage] = useState(1);
-  const [openDetailModal, setOpenDetailModal] = useState(false);
-  const [openEditHistoryModal, setOpenEditHistoryModal] = useState(false);
+  const [countries, setCountries] = useState([]);
   const [customerInfo, setCustomerInfo] = useState({
     name: "",
     email: "",
     country: "",
   });
-  const [countries, setCountries] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [editHistoryLoading, setEditHistoryLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [openEditHistoryModal, setOpenEditHistoryModal] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [error, setError] = useState(null);
 
-  const initialLoadRef = useRef(false);
   const [debouncedSearch] = useDebounce(searchText, 100);
+  const initialLoadRef = useRef(false);
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const filteredCustomers = customerData.filter((customer) => {
+    const s = debouncedSearch.toLowerCase();
+    return (
+      customer.Name?.toLowerCase().includes(s) ||
+      customer.Email?.toLowerCase().includes(s) ||
+      customer.ManyChatId?.toLowerCase().includes(s)
+    );
+  });
 
   useEffect(() => {
     if (!initialLoadRef.current) {
       initialLoadRef.current = true;
       fetchCustomerData(1, true);
       fetchBaseCountry();
-    } else if (debouncedSearch !== undefined) {
-      setPage(1);
-      setHasMore(true);
-      fetchCustomerData(1, true);
-      fetchBaseCountry();
     }
-  }, [debouncedSearch]);
+  }, []);
 
   const fetchCustomerData = useCallback(
     async (pageNumber, isNewSearch = false) => {
@@ -97,18 +101,11 @@ const CustomerListPage = () => {
       setError(null);
 
       try {
-        const url = debouncedSearch
-          ? `/api/customers/search?term=${encodeURIComponent(debouncedSearch)}`
-          : `/api/customers/?page=${pageNumber}&limit=${PAGE_SIZE}`;
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `Failed to fetch data (${response.status})`
-          );
-        }
+        const response = await fetch(
+          `/api/customers?page=${pageNumber}&limit=${PAGE_SIZE}`
+        );
+        if (!response.ok)
+          throw new Error(`Failed to fetch customers (${response.status})`);
 
         const result = await response.json();
         const newCustomers = result.data || [];
@@ -116,89 +113,94 @@ const CustomerListPage = () => {
         if (isNewSearch) {
           setCustomerData(newCustomers);
           setPage(pageNumber);
-
-          if (newCustomers.length > 0) {
-            const firstCustomerId = newCustomers[0].CustomerId;
-            setSelectedProfileId(firstCustomerId);
-            setHoveredProfileId(firstCustomerId);
-            fetchProfileDetails(firstCustomerId);
-          } else {
-            setSelectedProfileId(null);
-            setHoveredProfileId(null);
-            setProfileDetailData(null);
-          }
         } else {
-          setCustomerData((prevData) => [...prevData, ...newCustomers]);
-          setPage(pageNumber + 1);
+          setCustomerData((prev) => [...prev, ...newCustomers]);
+          setPage((prev) => prev + 1);
         }
 
         setHasMore(newCustomers.length >= PAGE_SIZE);
+
+        if (newCustomers.length > 0 && isNewSearch) {
+          const firstId = newCustomers[0].CustomerId;
+          setSelectedProfileId(firstId);
+          setHoveredProfileId(firstId);
+          fetchProfileDetails(firstId);
+        }
       } catch (err) {
         console.error(err);
         setError(err.message);
+        setHasMore(false);
         if (isNewSearch) {
           setCustomerData([]);
           setSelectedProfileId(null);
-          setHoveredProfileId(null);
           setProfileDetailData(null);
         }
-        setHasMore(false);
       } finally {
         setLoading(false);
       }
     },
-    [debouncedSearch, loading]
+    [loading]
   );
 
   const fetchBaseCountry = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch("/api/countries");
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-            `Failed to fetch base country (${response.status})`
-        );
-      }
-
-      const baseCountry = await response.json();
-      setCountries(baseCountry.Countries || []);
+      const res = await fetch("/api/countries");
+      if (!res.ok) throw new Error(`Failed to fetch countries`);
+      const data = await res.json();
+      setCountries(data.Countries || []);
     } catch (err) {
-      console.error("Error fetching base country:", err);
-      setError(`Failed to load base country: ${err.message}`);
-    } finally {
-      setLoading(false);
+      console.error(err);
     }
-  });
+  }, []);
 
-  const fetchProfileDetails = useCallback(async (profileId) => {
-    if (!profileId) return;
-
-    setProfileLoading(true);
-    setError(null);
-
+  const fetchSubscriptionByHopeFuelID = async (hopeFuelId) => {
     try {
-      const response = await fetch(`/api/customers/${profileId}`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+      const res = await fetch(
+        `/api/hopeFuelList/details/${hopeFuelId}/subscription`
+      );
+      if (!res.ok)
         throw new Error(
-          errorData.message ||
-            `Failed to fetch profile details (${response.status})`
+          `Failed to fetch subscription for HopeFuelID ${hopeFuelId}`
         );
-      }
-
-      const profileDetails = await response.json();
-      setProfileDetailData(profileDetails.customer);
+      const data = await res.json();
+      return data.data;
     } catch (err) {
-      console.error("Error fetching profile details:", err);
-      setError(`Failed to load profile details: ${err.message}`);
+      console.error(err);
+      return [];
+    }
+  };
 
-      setProfileDetailData(null);
+  const fetchCardIssuedByID = async (hopeFuelId) => {
+    try {
+      const res = await fetch(`/api/v1/card-issued/${hopeFuelId}`);
+
+      if (!res.ok)
+        throw new Error(`Failed to fetch card issued HopeFuelID ${hopeFuelId}`);
+      const data = await res.json();
+      return data.data;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
+  const fetchProfileDetails = useCallback(async (id) => {
+    if (!id) return;
+    setProfileLoading(true);
+    try {
+      const res = await fetch(`/api/customers/${id}`);
+      if (!res.ok) throw new Error(`Failed to fetch profile`);
+      const { customer } = await res.json();
+      const subscriptions = customer?.HopeFuelID
+        ? await fetchSubscriptionByHopeFuelID(customer.HopeFuelID)
+        : [];
+      const cardIssued = customer?.HopeFuelID
+        ? await fetchCardIssuedByID(customer?.HopeFuelID)
+        : [];
+      setProfileDetailData({ ...customer, subscriptions, cardIssued });
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
     } finally {
       setProfileLoading(false);
     }
@@ -206,71 +208,26 @@ const CustomerListPage = () => {
 
   const fetchEditHistory = useCallback(async (id) => {
     setEditHistoryLoading(true);
-    setError(null);
-
     try {
-      const response = await fetch(`/api/customers/${id}/edit/history`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.message ||
-            `Failed to fetch profile details (${response.status})`
-        );
-      }
-
-      const editHistory = await response.json();
-      setEditHistory(editHistory);
-    } catch (error) {
-      console.log(error);
+      const res = await fetch(`/api/customers/${id}/edit/history`);
+      if (!res.ok) throw new Error("Failed to fetch edit history");
+      const data = await res.json();
+      setEditHistory(data);
+    } catch (err) {
+      console.error(err);
     } finally {
       setEditHistoryLoading(false);
     }
   }, []);
 
-  const handleProfileSelect = useCallback(
-    (profileId) => {
-      setSelectedProfileId(profileId);
-      setHoveredProfileId(profileId);
-      fetchProfileDetails(profileId);
-    },
-    [fetchProfileDetails]
-  );
-
-  const handleProfileHover = useCallback((profileId) => {
-    setHoveredProfileId(profileId);
-  }, []);
-
   const handleLoadMore = useCallback(() => {
-    if (!loading && hasMore) {
-      fetchCustomerData(page, false);
-    }
+    if (!loading && hasMore) fetchCustomerData(page, false);
   }, [loading, hasMore, page, fetchCustomerData]);
 
-  const handleSearchChange = (event) => {
-    setSearchText(event.target.value);
-  };
-
-  const handleViewEditHistory = (id) => {
-    fetchEditHistory(id);
-    setOpenDetailModal((prev) => !prev);
-  };
-
-  const handleCloseDetailModal = () => {
-    setOpenDetailModal((prev) => !prev);
-  };
-
-  const handleOpenEditHistoryModal = (id) => {
-    setSelectedEditId(id);
-    setOpenEditHistoryModal((prev) => !prev);
-
-    if (profileDetailData) {
-      setCustomerInfo({
-        name: profileDetailData.Name || "",
-        email: profileDetailData.Email || "",
-        country: profileDetailData.UserCountry || "",
-      });
-    }
+  const handleProfileSelect = (id) => {
+    setSelectedProfileId(id);
+    setHoveredProfileId(id);
+    fetchProfileDetails(id);
   };
 
   const handleSave = useCallback(
@@ -303,54 +260,38 @@ const CustomerListPage = () => {
       };
 
       try {
-        let response = await fetch(
-          `api/customers/${selectedEditId}/edit`,
-          requestOptions
-        );
+        const res = await fetch(`/api/customers/${selectedEditId}/edit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            agentId,
+            updates: [
+              { field: "Name", newValue: data.name },
+              { field: "Email", newValue: data.email },
+              { field: "UserCountry", newValue: data.country },
+            ],
+          }),
+        });
 
-        if (response.ok) {
-          const responseData = await response.json();
+        if (!res.ok) throw new Error("Failed to update customer");
 
-          setSnackbarMessage(responseData.message);
-          setSnackbarSeverity("success");
-          setSnackbarOpen(true);
-
-          fetchProfileDetails(selectedProfileId);
-        } else {
-          setSnackbarMessage("Failed to update customer information");
-          setSnackbarSeverity("error");
-          setSnackbarOpen(true);
-        }
-      } catch (error) {
-        console.log(error);
-        setSnackbarMessage(
-          "An error occurred while updating customer information"
-        );
+        const resData = await res.json();
+        setSnackbarMessage(resData.message);
+        setSnackbarSeverity("success");
+        fetchProfileDetails(selectedProfileId);
+      } catch (err) {
+        setSnackbarMessage(err.message);
         setSnackbarSeverity("error");
-        setSnackbarOpen(true);
       } finally {
-        setOpenEditHistoryModal((prev) => !prev);
+        setSnackbarOpen(true);
+        setOpenEditHistoryModal(false);
       }
     },
     [selectedEditId, agent.id , fetchProfileDetails, selectedProfileId]
   );
-
-  const handleCancel = () => {
-    setOpenEditHistoryModal((prev) => !prev);
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen((prev) => !prev);
-  };
-
   return (
     <Box
       sx={{
-        p: 0,
-        m: 0,
         height: "100vh",
         overflow: "hidden",
         display: "flex",
@@ -360,14 +301,14 @@ const CustomerListPage = () => {
       <Grid container spacing={2}>
         <Grid item xs={12} md={3}>
           <Sidebar
-            profiles={customerData}
+            profiles={filteredCustomers}
             selectedProfileId={selectedProfileId}
             hoveredProfileId={hoveredProfileId}
             onSelectedProfile={handleProfileSelect}
-            onHoverProfile={handleProfileHover}
+            onHoverProfile={setHoveredProfileId}
             onLoadMore={handleLoadMore}
             searchValue={searchText}
-            onSearch={handleSearchChange}
+            onSearch={(e) => setSearchText(e.target.value)}
             loading={loading}
             hasMore={hasMore}
           />
@@ -383,99 +324,107 @@ const CustomerListPage = () => {
               onViewEditHistory={handleViewEditHistory}
             />
           ) : (
-            <Box sx={{ p: 2, border: "1px solid #E2E8F0", borderRadius: 1 }}>
-              <Typography variant="body1" align="center">
-                {profileLoading ? "Loading profile..." : "No profile selected"}
-              </Typography>
+          {profileLoading ? (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                minHeight: "60vh",
+              }}
+            >
+              <CircularProgress />
             </Box>
-          )}
-
-          {profileDetailData ? (
-            <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
-              <CardInfo data={profileDetailData} />
+          ) : filteredCustomers.length === 0 && !loading ? (
+            <Box sx={{ textAlign: "center", mt: 5 }}>
+              <Typography variant="h5">No customers found</Typography>
             </Box>
-          ) : (
-            <Box sx={{ p: 2, border: "1px solid #E2E8F0", borderRadius: 1 }}>
-              <Typography variant="body1" align="center">
-                {profileLoading ? "Loading profile..." : "No profile selected"}
-              </Typography>
-            </Box>
-          )}
-
-          <Grid container spacing={2} sx={{ pt: theme.spacing(3) }}>
-            <SubscriptionCard cards={SUBSCRIPTION_DATA} />
-          </Grid>
-
-          <Grid container spacing={2} sx={{ px: 2, pt: theme.spacing(3) }}>
-            {mockCards.map((card, index) => (
-              <Grid item key={card.id || index}>
-                <CardDisplay
-                  id={card.id}
-                  name={card.name}
-                  status={card.status}
+          ) : profileDetailData ? (
+            <>
+              <UserInfoCard
+                userRole={currentUser?.UserRole}
+                data={profileDetailData}
+                isMobile={isMobile}
+                onEdit={() => {
+                  setCustomerInfo({
+                    name: profileDetailData.Name || "",
+                    email: profileDetailData.Email || "",
+                    country: profileDetailData.UserCountry || "",
+                  });
+                  setSelectedEditId(profileDetailData.CustomerId);
+                  setOpenEditHistoryModal(true);
+                }}
+                onViewEditHistory={(id) => {
+                  fetchEditHistory(id);
+                  setOpenDetailModal(true);
+                }}
+              />
+              <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
+                <CardInfo data={profileDetailData} />
+              </Box>
+              <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
+                <SubscriptionCard
+                  cards={profileDetailData.subscriptions || []}
                 />
               </Grid>
-            ))}
-          </Grid>
+              <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
+                {profileDetailData?.cardIssued.map((card) => (
+                  <Grid item key={card.id}>
+                    <CardDisplay
+                      hopeFuelID={card.HopeFuelID}
+                      transactionStatus={card.TransactionStatus}
+                      currency={card.CurrencyCode}
+                      amount={card.Amount}
+                      date={card.TransactionDate}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </>
+          ) : (
+            <Box sx={{ textAlign: "center", mt: 5 }}>
+              <Typography variant="h5">
+                {error || "No customer data available"}
+              </Typography>
+            </Box>
+          )}
         </Grid>
       </Grid>
-      <Modal
-        open={openDetailModal}
-        onClose={handleCloseDetailModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{ alignSelf: "center", justifyItems: "center" }}
-      >
-        {editHistoryLoading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
+
+      {/* Edit History Modal */}
+      <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
+        <Box sx={{ p: 4, maxHeight: "80vh", overflowY: "auto" }}>
+          {editHistoryLoading ? (
             <CircularProgress />
-          </Box>
-        ) : editHistory ? (
-          <EditHistory historyData={editHistory.data} />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Typography sx={{ textAlign: "center" }}>
-              No Edit History Found
-            </Typography>
-          </Box>
-        )}
+          ) : editHistory ? (
+            <EditHistory historyData={editHistory.data} />
+          ) : (
+            <Typography>No Edit History Found</Typography>
+          )}
+        </Box>
       </Modal>
+
+      {/* Edit Info Modal */}
       <Modal
         open={openEditHistoryModal}
-        onClose={() => setOpenEditHistoryModal((prev) => !prev)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        sx={{ alignSelf: "center", justifyItems: "center" }}
+        onClose={() => setOpenEditHistoryModal(false)}
       >
         <CustomerInfoEdit
           customerInfo={customerInfo}
           countries={countries}
           setCustomerInfo={setCustomerInfo}
           onSave={handleSave}
-          onCancel={handleCancel}
+          onCancel={() => setOpenEditHistoryModal(false)}
         />
       </Modal>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={handleSnackbarClose}
+        onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
         <Alert
-          onClose={handleSnackbarClose}
+          onClose={() => setSnackbarOpen(false)}
           severity={snackbarSeverity}
           sx={{ width: "100%" }}
         >

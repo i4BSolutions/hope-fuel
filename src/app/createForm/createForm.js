@@ -12,6 +12,8 @@ import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
 import ErrorMessage from "./components/errorMessage";
 
+import { remove } from "aws-amplify/storage";
+
 const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const { agent } = useAgentStore();
 
@@ -136,8 +138,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       !isNaN(amount) &&
       parseFloat(amount) > 0 &&
       amount >= minimumAmount &&
-      month >= 1 &&
-      month <= 12
+      month >= 1
     );
   };
 
@@ -240,8 +241,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       validationErrors.amount = "Amount must be a positive number.";
     }
 
-    if (isNaN(month) || month < 1 || month > 12) {
-      validationErrors.month = "Month should be between 1 and 12.";
+    if (isNaN(month) || month < 1) {
+      validationErrors.month = "Month should be at least 1";
     }
 
     setErrors(validationErrors);
@@ -264,11 +265,40 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     setIsUploading(false);
   };
 
+  // Handle File Deletion
+  const handleDeleteFile = async (fileName) => {
+    try {
+      const fileToDelete = files.find((file) => file.name === fileName);
+
+      if (!fileToDelete) {
+        console.warn("File not found in state:", fileName);
+        return;
+      }
+
+      setUploadProgress(`Deleting ${fileName}...`);
+
+      await remove({ key: fileToDelete.key });
+
+      setFiles((prevFiles) =>
+        prevFiles.filter((file) => file.name !== fileName)
+      );
+
+      setUploadedFiles((prev) => prev.filter((file) => file.name !== fileName));
+
+      setUploadProgress("File deleted.");
+    } catch (error) {
+      console.error("Delete error:", error);
+      setUploadProgress("Error deleting file.");
+    }
+  };
+
   // form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!validateForm()) return;
+
+    setBtnDisable(true);
 
     try {
       const response = await createFormSubmit(
@@ -301,6 +331,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
       }
     } catch (error) {
       console.error("form submitted error: ", error);
+    } finally {
+      setBtnDisable(false);
     }
   };
 
@@ -635,6 +667,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
             <CustomDropzone
               handleDrop={handleDrop}
               uploadProgress={uploadProgress}
+              files={uploadedFiles}
+              onDelete={handleDeleteFile}
             />
             <ErrorMessage message={errors.files} />
           </Box>

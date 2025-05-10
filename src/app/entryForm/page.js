@@ -88,7 +88,12 @@ export default function EntryForm() {
 
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
-      <Box sx={{ width: 300, marginRight: 3 }}>
+      <Box
+        sx={{
+          width: 300,
+          borderRight: "1px solid #e0e0e0",
+        }}
+      >
         <SearchBarForm
           key={hopeFuelID === null ? Date.now() : "active"}
           url={"/api/entryFormStatus"}
@@ -98,13 +103,22 @@ export default function EntryForm() {
           }}
         />
       </Box>
-      <PaymentDetails
-        data={data}
-        clearHopeFuelID={() => {
-          setHopeFuelID(null);
-          router.replace(`/entryForm?walletId=${walletId}`);
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          padding: 2,
+          maxWidth: "calc(100% - 300px)",
         }}
-      />
+      >
+        <PaymentDetails
+          data={data}
+          clearHopeFuelID={() => {
+            setHopeFuelID(null);
+            router.replace(`/entryForm?walletId=${walletId}`);
+          }}
+        />
+      </Box>
     </Box>
   );
 }

@@ -35,6 +35,7 @@ const ActionButtons = ({ data, onActionComplete }) => {
 
   const handleDenied = async () => {
     setLoading(true);
+
     const payload = {
       transactionId: data.TransactionID,
       agentId: agent.id,
