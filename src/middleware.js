@@ -1,27 +1,39 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+import { AGENT_ROLE } from "./lib/constants";
+
 const restrictedRoutes = {
   1: ["/entryForm", "/admin-panel"],
   2: [],
   3: ["/createForm", "/extendForm", "/fundraisers", "/admin-panel"],
 };
 
-const publicApiRoutes = ["/logout", "/not-authorized", "/checkAgent"];
+const publicApiRoutes = ["/checkAgent"];
+
 export function middleware(request) {
   const serverCookie = cookies().get("hopefuel-server");
   const pathname = request.nextUrl.pathname;
-  if (
-    pathname.startsWith("/api/") &&
-    publicApiRoutes.includes(pathname) &&
-    !serverCookie
-  ) {
-    return NextResponse.redirect(new URL("/not-authorized", request.url));
+
+  const isPublicApi = publicApiRoutes.some((route) =>
+    pathname.startsWith(`/api${route}`)
+  );
+
+  if (pathname.startsWith("/api/") && !isPublicApi && !serverCookie) {
+    return NextResponse.json(
+      { message: "Agent not authorized" },
+      { status: 401 }
+    );
   }
 
   const currentRole = serverCookie
     ? JSON.parse(serverCookie.value).roleId
     : null;
+
+  if (currentRole === AGENT_ROLE.PAYMENT_PROCESSOR && pathname === "/") {
+    return NextResponse.redirect(new URL("/entryForm", request.url));
+  }
+
   const isRestrictedRoute = restrictedRoutes[currentRole]?.some((route) =>
     pathname.startsWith(route)
   );

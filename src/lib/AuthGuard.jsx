@@ -1,13 +1,15 @@
 "use client";
 
 import { getCookie } from "cookies-next";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Loading from "../app/components/Loading";
 import getAuthCurrentUser from "../app/utilites/getAuthCurrentUser";
 import { useAgentStore } from "../stores/agentStore";
 import { COOKIE_KEY } from "./constants";
 
 export default function AuthGuard({ children }) {
   const { hasHydrated, setHasHydrated, setAgent } = useAgentStore();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     console.log("AuthGuard mounted");
@@ -17,6 +19,7 @@ export default function AuthGuard({ children }) {
     if (cookie) {
       setAgent(JSON.parse(cookie));
       setHasHydrated(true);
+      setLoading(false);
       return;
     }
 
@@ -27,13 +30,13 @@ export default function AuthGuard({ children }) {
         if (!userId || !email) {
           throw new Error("User ID or email is missing");
         }
+        setLoading(true);
         const res = await fetch("/api/checkAgent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ awsId: userId, email }),
           credentials: "include",
         });
-
         const json = await res.json();
 
         if (!res.ok || !json.success) {
@@ -44,11 +47,15 @@ export default function AuthGuard({ children }) {
         setHasHydrated(true);
       } catch (error) {
         console.error("[AuthGuard] Auth fallback failed:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     callCheckOrCreate();
   }, [hasHydrated]);
+
+  if (loading) return <Loading />;
 
   return <>{children}</>;
 }
