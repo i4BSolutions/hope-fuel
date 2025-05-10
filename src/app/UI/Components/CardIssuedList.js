@@ -28,31 +28,41 @@ const CardsIssuedList = ({ data }) => {
       fetchCards();
     }
   }, [data?.Email, data?.Name]); // Re-fetch data if Email or Name changes
- const formatDate = (dateString) => {
-   const date = new Date(dateString);
-   return date.toLocaleDateString("en-US", {
-     year: "numeric",
-     month: "long", // This converts to the full month name
-     day: "numeric",
-   });
- };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long", // This converts to the full month name
+      day: "numeric",
+    });
+  };
   return (
     <Box sx={{ marginTop: 4 }}>
       <Typography variant="h6">List of Cards Issued</Typography>
-      <Stack direction="row" spacing={2} sx={{ marginTop: 2 }}>
-        {cards.length > 0 ? (
-          cards.map((card, index) => (
-            <CardItem
-              key={index}
-              date={formatDate(card.TransactionDate)}
-              amount={card.Amount.toLocaleString()}
-              currency={card.CurrencyCode}
-            />
-          ))
-        ) : (
-          <Typography>No cards issued for this customer.</Typography>
-        )}
-      </Stack>
+
+      <Box
+        sx={{
+          marginTop: 2,
+          overflowX: "auto",
+          whiteSpace: "nowrap",
+          paddingBottom: 1,
+        }}
+      >
+        <Stack direction="row" spacing={2} sx={{ display: "inline-flex" }}>
+          {cards.length > 0 ? (
+            cards.map((card, index) => (
+              <CardItem
+                key={index}
+                date={formatDate(card.TransactionDate)}
+                amount={card.Amount.toLocaleString()}
+                currency={card.CurrencyCode}
+              />
+            ))
+          ) : (
+            <Typography>No cards issued for this customer.</Typography>
+          )}
+        </Stack>
+      </Box>
     </Box>
   );
 };

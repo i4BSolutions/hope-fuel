@@ -28,6 +28,8 @@ export default function SearchBarForm({ onItemClick }) {
         page: currentPage,
       });
 
+      console.log("Query Params:", queryParams.toString());
+
       const response = await fetch(`/api/searchDB?${queryParams}`);
       if (!response.ok) throw new Error("No item found");
 
