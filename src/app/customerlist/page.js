@@ -44,8 +44,8 @@ const PAGE_SIZE = 10;
 
 const CustomerListPage = () => {
   const theme = useTheme();
-  const { agent } = useAgentStore();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { agent } = useAgentStore();
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
@@ -232,39 +232,12 @@ const CustomerListPage = () => {
 
   const handleSave = useCallback(
     async (data) => {
-      var myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      let raw = JSON.stringify({
-        agentId: agent.id,
-        updates: [
-          {
-            field: "Name",
-            newValue: data.name,
-          },
-          {
-            field: "Email",
-            newValue: data.email,
-          },
-          {
-            field: "UserCountry",
-            newValue: data.country,
-          },
-        ],
-      });
-
-      let requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-
       try {
         const res = await fetch(`/api/customers/${selectedEditId}/edit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            agentId,
+            agentId: agent.id,
             updates: [
               { field: "Name", newValue: data.name },
               { field: "Email", newValue: data.email },
@@ -287,8 +260,9 @@ const CustomerListPage = () => {
         setOpenEditHistoryModal(false);
       }
     },
-    [selectedEditId, agent.id , fetchProfileDetails, selectedProfileId]
+    [selectedEditId, agent.id, fetchProfileDetails, selectedProfileId]
   );
+  console.log(profileDetailData?.cardIssued);
   return (
     <Box
       sx={{
@@ -315,15 +289,6 @@ const CustomerListPage = () => {
         </Grid>
 
         <Grid item xs={12} md={9}>
-          {profileDetailData ? (
-            <UserInfoCard
-              userRole={agent.roleId}
-              data={profileDetailData}
-              isMobile={isMobile}
-              onEdit={handleOpenEditHistoryModal}
-              onViewEditHistory={handleViewEditHistory}
-            />
-          ) : (
           {profileLoading ? (
             <Box
               sx={{
@@ -341,7 +306,7 @@ const CustomerListPage = () => {
           ) : profileDetailData ? (
             <>
               <UserInfoCard
-                userRole={currentUser?.UserRole}
+                userRole={agent.roleId}
                 data={profileDetailData}
                 isMobile={isMobile}
                 onEdit={() => {
