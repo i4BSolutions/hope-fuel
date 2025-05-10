@@ -8,6 +8,7 @@ import {
   ListItem,
   ListItemText,
   IconButton,
+  Dialog,
 } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -15,6 +16,8 @@ import { useDropzone } from "react-dropzone";
 
 const CustomDropzone = ({ handleDrop, uploadProgress, files, onDelete }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: async (acceptedFiles) => {
@@ -25,6 +28,16 @@ const CustomDropzone = ({ handleDrop, uploadProgress, files, onDelete }) => {
     accept: { "image/*": [] },
     multiple: true,
   });
+
+  const handlePreview = (file) => {
+    setSelectedImage(URL.createObjectURL(file));
+    setPreviewOpen(true);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewOpen(false);
+    setSelectedImage(null);
+  };
 
   return (
     <Box sx={{ width: "100%", maxWidth: "450px" }}>
@@ -82,11 +95,37 @@ const CustomDropzone = ({ handleDrop, uploadProgress, files, onDelete }) => {
                 </IconButton>
               }
             >
-              <ListItemText primary={file.name} />
+              <ListItemText
+                primary={
+                  <Typography
+                    onClick={() => handlePreview(file)}
+                    sx={{
+                      cursor: "pointer",
+                      textDecoration: "underline",
+                      color: "blue",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {file.name}
+                  </Typography>
+                }
+              />
             </ListItem>
           ))}
         </List>
       )}
+
+      <Dialog open={previewOpen} onClose={handleClosePreview} maxWidth="md">
+        <Box sx={{ p: 2 }}>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Preview"
+              style={{ maxWidth: "100%", maxHeight: "80vh" }}
+            />
+          )}
+        </Box>
+      </Dialog>
     </Box>
   );
 };
