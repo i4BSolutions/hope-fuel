@@ -173,6 +173,20 @@ const CustomerListPage = () => {
     }
   };
 
+  const fetchCardIssuedByID = async (hopeFuelId) => {
+    try {
+      const res = await fetch(`/api/v1/card-issued/${hopeFuelId}`);
+
+      if (!res.ok)
+        throw new Error(`Failed to fetch card issued HopeFuelID ${hopeFuelId}`);
+      const data = await res.json();
+      return data.data;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  };
+
   const fetchProfileDetails = useCallback(async (id) => {
     if (!id) return;
     setProfileLoading(true);
@@ -183,7 +197,10 @@ const CustomerListPage = () => {
       const subscriptions = customer?.HopeFuelID
         ? await fetchSubscriptionByHopeFuelID(customer.HopeFuelID)
         : [];
-      setProfileDetailData({ ...customer, subscriptions });
+      const cardIssued = customer?.HopeFuelID
+        ? await fetchCardIssuedByID(customer?.HopeFuelID)
+        : [];
+      setProfileDetailData({ ...customer, subscriptions, cardIssued });
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -248,7 +265,7 @@ const CustomerListPage = () => {
     },
     [selectedEditId, agentId, fetchProfileDetails, selectedProfileId]
   );
-
+  console.log(profileDetailData?.cardIssued);
   return (
     <Box
       sx={{
@@ -318,9 +335,15 @@ const CustomerListPage = () => {
                 />
               </Grid>
               <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
-                {mockCards.map((card) => (
+                {profileDetailData?.cardIssued.map((card) => (
                   <Grid item key={card.id}>
-                    <CardDisplay {...card} />
+                    <CardDisplay
+                      hopeFuelID={card.HopeFuelID}
+                      transactionStatus={card.TransactionStatus}
+                      currency={card.CurrencyCode}
+                      amount={card.Amount}
+                      date={card.TransactionDate}
+                    />
                   </Grid>
                 ))}
               </Grid>

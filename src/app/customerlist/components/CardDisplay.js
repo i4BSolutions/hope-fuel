@@ -1,20 +1,26 @@
 import React from "react";
-import { Grid, Card, Typography, Chip, Box, Button } from "@mui/material";
+import { Card, Typography, Chip, Box } from "@mui/material";
+import moment from "moment-timezone";
 
-const CardDisplay = ({ id, name, status }) => {
+const CardDisplay = ({
+  hopeFuelID,
+  transactionStatus,
+  currency,
+  amount,
+  date,
+}) => {
   return (
     <Card
       sx={{
         width: 184,
-        height: 229,
         borderRadius: 2,
-        padding: 0,
         overflow: "visible",
         boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         bgcolor: "#FFFFFF",
+        py: 1,
       }}
     >
       <Box
@@ -23,18 +29,6 @@ const CardDisplay = ({ id, name, status }) => {
           flexDirection: "column",
         }}
       >
-        <Box
-          sx={{
-            width: 160,
-            height: 126,
-            backgroundColor: "#CBD5E1",
-            borderRadius: 2,
-            alignSelf: "center",
-            justifyContent: "center",
-            display: "flex",
-            m: 1,
-          }}
-        />
         <Box
           sx={{
             gap: 1,
@@ -52,7 +46,7 @@ const CardDisplay = ({ id, name, status }) => {
               lineHeight: "20px",
             }}
           >
-            {id}
+            {hopeFuelID}
           </Typography>
           <Typography
             variant="body2"
@@ -61,10 +55,28 @@ const CardDisplay = ({ id, name, status }) => {
               fontSize: "14px",
             }}
           >
-            {name}
+            {currency}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+            }}
+          >
+            {amount}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+            }}
+          >
+            {moment(date).format("YYYY-MM-DD hh:mm")}
           </Typography>
           <Chip
-            label={status}
+            label={transactionStatus ? transactionStatus : "N/A"}
             sx={{
               backgroundColor: "#ffc107",
               color: "#000",
