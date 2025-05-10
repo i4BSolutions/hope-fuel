@@ -39,7 +39,7 @@ export async function POST(req) {
       username: email.split("@")[0],
       email,
     };
-    const token = new SignJWT(payload)
+    const token = await new SignJWT(payload)
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("1d")
       .sign(secret);
@@ -64,7 +64,7 @@ export async function POST(req) {
 
     res.headers.append(
       "Set-Cookie",
-      serialize("hopefuel-client", JSON.stringify(payload), {
+      serialize("hopefuel-client", token, {
         httpOnly: false,
         secure,
         sameSite: "Strict",

@@ -1,6 +1,7 @@
 "use client";
 
 import { getCookie } from "cookies-next";
+import { decodeJwt } from "jose";
 import { useEffect, useState } from "react";
 import Loading from "../app/components/Loading";
 import getAuthCurrentUser from "../app/utilites/getAuthCurrentUser";
@@ -17,7 +18,8 @@ export default function AuthGuard({ children }) {
     console.log("Hydrating from cookie");
     const cookie = getCookie(COOKIE_KEY);
     if (cookie) {
-      setAgent(JSON.parse(cookie));
+      const decoded = decodeJwt(cookie);
+      setAgent(decoded);
       setHasHydrated(true);
       setLoading(false);
       return;
@@ -43,7 +45,8 @@ export default function AuthGuard({ children }) {
           throw new Error(json.error || "Authentication failed");
         }
         const cookie = getCookie(COOKIE_KEY);
-        setAgent(JSON.parse(cookie));
+        const decoded = decodeJwt(cookie);
+        setAgent(decoded);
         setHasHydrated(true);
       } catch (error) {
         console.error("[AuthGuard] Auth fallback failed:", error);
