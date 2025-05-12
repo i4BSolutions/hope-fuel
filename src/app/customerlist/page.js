@@ -11,17 +11,16 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import Sidebar from "./components/Sidebar";
-import UserInfoCard from "./components/UserInfoCard";
-import CardInfo from "./components/CardInfo";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useDebounce } from "use-debounce";
+import { useAgentStore } from "../../stores/agentStore";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import CardDisplay from "./components/CardDisplay";
-import EditHistory from "./components/EditHistory";
+import CardInfo from "./components/CardInfo";
 import CustomerInfoEdit from "./components/CustomerInfoEdit";
-import { useAgent } from "../context/AgentContext";
-import { useUser } from "../context/UserContext";
-import { useDebounce } from "use-debounce";
+import EditHistory from "./components/EditHistory";
+import Sidebar from "./components/Sidebar";
+import UserInfoCard from "./components/UserInfoCard";
 
 const mockCards = [
   {
@@ -46,9 +45,7 @@ const PAGE_SIZE = 10;
 const CustomerListPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const agentId = useAgent();
-  const { setUser, currentUser } = useUser();
-
+  const { agent } = useAgentStore();
   const [searchText, setSearchText] = useState("");
   const [selectedEditId, setSelectedEditId] = useState(null);
   const [selectedProfileId, setSelectedProfileId] = useState(null);
@@ -240,7 +237,7 @@ const CustomerListPage = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            agentId,
+            agentId: agent.id,
             updates: [
               { field: "Name", newValue: data.name },
               { field: "Email", newValue: data.email },
@@ -263,7 +260,7 @@ const CustomerListPage = () => {
         setOpenEditHistoryModal(false);
       }
     },
-    [selectedEditId, agentId, fetchProfileDetails, selectedProfileId]
+    [selectedEditId, agent.id, fetchProfileDetails, selectedProfileId]
   );
   console.log(profileDetailData?.cardIssued);
   return (
@@ -309,7 +306,7 @@ const CustomerListPage = () => {
           ) : profileDetailData ? (
             <>
               <UserInfoCard
-                userRole={currentUser?.UserRole}
+                userRole={agent.roleId}
                 data={profileDetailData}
                 isMobile={isMobile}
                 onEdit={() => {

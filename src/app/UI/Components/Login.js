@@ -1,4 +1,4 @@
-// // components/Login.tsx
+// // components/Login.tsxResponsiveAppBar
 // "use client";
 
 // import { withAuthenticator } from "@aws-amplify/ui-react";

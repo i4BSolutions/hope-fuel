@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import FormStatus from "./components/FormStatus";
-import { HISTORY_DATA } from "../variables/const";
-import { useAgent } from "../context/AgentContext";
 import { Alert, Snackbar } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useAgentStore } from "../../stores/agentStore";
+import FormStatus from "./components/FormStatus";
 
 const FormOpenClosePage = () => {
-  const agentId = useAgent();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formVisibilityData, setFormVisibilityData] = useState([]);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { agent } = useAgentStore();
 
   useEffect(() => {
     const fetchFormStatus = async () => {
@@ -38,7 +37,7 @@ const FormOpenClosePage = () => {
       myHeaders.append("Content-Type", "application/json");
 
       const raw = JSON.stringify({
-        AgentId: agentId,
+        AgentId: agent.id,
         IsFormOpen: newFormStatus,
       });
 

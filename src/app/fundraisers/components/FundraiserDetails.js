@@ -1,17 +1,16 @@
-import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import {
+  Avatar,
   Box,
-  Typography,
-  Paper,
   Divider,
   IconButton,
-  Avatar,
   Link,
-  Grid2,
+  Paper,
+  Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { AGENT_ROLE } from "../../../lib/constants";
 
 const FundraiserDetails = ({
   fundraiserDetails,
@@ -32,7 +31,7 @@ const FundraiserDetails = ({
         m: "auto",
       }}
     >
-      {userRole === "Admin" && (
+      {userRole === AGENT_ROLE.ADMIN && (
         <Box sx={{ p: 1, display: "flex", justifyContent: "space-between" }}>
           <IconButton onClick={() => onClose && onClose()} size="small">
             <CloseIcon />

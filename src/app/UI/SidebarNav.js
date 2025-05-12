@@ -11,7 +11,6 @@ import {
   ListItemText,
   Toolbar,
   Typography,
-  CircularProgress,
 } from "@mui/material";
 import { useState } from "react";
 
@@ -26,115 +25,89 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import SyncAltRoundedIcon from "@mui/icons-material/SyncAltRounded";
 import Divider from "@mui/material/Divider";
 import { signOut } from "aws-amplify/auth";
-import { useUser } from "../context/UserContext";
-
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useAgentStore } from "../../stores/agentStore";
 
 const drawerWidth = 250; // Full-width drawer
 const miniDrawerWidth = 80; // Mini sidebar width
 
+const navItems = {
+  createForm: {
+    text: "အသစ်သွင်းခြင်း",
+    icon: <AddCircleOutlineIcon />,
+    path: "/createForm",
+  },
+  extendUser: {
+    text: "သက်တမ်းတိုးခြင်း",
+    icon: <SyncAltRoundedIcon />,
+    path: "/extendUser",
+  },
+  entryForm: {
+    text: "ငွေစစ်ဆေးခြင်း",
+    icon: <AttachMoneyIcon />,
+    path: "/entryForm",
+  },
+  hopefuelidlist: {
+    text: "HOPEID List",
+    icon: <FormatListBulletedRoundedIcon />,
+    path: "/hopefuelidlist",
+  },
+  customerlist: {
+    text: "Customers List",
+    icon: <PeopleAltOutlinedIcon />,
+    path: "/customerlist",
+  },
+  fundraisers: {
+    text: "Fundraisers",
+    icon: <FlagIcon />,
+    path: "/fundraisers",
+  },
+  adminPanel: {
+    text: "Admin Panel",
+    icon: <ManageAccountsIcon />,
+    path: "/admin-panel",
+  },
+  logout: {
+    text: "Logout",
+    icon: <LogoutIcon />,
+    path: "/logout",
+  },
+};
+
+const roleBasedNavItems = {
+  1: [
+    navItems.createForm,
+    navItems.extendUser,
+    navItems.hopefuelidlist,
+    navItems.customerlist,
+    navItems.fundraisers,
+  ],
+  2: [
+    navItems.createForm,
+    navItems.extendUser,
+    navItems.entryForm,
+    navItems.hopefuelidlist,
+    navItems.customerlist,
+    navItems.fundraisers,
+    navItems.adminPanel,
+  ],
+  3: [navItems.entryForm, navItems.customerlist, navItems.hopefuelidlist],
+};
+
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
   const router = useRouter();
   const pathname = usePathname();
-  const { setUser, currentUser } = useUser();
+  const { agent, setHasHydrated } = useAgentStore();
 
-  // Role-Based Sidebar Navigation
-  const roleBasedNavItems = {
-    Admin: [
-      {
-        text: "အသစ်သွင်းခြင်း",
-        icon: <AddCircleOutlineIcon />,
-        path: "/createForm",
-      },
-      {
-        text: "သက်တမ်းတိုးခြင်း",
-        icon: <SyncAltRoundedIcon />,
-        path: "/extendUser",
-      },
-      // {
-      //   text: "အချက်အလက်ပြင်ဆင်ခြင်း",
-      //   icon: <ModeOutlinedIcon />,
-      //   path: "/fundraisers",
-      // },
-      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
-      {
-        text: "Admin Panel",
-        icon: <ManageAccountsIcon />,
-        path: "/admin-panel",
-      },
-      {
-        text: "HOPEID List",
-        icon: <FormatListBulletedRoundedIcon />,
-        path: "/hopefuelidlist",
-      },
-      {
-        text: "Customers List",
-        icon: <PeopleAltOutlinedIcon />,
-        path: "/customerlist",
-      },
-      {
-        text: "Fundraisers",
-        icon: <FlagIcon />,
-        path: "/fundraisers",
-      },
-    ],
-    "Support Agent": [
-      {
-        text: "အသစ်သွင်းခြင်း",
-        icon: <AddCircleOutlineIcon />,
-        path: "/createForm",
-      },
-      { text: "ငွေစစ်ဆေးခြင်း", icon: <AttachMoneyIcon />, path: "/entryForm" },
-      {
-        text: "သက်တမ်းတိုးခြင်း",
-        icon: <SyncAltRoundedIcon />,
-        path: "/extendUser",
-      },
-      {
-        text: "HOPEID List",
-        icon: <FormatListBulletedRoundedIcon />,
-        path: "/hopefuelidlist",
-      },
-      {
-        text: "Customers List",
-        icon: <PeopleAltOutlinedIcon />,
-        path: "/customerlist",
-      },
-      {
-        text: "Fundraisers",
-        icon: <FlagIcon />,
-        path: "/fundraisers/",
-      },
-    ],
-    "Payment Processor": [
-      {
-        text: "အသစ်သွင်းခြင်း",
-        icon: <AddCircleOutlineIcon />,
-        path: "/createForm",
-      },
-      {
-        text: "သက်တမ်းတိုးခြင်း",
-        icon: <SyncAltRoundedIcon />,
-        path: "/extendUser",
-      },
-      {
-        text: "ငွေစစ်ဆေးခြင်း",
-        icon: <AttachMoneyIcon />,
-        path: "/entryForm",
-      },
-      {
-        text: "Customers List",
-        icon: <PeopleAltOutlinedIcon />,
-        path: "/customerlist",
-      },
-    ],
-  };
-
-  // Get menu items based on `currentUser.UserRole`
-  const menuItems = currentUser?.UserRole
-    ? roleBasedNavItems[currentUser.UserRole] || []
-    : [];
+  useEffect(() => {
+    if (agent) {
+      const roleBasedMenuItems = roleBasedNavItems[agent.roleId] || [];
+      setMenuItems(roleBasedMenuItems);
+    }
+  }, [agent]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -222,10 +195,10 @@ const Sidebar = () => {
         <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => {
-                signOut({ global: true });
-                setUser(null);
-                router.push("/");
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                await signOut({ global: true });
+                setHasHydrated(false);
               }}
               sx={{
                 marginX: "15px",
@@ -342,10 +315,10 @@ const Sidebar = () => {
         <Box sx={{ mt: "auto", mb: 2 }}>
           <ListItem disablePadding>
             <ListItemButton
-              onClick={() => {
-                signOut({ global: true });
-                setUser(null);
-                router.push("/");
+              onClick={async () => {
+                await fetch("/api/auth/logout", { method: "POST" });
+                await signOut({ global: true });
+                setHasHydrated(false);
               }}
               sx={{
                 marginX: "15px",

@@ -1,63 +1,83 @@
+import { serialize } from "cookie";
+import { SignJWT } from "jose";
 import { NextResponse } from "next/server";
-import db from "../../utilites/db";
+import prisma from "../../utilites/prisma";
 
 export const dynamic = "force-dynamic";
-async function checkExistedAgent(awsId) {
-  const query = `
- SELECT 
-  (
-    SELECT 1
-    FROM Agent
-    WHERE AWSID = ?
-  ) AS AgentExists,
-  a.AgentID, 
-  a.AWSID, 
-  a.UserRoleID, 
-  ur.UserRole
-FROM Agent a
-JOIN UserRole ur ON a.UserRoleID = ur.UserRoleID
-WHERE a.AWSID = ?;
-  `;
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-  const values = [awsId,awsId];
+export async function POST(req) {
   try {
-    const result = await db(query, values);
-   // console.log("Agent exists:", result);
-    return result; 
-  } catch (error) {
-    console.error("[DB] Error checking agentDB:", error);
-    throw error;
-  }
-}
+    const { awsId, email } = await req.json();
 
-export async function GET(req) {
-  try {
-   
-    const url = new URL(req.url); 
-    const awsId = url.searchParams.get("awsId");
-   // console.log("AWSID being queried:", awsId);
-
-    if (!awsId) {
+    if (!awsId || !email) {
       return NextResponse.json(
-        { error: "Missing awsId query parameter" },
+        { error: "Missing awsId or email in request body" },
         { status: 400 }
       );
     }
 
-    const data = await checkExistedAgent(awsId);
-   // console.log("Data from CheckAgent:", data); // Log the entire data array
+    let agent = await prisma.agent.findFirst({
+      where: { AwsId: awsId },
+      include: { UserRole: true },
+    });
 
-    if (data.length === 0 || data[0].AgentExists === 0) {
-      return NextResponse.json(
-        { message: "User does not exist", code: 0 },
-        { status: 404 }
-      );
+    if (!agent) {
+      agent = await prisma.agent.create({
+        data: {
+          AwsId: awsId,
+          UserRoleId: 1,
+        },
+        include: { UserRole: true },
+      });
     }
-    return NextResponse.json({ message: "User exists", code: 1, user: data[0] });
+
+    const payload = {
+      id: agent.AgentId,
+      awsId: agent.AwsId,
+      roleId: agent.UserRoleId,
+      username: email.split("@")[0],
+      email,
+    };
+    const token = await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1d")
+      .sign(secret);
+
+    const secure = process.env.NODE_ENV === "production";
+
+    const res = NextResponse.json(
+      { success: true, message: "Agent authenticated successfully" },
+      { status: 200 }
+    );
+
+    res.headers.append(
+      "Set-Cookie",
+      serialize("hopefuel-server", token, {
+        httpOnly: true,
+        secure,
+        sameSite: "Strict",
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      })
+    );
+
+    res.headers.append(
+      "Set-Cookie",
+      serialize("hopefuel-client", token, {
+        httpOnly: false,
+        secure,
+        sameSite: "Strict",
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      })
+    );
+
+    return res;
   } catch (error) {
-    console.error("[Error] Cannot load existing agentUser", error);
+    console.error("[check-or-create-agent] Error:", error);
     return NextResponse.json(
-      { error: "Cannot load existing agentUser" },
+      { error: "Internal Server Error" },
       { status: 500 }
     );
   }

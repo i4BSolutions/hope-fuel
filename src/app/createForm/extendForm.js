@@ -2,12 +2,9 @@
 
 import { Box, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { useAgent } from "../context/AgentContext";
-import { useUser } from "../context/UserContext";
-
 import filehandler from "../utilites/createForm/fileHandler";
 import extendFormSubmit from "../utilites/extendForm/extendFormSubmit";
-
+import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
 import CustomDropzone from "../components/Dropzone";
 import CustomInput from "../components/Input";
@@ -16,10 +13,7 @@ import ErrorMessage from "./components/errorMessage";
 import { remove } from "aws-amplify/storage";
 
 const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
-  const user = useUser();
-  const agent = useAgent();
-
-  const formFillingPerson = user?.email || "Unknown User";
+  const { agent } = useAgentStore();
 
   // Form Fields
   const [currency, setCurrency] = useState("");
@@ -327,13 +321,13 @@ const ExtendForm = ({ userInfo, setloading, onSuccess }) => {
         files,
         userInfo,
         setloading,
-        formFillingPerson,
+        agent.email,
         setAmountValidate,
         setMonthValidate,
         setManyChatValidate,
         fileExist,
         setFileExist,
-        agent,
+        agent.id,
         contactLink,
         notes,
         manyChatId,

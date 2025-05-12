@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   Alert,
@@ -16,23 +16,23 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers-pro/AdapterDayjs";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers-pro/LocalizationProvider";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import moment from "moment-timezone";
 import CustomButton from "../../components/Button";
 import TransactionList from "../../UI/Components/TransactionList";
 import TransactionHistoryList from "../../UI/Components/TransactionsHistoryList";
-import CloseIcon from "@mui/icons-material/Close";
-import CheckIcon from "@mui/icons-material/Check";
 import csvHandler from "../../utilites/exportCSV/csvHandler";
 
-import { useAgent } from "../../context/AgentContext";
+import { useAgentStore } from "../../../stores/agentStore";
 
 const ExportCSVPage = () => {
-  const agent = useAgent();
+  const { agent } = useAgentStore();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -243,7 +243,7 @@ const ExportCSVPage = () => {
 
       // Save the CSV export transaction log to the database
       const requestBody = {
-        AgentId: agent,
+        AgentId: agent.id,
         CSVExportTransactionDateTime: new Date(),
         CSVExportTransactionFileName: uploadedUrl,
       };

@@ -1,11 +1,11 @@
+import { Button, Stack, Typography } from "@mui/material";
 import React from "react";
-import { Stack, Button, Typography } from "@mui/material";
-import { useAgent } from "../../context/AgentContext";
+import { useAgentStore } from "../../../stores/agentStore";
 
 const ActionButtons = ({ data, onActionComplete }) => {
   const [loading, setLoading] = React.useState(false);
   const [confirmDenyFlag, setConfirmDenyFlag] = React.useState(null);
-  const agentId = useAgent();
+  const { agent } = useAgentStore();
 
   if (!data || !data.HopeFuelID) {
     console.error("Invalid data passed to ActionButtons:", data);
@@ -16,7 +16,7 @@ const ActionButtons = ({ data, onActionComplete }) => {
     setLoading(true);
     const payload = {
       transactionId: data.TransactionID,
-      agentId: agentId,
+      agentId: agent.id,
     };
 
     try {
@@ -38,7 +38,7 @@ const ActionButtons = ({ data, onActionComplete }) => {
 
     const payload = {
       transactionId: data.TransactionID,
-      agentId: agentId,
+      agentId: agent.id,
     };
 
     try {
