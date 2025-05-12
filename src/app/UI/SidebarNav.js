@@ -199,6 +199,7 @@ const Sidebar = () => {
                 await fetch("/api/auth/logout", { method: "POST" });
                 await signOut({ global: true });
                 setHasHydrated(false);
+                router.push("/");
               }}
               sx={{
                 marginX: "15px",
@@ -319,6 +320,7 @@ const Sidebar = () => {
                 await fetch("/api/auth/logout", { method: "POST" });
                 await signOut({ global: true });
                 setHasHydrated(false);
+                router.push("/");
               }}
               sx={{
                 marginX: "15px",
