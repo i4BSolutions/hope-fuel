@@ -8,15 +8,22 @@ const restrictedRoutes = {
   2: [],
   3: ["/createForm", "/extendForm", "/fundraisers", "/admin-panel"],
 };
-
 const publicApiRoutes = ["/checkAgent"];
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export function middleware(request) {
+export async function middleware(request) {
   const serverCookie = cookies().get("hopefuel-server");
-  const verifiedToken = serverCookie
-    ? jwtVerify(serverCookie.value, JWT_SECRET)
-    : null;
+
+  let verifiedToken = null;
+
+  if (serverCookie) {
+    try {
+      verifiedToken = await jwtVerify(serverCookie.value, JWT_SECRET);
+    } catch (error) {
+      console.error("JWT verification failed:", error);
+    }
+  }
+
   const pathname = request.nextUrl.pathname;
 
   const isPublicApi = publicApiRoutes.some((route) =>
@@ -25,12 +32,12 @@ export function middleware(request) {
 
   if (pathname.startsWith("/api/") && !isPublicApi && !verifiedToken) {
     return NextResponse.json(
-      { message: "Agent not authorized" },
+      { message: "Agent not authenticated" },
       { status: 401 }
     );
   }
 
-  const currentRole = verifiedToken ? verifiedToken.roleId : null;
+  const currentRole = verifiedToken ? verifiedToken.payload.roleId : null;
 
   if (currentRole === AGENT_ROLE.PAYMENT_PROCESSOR && pathname === "/") {
     return NextResponse.redirect(new URL("/entryForm", request.url));
