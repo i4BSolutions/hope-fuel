@@ -5,18 +5,19 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Box, Modal, TextField, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect, useState } from "react";
+import { AGENT_ROLE } from "../../lib/constants";
+import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
-import { useUser } from "../context/UserContext";
 import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import checkUserSubmit from "../utilites/checkUserSubmit";
 
-export default function CheckUser({ onUserCheck, UserRole }) {
+export default function CheckUser({ onUserCheck }) {
   const [loading, setLoading] = useState(false);
   const [hasPermissionThisMonth, sethasPermissionThisMonth] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(null);
   const [error, setError] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const { currentUser } = useUser();
+  const { agent } = useAgentStore();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -42,13 +43,9 @@ export default function CheckUser({ onUserCheck, UserRole }) {
     setLoading(true);
 
     const formData = new FormData(event.currentTarget);
-    const userRole = currentUser["UserRole"];
-
-    // const { username, userId, signInDetails } = await getCurrentUser();
     const name = formData.get("name").trim();
     const email = formData.get("email").trim();
-
-    const user = await checkUserSubmit(name, email, userRole);
+    const user = await checkUserSubmit(name, email);
 
     // // check if the user has permission
     var myHeaders = new Headers();
@@ -68,8 +65,7 @@ export default function CheckUser({ onUserCheck, UserRole }) {
 
     let bool = true;
 
-    // if user is an admin
-    if (userRole !== "Admin") {
+    if (agent.roleId !== AGENT_ROLE.ADMIN) {
       let response = await fetch(
         "/api/checkolduserpermission/",
         requestOptions
@@ -89,7 +85,6 @@ export default function CheckUser({ onUserCheck, UserRole }) {
       // if user don't exist
       onUserCheck({ name, email }, false); // New user, show CreateForm
     }
-
     setLoading(false);
   };
 
@@ -107,6 +102,10 @@ export default function CheckUser({ onUserCheck, UserRole }) {
       </Box>
     );
 
+  if (isFormOpen === false && agent.roleId !== AGENT_ROLE.ADMIN) {
+    return <ServiceUnavailable />;
+  }
+
   return (
     <>
       <Typography
@@ -118,71 +117,66 @@ export default function CheckUser({ onUserCheck, UserRole }) {
       >
         Customer Membership Registration
       </Typography>
-      {(currentUser && isFormOpen) ||
-      (currentUser && currentUser.UserRole === "Admin") ? (
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ width: 360, mx: "auto", mt: 4 }}
-        >
-          <Typography sx={{ fontSize: "12px" }}>
-            Name <span style={{ color: "red" }}>*</span>
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Mg Mg"
-            sx={{
-              mb: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                height: "48px",
-              },
-              "& .MuiInputBase-input": {
-                height: "100%",
-                padding: "0px 0px 0px 12px",
-              },
-            }}
-            name="name"
-            id="name"
-            type="text"
-            required
-          />
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ width: 360, mx: "auto", mt: 4 }}
+      >
+        <Typography sx={{ fontSize: "12px" }}>
+          Name <span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Mg Mg"
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              height: "48px",
+            },
+            "& .MuiInputBase-input": {
+              height: "100%",
+              padding: "0px 0px 0px 12px",
+            },
+          }}
+          name="name"
+          id="name"
+          type="text"
+          required
+        />
 
-          <Typography sx={{ fontSize: "12px" }}>
-            Email <span style={{ color: "red" }}>*</span>
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="mgmg@gmail.com"
-            sx={{
-              mb: 4,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                height: "48px",
-              },
-              "& .MuiInputBase-input": {
-                height: "100%",
-                padding: "0px 0px 0px 12px",
-              },
-            }}
-            name="email"
-            id="email"
-            type="email"
-            required
-          />
+        <Typography sx={{ fontSize: "12px" }}>
+          Email <span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="mgmg@gmail.com"
+          sx={{
+            mb: 4,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              height: "48px",
+            },
+            "& .MuiInputBase-input": {
+              height: "100%",
+              padding: "0px 0px 0px 12px",
+            },
+          }}
+          name="email"
+          id="email"
+          type="email"
+          required
+        />
 
-          <CustomButton
-            width={true}
-            variant="contained"
-            type="submit"
-            text="Check"
-          />
-        </Box>
-      ) : currentUser && !isFormOpen ? (
-        <ServiceUnavailable />
-      ) : null}
+        <CustomButton
+          width={true}
+          variant="contained"
+          type="submit"
+          text="Check"
+        />
+      </Box>
 
       {hasPermissionThisMonth == false && (
         <Modal

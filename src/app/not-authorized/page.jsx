@@ -1,14 +1,14 @@
 import HttpsIcon from "@mui/icons-material/Https";
 import { Box, Container, Paper, Typography } from "@mui/material";
 
-const ServiceUnavailable = () => {
+export default function NotAuthorizedPage() {
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "80vh",
+        minHeight: "90vh",
       }}
     >
       <Container maxWidth="sm">
@@ -19,6 +19,7 @@ const ServiceUnavailable = () => {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            gap: 2,
             textAlign: "center",
           }}
         >
@@ -37,19 +38,7 @@ const ServiceUnavailable = () => {
               lineHeight: "56px",
             }}
           >
-            Service Temporarily
-          </Typography>
-
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              fontWeight: 700,
-              fontSize: "48px",
-              lineHeight: "56px",
-            }}
-          >
-            Unavailable.
+            Service Unavailable.
           </Typography>
 
           <Typography
@@ -59,12 +48,10 @@ const ServiceUnavailable = () => {
               lineHeight: "28px",
             }}
           >
-            We'll be right back!
+            Agent not authorized.
           </Typography>
         </Paper>
       </Container>
     </Box>
   );
-};
-
-export default ServiceUnavailable;
+}
