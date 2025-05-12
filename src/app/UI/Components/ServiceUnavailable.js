@@ -1,6 +1,5 @@
-import { Box, Container, Paper, Typography } from "@mui/material";
 import HttpsIcon from "@mui/icons-material/Https";
-import React from "react";
+import { Box, Container, Paper, Typography } from "@mui/material";
 
 const ServiceUnavailable = () => {
   return (
@@ -9,7 +8,7 @@ const ServiceUnavailable = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "90vh",
+        minHeight: "80vh",
       }}
     >
       <Container maxWidth="sm">

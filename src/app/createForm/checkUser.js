@@ -102,6 +102,10 @@ export default function CheckUser({ onUserCheck }) {
       </Box>
     );
 
+  if (isFormOpen === false && agent.roleId !== AGENT_ROLE.ADMIN) {
+    return <ServiceUnavailable />;
+  }
+
   return (
     <>
       <Typography
@@ -113,70 +117,66 @@ export default function CheckUser({ onUserCheck }) {
       >
         Customer Membership Registration
       </Typography>
-      {isFormOpen || agent.roleId === 2 ? (
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{ width: 360, mx: "auto", mt: 4 }}
-        >
-          <Typography sx={{ fontSize: "12px" }}>
-            Name <span style={{ color: "red" }}>*</span>
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Mg Mg"
-            sx={{
-              mb: 2,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                height: "48px",
-              },
-              "& .MuiInputBase-input": {
-                height: "100%",
-                padding: "0px 0px 0px 12px",
-              },
-            }}
-            name="name"
-            id="name"
-            type="text"
-            required
-          />
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ width: 360, mx: "auto", mt: 4 }}
+      >
+        <Typography sx={{ fontSize: "12px" }}>
+          Name <span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Mg Mg"
+          sx={{
+            mb: 2,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              height: "48px",
+            },
+            "& .MuiInputBase-input": {
+              height: "100%",
+              padding: "0px 0px 0px 12px",
+            },
+          }}
+          name="name"
+          id="name"
+          type="text"
+          required
+        />
 
-          <Typography sx={{ fontSize: "12px" }}>
-            Email <span style={{ color: "red" }}>*</span>
-          </Typography>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="mgmg@gmail.com"
-            sx={{
-              mb: 4,
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "12px",
-                height: "48px",
-              },
-              "& .MuiInputBase-input": {
-                height: "100%",
-                padding: "0px 0px 0px 12px",
-              },
-            }}
-            name="email"
-            id="email"
-            type="email"
-            required
-          />
+        <Typography sx={{ fontSize: "12px" }}>
+          Email <span style={{ color: "red" }}>*</span>
+        </Typography>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="mgmg@gmail.com"
+          sx={{
+            mb: 4,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "12px",
+              height: "48px",
+            },
+            "& .MuiInputBase-input": {
+              height: "100%",
+              padding: "0px 0px 0px 12px",
+            },
+          }}
+          name="email"
+          id="email"
+          type="email"
+          required
+        />
 
-          <CustomButton
-            width={true}
-            variant="contained"
-            type="submit"
-            text="Check"
-          />
-        </Box>
-      ) : !isFormOpen ? (
-        <ServiceUnavailable />
-      ) : null}
+        <CustomButton
+          width={true}
+          variant="contained"
+          type="submit"
+          text="Check"
+        />
+      </Box>
 
       {hasPermissionThisMonth == false && (
         <Modal
