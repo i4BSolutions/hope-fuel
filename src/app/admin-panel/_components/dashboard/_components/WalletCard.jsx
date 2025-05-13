@@ -1,39 +1,28 @@
 import {
   Card,
+  Grid2,
   CardContent,
   Typography,
-  Grid2,
   Box,
   Divider,
 } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import { Doughnut } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
+import { Gauge } from "@mui/x-charts/Gauge";
 
 export default function WalletCard({ name, checked, pending, amount }) {
   const total = checked + pending;
-
-  const data = {
-    labels: ["Checked", "Pending"],
-    datasets: [
-      {
-        data: [checked, pending],
-        backgroundColor: ["#00B074", "#C8F0DF"],
-        borderWidth: 0,
-      },
-    ],
-  };
+  const percentage = total === 0 ? 0 : Math.round((checked / total) * 100);
 
   return (
     <Card sx={{ borderRadius: 3, width: 255 }}>
       <CardContent>
+        {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">{name}</Typography>
           <AccountBalanceWalletIcon />
         </Box>
 
+        {/* Gauge Chart */}
         <Box
           mt={2}
           mb={2}
@@ -41,28 +30,32 @@ export default function WalletCard({ name, checked, pending, amount }) {
           flexDirection="column"
           alignItems="center"
         >
-          <Box sx={{ width: 100, height: 100 }}>
-            <Doughnut
-              data={data}
-              options={{
-                cutout: "70%",
-                plugins: {
-                  legend: { display: false },
-                },
-              }}
-            />
-            <Box
-              sx={{
-                transform: "translate(0%, -135%)",
-                textAlign: "center",
-              }}
-            >
-              <Typography variant="subtitle2">Total</Typography>
-              <Typography variant="h6">{total}</Typography>
-            </Box>
-          </Box>
+          <Gauge
+            width={180}
+            height={180}
+            value={percentage}
+            valueMin={0}
+            valueMax={total}
+            innerRadius="70%"
+            text={() => `Total\n${total}`}
+            sx={{
+              [`& .MuiGauge-valueText`]: {
+                whiteSpace: "pre-line",
+                textAnchor: "middle",
+                dominantBaseline: "middle",
+                fontSize: "1rem",
+              },
+              [`& .MuiGauge-valueArc`]: {
+                fill: "#00B074",
+              },
+              [`& .MuiGauge-referenceArc`]: {
+                fill: "#C8F0DF",
+              },
+            }}
+          />
         </Box>
 
+        {/* Checked / Pending Breakdown */}
         <Grid2
           container
           spacing={1}
@@ -98,8 +91,8 @@ export default function WalletCard({ name, checked, pending, amount }) {
           </Grid2>
         </Grid2>
 
+        {/* Checked Amount */}
         <Divider sx={{ my: 2 }} />
-
         <Box display="flex" alignItems="center" gap={1}>
           <Box flex={1}>
             <Typography variant="body2">Checked Amount</Typography>

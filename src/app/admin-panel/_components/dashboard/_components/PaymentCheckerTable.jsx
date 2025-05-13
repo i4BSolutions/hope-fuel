@@ -37,6 +37,22 @@ const checkers = [
     avgTime: "N/A",
     over48Percent: "10%",
   },
+  {
+    name: "Mya Mya",
+    checked: 100,
+    pending: 500,
+    wallets: ["Wallet F(200)", "Wallet G(200)", "Wallet H(200)"],
+    avgTime: "N/A",
+    over48Percent: "10%",
+  },
+  {
+    name: "Mya Mya",
+    checked: 100,
+    pending: 500,
+    wallets: ["Wallet F(200)", "Wallet G(200)", "Wallet H(200)"],
+    avgTime: "N/A",
+    over48Percent: "10%",
+  },
 ];
 
 export default function PaymentCheckerTable() {
@@ -56,8 +72,11 @@ export default function PaymentCheckerTable() {
 
   return (
     <>
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: "none", border: "1px solid #E0E0E0" }}
+      >
+        <Table sx={{ borderCollapse: "separate", borderSpacing: 0 }}>
           <TableHead>
             <TableRow>
               <TableCell>
@@ -72,13 +91,17 @@ export default function PaymentCheckerTable() {
           </TableHead>
           <TableBody>
             {checkers.map((checker, index) => (
-              <TableRow key={index}>
-                <TableCell>
+              <TableRow key={index} sx={{ borderBottom: "none" }}>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
                   {index + 1}. {checker.name}
                 </TableCell>
-                <TableCell>{checker.checked}</TableCell>
-                <TableCell>{checker.pending}</TableCell>
-                <TableCell>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
+                  {checker.checked}
+                </TableCell>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
+                  {checker.pending}
+                </TableCell>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
                   {checker.wallets.slice(0, 1).join(", ")}...
                   <Button
                     size="small"
@@ -94,8 +117,12 @@ export default function PaymentCheckerTable() {
                     View All
                   </Button>
                 </TableCell>
-                <TableCell>{checker.avgTime}</TableCell>
-                <TableCell>{checker.over48Percent}</TableCell>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
+                  {checker.avgTime}
+                </TableCell>
+                <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
+                  {checker.over48Percent}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
