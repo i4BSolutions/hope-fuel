@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Typography, Divider, Button, Paper, Box } from "@mui/material";
+import { Box, Button, Divider, Paper, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
-import CustomInput from "../../components/Input";
+import CustomInput from "../../../components/Input";
 
 export default function ExchangeRates() {
   const [rates, setRates] = useState([]);

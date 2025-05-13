@@ -2,8 +2,8 @@
 
 import { Alert, Snackbar } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useAgentStore } from "../../stores/agentStore";
-import FormStatus from "./components/FormStatus";
+import { useAgentStore } from "../../../../stores/agentStore";
+import FormStatus from "./FormStatus";
 
 const FormOpenClosePage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
