@@ -81,7 +81,6 @@ const Sidebar = ({
                       backgroundColor: "action.hover",
                       cursor: "pointer",
                     },
-                    // Ensure the first item is visually distinct when none are selected
                     ...(index === 0 && !selectedProfileId && !hoveredProfileId
                       ? {
                           borderLeft: "4px solid",
