@@ -1,32 +1,34 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
-  Typography,
-  TextField,
-  Card,
-  Stack,
-  FormControl,
-  Divider,
   Button,
-  Chip,
+  Card,
+  Divider,
+  FormControl,
   Modal,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useState } from "react";
+import { AGENT_ROLE } from "../../../lib/constants";
+import { useAgentStore } from "../../../stores/agentStore";
 import ActionButtons from "../../UI/Components/ActionButton";
 import AmountDetails from "../../UI/Components/AmountDetails";
 import CardsIssuedList from "../../UI/Components/CardIssuedList";
 import CreatorInfo from "../../UI/Components/CreatorInfo";
+import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
 import SupportRegion from "../../UI/Components/SupportRegion";
 import UserInfo from "../../UI/Components/UserInfo";
-import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
 
 export default function PaymentDetails({ data, clearHopeFuelID }) {
   const [status, setStatus] = useState(1);
   const [note, setNote] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const { agent } = useAgentStore();
 
   // Fetch data based on HopeFuelID
   async function handleNoteSave() {
@@ -108,48 +110,43 @@ export default function PaymentDetails({ data, clearHopeFuelID }) {
                 <Card variant="outlined" sx={{ padding: 2 }}>
                   <CreatorInfo creator={data} />
                 </Card>
+                {agent.roleId !== AGENT_ROLE.SUPPORT_AGENT && (
+                  <>
+                    <Stack spacing={2}>
+                      <TextField
+                        fullWidth
+                        label="Note"
+                        multiline
+                        rows={3}
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        disabled={!isEditing}
+                        sx={{ marginBottom: 2 }}
+                      />
 
-                <Stack spacing={2}>
-                  <TextField
-                    fullWidth
-                    label="Note"
-                    multiline
-                    rows={3}
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    disabled={!isEditing} // Disable text field when not editing
-                    sx={{ marginBottom: 2 }}
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={
-                      isEditing ? handleNoteSave : () => setIsEditing(true)
-                    }
-                  >
-                    {isEditing ? "Save" : "Edit"}
-                  </Button>
-                </Stack>
-                <Chip
-                  label={`${data.TransactionStatus} `}
-                  sx={{
-                    backgroundColor: "#ffd700",
-                    color: "#000",
-                    fontWeight: "bold",
-                    padding: "4px 8px",
-                  }}
-                />
-                <FormControl fullWidth>
-                  <ActionButtons
-                    data={{
-                      HopeFuelID: data.HopeFuelID,
-                      Note: note,
-                      Status: status,
-                      AgentId: data.AgentId,
-                      TransactionID: data.TransactionID,
-                    }}
-                    onActionComplete={() => setIsSuccessModalOpen(true)}
-                  />
-                </FormControl>
+                      <Button
+                        variant="contained"
+                        onClick={
+                          isEditing ? handleNoteSave : () => setIsEditing(true)
+                        }
+                      >
+                        {isEditing ? "Save" : "Edit"}
+                      </Button>
+                    </Stack>
+                    <FormControl fullWidth>
+                      <ActionButtons
+                        data={{
+                          HopeFuelID: data.HopeFuelID,
+                          Note: note,
+                          Status: status,
+                          AgentId: data.AgentId,
+                          TransactionID: data.TransactionID,
+                        }}
+                        onActionComplete={() => setIsSuccessModalOpen(true)}
+                      />
+                    </FormControl>
+                  </>
+                )}
               </Stack>
             </Stack>
 
