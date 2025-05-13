@@ -14,7 +14,15 @@ export default function WalletCard({ name, checked, pending, amount }) {
   const percentage = total === 0 ? 0 : Math.round((checked / total) * 100);
 
   return (
-    <Card sx={{ borderRadius: 3, width: "100%", height: "100%" }}>
+    <Card
+      sx={{
+        width: "100%",
+        height: "100%",
+        boxShadow: "none",
+        borderRadius: 6,
+        border: "1px solid #E0E0E0",
+      }}
+    >
       <CardContent>
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
