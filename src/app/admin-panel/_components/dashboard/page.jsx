@@ -1,10 +1,13 @@
+"use client";
+
 import { Box, Typography } from "@mui/material";
 import dayjs from "dayjs";
-import { Suspense, useState } from "react";
-import CustomerStats from "../_components/CustomerStats";
-import MonthYearPicker from "../_components/MonthYearPicker";
-import PaymentCheckerStats from "../_components/PaymentCheckerStats";
-import SupportAgentStats from "../_components/SupportAgentStats";
+import { useState } from "react";
+import CustomerStats from "./CustomerStats";
+import HopefuelIdStats from "./HopefuelIdStats";
+import MonthYearPicker from "./MonthYearPicker";
+import PaymentCheckerStats from "./PaymentCheckerStats";
+import SupportAgentStats from "./SupportAgentStats";
 
 export default function Dashboard() {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
@@ -30,19 +33,14 @@ export default function Dashboard() {
           handleMonthChange={handleMonthChange}
         />
       </Box>
-      <Typography>Welcome to the admin panel dashboard!</Typography>
 
-      <Suspense fallback={<Loading />}>
-        <CustomerStats currentMonth={currentMonth} />
-      </Suspense>
+      <CustomerStats currentMonth={currentMonth} />
 
-      <Suspense fallback={<div>Loading...</div>}>
-        <SupportAgentStats currentMonth={currentMonth} />
-      </Suspense>
+      <HopefuelIdStats currentMonth={currentMonth} />
 
-      <Suspense>
-        <PaymentCheckerStats currentMonth={currentMonth} />
-      </Suspense>
+      <SupportAgentStats currentMonth={currentMonth} />
+
+      <PaymentCheckerStats currentMonth={currentMonth} />
     </Box>
   );
 }
