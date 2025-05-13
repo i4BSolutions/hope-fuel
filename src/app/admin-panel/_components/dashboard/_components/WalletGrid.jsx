@@ -1,4 +1,4 @@
-import { Grid2, Box } from "@mui/material";
+import { Box } from "@mui/material";
 import WalletCard from "./WalletCard";
 
 const dummyData = [
@@ -12,13 +12,28 @@ const dummyData = [
 export default function WalletGrid() {
   return (
     <Box sx={{ width: "100%" }}>
-      <Grid2 container spacing={2} sx={{ justifyContent: "space-between" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "flex-start",
+          gap: 2,
+        }}
+      >
         {dummyData.map((wallet, index) => (
-          <Grid2 item xs={12} sm={6} md={4} lg={2.4} key={index}>
+          <Box
+            key={index}
+            sx={{
+              width: "19%",
+              minWidth: "200px",
+              boxSizing: "border-box",
+              flexShrink: 0,
+            }}
+          >
             <WalletCard {...wallet} />
-          </Grid2>
+          </Box>
         ))}
-      </Grid2>
+      </Box>
     </Box>
   );
 }

@@ -14,15 +14,15 @@ export default function PaymentCheckerStats({ currentMonth }) {
         sx={{
           mt: 1,
           display: "flex",
-          flexDirection: "row",
+          flexWrap: "wrap",
           gap: 2,
           width: "100%",
         }}
       >
-        <Box flex={2} sx={{ width: 250 }}>
+        <Box sx={{ flex: 1, minWidth: 250 }}>
           <PaymentStatsCard checked={300} pending={500} />
         </Box>
-        <Box flex={10} sx={{ width: "100%" }}>
+        <Box sx={{ flex: 3, minWidth: "300px" }}>
           <PaymentCheckerTable />
         </Box>
       </Box>

@@ -74,19 +74,36 @@ export default function PaymentCheckerTable() {
     <>
       <TableContainer
         component={Paper}
-        sx={{ borderRadius: 2, boxShadow: "none", border: "1px solid #E0E0E0" }}
+        sx={{
+          borderRadius: 6,
+          boxShadow: "none",
+          border: "1px solid #E0E0E0",
+          overflowX: "auto",
+        }}
       >
         <Table sx={{ borderCollapse: "separate", borderSpacing: 0 }}>
           <TableHead>
-            <TableRow>
-              <TableCell>
-                <b>Name</b>
+            <TableRow
+              sx={{ paddingTop: 1, paddingBottom: 1, textAlign: "left" }}
+            >
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Name
               </TableCell>
-              <TableCell>Payment Checked</TableCell>
-              <TableCell>Payment Check Pending</TableCell>
-              <TableCell>Wallets Assigned</TableCell>
-              <TableCell>Average Time to Complete</TableCell>
-              <TableCell>Over 48 Hrs</TableCell>
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Payment <br /> Checked
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Payment Check <br /> Pending
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Wallets <br /> Assigned
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Average Time <br /> to Complete
+              </TableCell>
+              <TableCell sx={{ fontWeight: "bold", verticalAlign: "top" }}>
+                Over <br /> 48 Hrs
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -105,12 +122,15 @@ export default function PaymentCheckerTable() {
                   {checker.wallets.slice(0, 1).join(", ")}...
                   <Button
                     size="small"
-                    variant="outlined"
+                    variant="contained"
                     sx={{
                       ml: 1,
                       fontSize: "0.75rem",
                       textTransform: "none",
-                      borderRadius: 2,
+                      borderRadius: 4,
+                      backgroundColor: "#E2E8F0",
+                      color: "#000",
+                      fontWeight: "bold",
                     }}
                     onClick={(e) => handleClick(e, checker.wallets)}
                   >

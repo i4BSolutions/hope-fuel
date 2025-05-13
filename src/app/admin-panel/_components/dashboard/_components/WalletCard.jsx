@@ -14,21 +14,25 @@ export default function WalletCard({ name, checked, pending, amount }) {
   const percentage = total === 0 ? 0 : Math.round((checked / total) * 100);
 
   return (
-    <Card sx={{ borderRadius: 3, width: 255 }}>
+    <Card sx={{ borderRadius: 3, width: "100%", height: "100%" }}>
       <CardContent>
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">{name}</Typography>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            {name}
+          </Typography>
           <AccountBalanceWalletIcon />
         </Box>
 
         {/* Gauge Chart */}
         <Box
-          mt={2}
-          mb={2}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
+          sx={{
+            mt: 2,
+            mb: 2,
+            display: "flex",
+            justifyContent: "center",
+            width: "100%",
+          }}
         >
           <Gauge
             width={180}
@@ -73,7 +77,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
               />
               <Typography variant="body2">Checked</Typography>
             </Box>
-            <Typography fontWeight="medium">{checked}</Typography>
+            <Typography fontWeight="bold">{checked}</Typography>
           </Grid2>
           <Grid2 item xs={6}>
             <Box display="flex" alignItems="center" gap={1}>
@@ -87,7 +91,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
               />
               <Typography variant="body2">Pending</Typography>
             </Box>
-            <Typography fontWeight="medium">{pending}</Typography>
+            <Typography fontWeight="bold">{pending}</Typography>
           </Grid2>
         </Grid2>
 
@@ -98,7 +102,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
             <Typography variant="body2">Checked Amount</Typography>
           </Box>
           <Box sx={{ display: "flex" }}>
-            <Typography variant="h6">
+            <Typography variant="h6" fontWeight="bold">
               {amount.toLocaleString()}{" "}
               <Typography variant="caption" component="span">
                 USD

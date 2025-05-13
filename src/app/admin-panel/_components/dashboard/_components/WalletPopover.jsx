@@ -13,7 +13,7 @@ export default function WalletPopover({ anchorEl, open, onClose, wallets }) {
     >
       <List dense>
         {wallets.map((wallet, index) => (
-          <ListItem key={index} divider>
+          <ListItem key={index}>
             <ListItemText primary={wallet} />
           </ListItem>
         ))}
