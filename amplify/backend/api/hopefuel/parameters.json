@@ -1,5 +1,0 @@
-{
-  "AppSyncApiName": "hopefuel",
-  "DynamoDBBillingMode": "PAY_PER_REQUEST",
-  "DynamoDBEnableServerSideEncryption": false
-}
