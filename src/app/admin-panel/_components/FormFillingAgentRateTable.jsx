@@ -45,13 +45,19 @@ const FormFillingAgentRateTable = ({
           borderRadius: 4,
           maxWidth: 620,
           minHeight: 392,
+          borderRight: 2,
+          borderLeft: 2,
+          borderBottom: 2,
+          borderRightColor: "#CBD5E1",
+          borderLeftColor: "#CBD5E1",
+          borderBottomColor: "#CBD5E1",
         }}
       >
         <Box
           sx={{
             backgroundColor: headerColor,
             color: "white",
-            py: 1,
+            py: 2,
             px: 4,
             display: "flex",
             justifyContent: "space-between",
@@ -87,103 +93,102 @@ const FormFillingAgentRateTable = ({
           </Typography>
         </Box>
 
-        <TableContainer>
-          <Table>
-            <TableBody>
-              {currentAgents.map((agent) => (
-                <TableRow key={agent.id}>
-                  <TableCell
-                    sx={{
-                      px: 4,
-                    }}
-                  >
-                    <Typography
-                      variant="h6"
-                      component="div"
-                      sx={{
-                        color: "#0F172A",
-                        fontSize: "20px",
-                        fontWeight: 500,
-                        letterSpacing: "-2%",
-                        lineHeight: "34px",
-                      }}
-                    >
-                      {`${agent.id}. ${agent.name}`}
-                    </Typography>
-                    <Box sx={{ width: "100%", mt: 1 }}>
-                      <LinearProgress
-                        variant="determinate"
-                        value={(agent.value / data.totalValue) * 100}
-                        sx={{
-                          height: 12,
-                          borderRadius: 2,
-                          backgroundColor: "#E2E8F0",
-                          "& .MuiLinearProgress-bar": {
-                            backgroundColor: progressColor,
-                            borderRadius: 2,
-                          },
-                        }}
-                      />
-                    </Box>
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{
-                      px: 4,
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      component="div"
-                      sx={{
-                        color: "#0F172A",
-                        fontWeight: 500,
-                        fontSize: "20px",
-                        lineHeight: "34px",
-                        letterSpacing: "-2%",
-                      }}
-                    >
-                      {agent.value}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            py: 2,
-            borderTop: "1px solid #eee",
-          }}
-        >
-          <Stack spacing={2} direction="row" alignItems="center">
-            <Typography>&lt;</Typography>
-            <Pagination
-              count={totalPages}
-              page={page}
-              onChange={handlePageChange}
-              hideNextButton
-              hidePrevButton
-              size="large"
+        {currentAgents.map((agent) => (
+          <Box>
+            <Box
               sx={{
-                "& .MuiPaginationItem-root": {
-                  borderRadius: 0,
-                  mx: 0.5,
-                },
-                "& .Mui-selected": {
-                  backgroundColor: "#fff",
-                  border: "1px solid #1976d2",
-                  color: "#1976d2",
-                },
+                display: "flex",
+                px: 2,
+                py: 2,
+                flexDirection: "column",
               }}
-            />
-            <Typography>&gt;</Typography>
-          </Stack>
-        </Box>
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  component="div"
+                  sx={{
+                    color: "#0F172A",
+                    fontSize: "20px",
+                    fontWeight: 500,
+                    letterSpacing: "-2%",
+                    lineHeight: "34px",
+                  }}
+                >
+                  {`${agent.id}. ${agent.name}`}
+                </Typography>
+                <Typography
+                  variant="h4"
+                  component="div"
+                  sx={{
+                    color: "#0F172A",
+                    fontWeight: 500,
+                    fontSize: "20px",
+                    lineHeight: "34px",
+                    letterSpacing: "-2%",
+                  }}
+                >
+                  {agent.value}
+                </Typography>
+              </Box>
+              <Box sx={{ width: "100%", mt: 1 }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={(agent.value / data.totalValue) * 100}
+                  sx={{
+                    height: 12,
+                    borderRadius: 2,
+                    backgroundColor: "#E2E8F0",
+                    "& .MuiLinearProgress-bar": {
+                      backgroundColor: progressColor,
+                      borderRadius: 2,
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+          </Box>
+        ))}
+
+        {data.agents.length > 4 && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              py: 2,
+              borderTop: "1px solid #eee",
+            }}
+          >
+            <Stack spacing={2} direction="row" alignItems="center">
+              <Typography>&lt;</Typography>
+              <Pagination
+                count={totalPages}
+                page={page}
+                onChange={handlePageChange}
+                hideNextButton
+                hidePrevButton
+                size="large"
+                sx={{
+                  "& .MuiPaginationItem-root": {
+                    borderRadius: 0,
+                    mx: 0.5,
+                  },
+                  "& .Mui-selected": {
+                    backgroundColor: "#fff",
+                    border: "1px solid #1976d2",
+                    color: "#1976d2",
+                  },
+                }}
+              />
+              <Typography>&gt;</Typography>
+            </Stack>
+          </Box>
+        )}
       </Paper>
     </Box>
   );
