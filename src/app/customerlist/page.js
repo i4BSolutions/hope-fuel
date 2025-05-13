@@ -22,24 +22,6 @@ import EditHistory from "./components/EditHistory";
 import Sidebar from "./components/Sidebar";
 import UserInfoCard from "./components/UserInfoCard";
 
-const mockCards = [
-  {
-    id: "HOPEID-12345",
-    name: "Geek Squad Studio",
-    status: "၁ - ဖောင်တင်သွင်း",
-  },
-  {
-    id: "HOPEID-67890",
-    name: "Geek Squad Studio",
-    status: "၁ - ဖောင်တင်သွင်း",
-  },
-  {
-    id: "HOPEID-24680",
-    name: "Geek Squad Studio",
-    status: "၁ - ဖောင်တင်သွင်း",
-  },
-];
-
 const PAGE_SIZE = 10;
 
 const CustomerListPage = () => {
@@ -65,6 +47,7 @@ const CustomerListPage = () => {
   const [editHistoryLoading, setEditHistoryLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
 
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [openEditHistoryModal, setOpenEditHistoryModal] = useState(false);
@@ -73,17 +56,10 @@ const CustomerListPage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [error, setError] = useState(null);
 
-  const [debouncedSearch] = useDebounce(searchText, 100);
+  const [debouncedSearch] = useDebounce(searchText, 500);
   const initialLoadRef = useRef(false);
 
-  const filteredCustomers = customerData.filter((customer) => {
-    const s = debouncedSearch.toLowerCase();
-    return (
-      customer.Name?.toLowerCase().includes(s) ||
-      customer.Email?.toLowerCase().includes(s) ||
-      customer.ManyChatId?.toLowerCase().includes(s)
-    );
-  });
+  const filteredCustomers = customerData;
 
   useEffect(() => {
     if (!initialLoadRef.current) {
@@ -93,11 +69,75 @@ const CustomerListPage = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (debouncedSearch) {
+      searchCustomers(debouncedSearch);
+    } else if (initialLoadRef.current) {
+      fetchCustomerData(1, true);
+    }
+  }, [debouncedSearch]);
+
+  const searchCustomers = useCallback(async (term) => {
+    if (!term) return;
+
+    setLoading(true);
+    setIsSearching(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/customers/search?term=${encodeURIComponent(term)}`
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          setCustomerData([]);
+          setSelectedProfileId(null);
+          setProfileDetailData(null);
+          setHasMore(false);
+          return;
+        }
+        throw new Error(`Search failed (${response.status})`);
+      }
+
+      const result = await response.json();
+      const searchResults = result.data || [];
+
+      const uniqueResults = [
+        ...new Map(
+          searchResults.map((item) => [item.CustomerId, item])
+        ).values(),
+      ];
+
+      setCustomerData(uniqueResults);
+      setHasMore(false);
+
+      if (uniqueResults.length > 0) {
+        const firstId = uniqueResults[0].CustomerId;
+        setSelectedProfileId(firstId);
+        setHoveredProfileId(firstId);
+        fetchProfileDetails(firstId);
+      } else {
+        setSelectedProfileId(null);
+        setProfileDetailData(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+      setCustomerData([]);
+      setSelectedProfileId(null);
+      setProfileDetailData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const fetchCustomerData = useCallback(
     async (pageNumber, isNewSearch = false) => {
       if (loading) return;
 
       setLoading(true);
+      setIsSearching(false);
       setError(null);
 
       try {
@@ -221,8 +261,8 @@ const CustomerListPage = () => {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (!loading && hasMore) fetchCustomerData(page, false);
-  }, [loading, hasMore, page, fetchCustomerData]);
+    if (!loading && hasMore && !isSearching) fetchCustomerData(page + 1, false);
+  }, [loading, hasMore, page, fetchCustomerData, isSearching]);
 
   const handleProfileSelect = (id) => {
     setSelectedProfileId(id);
@@ -262,7 +302,17 @@ const CustomerListPage = () => {
     },
     [selectedEditId, agent.id, fetchProfileDetails, selectedProfileId]
   );
-  console.log(profileDetailData?.cardIssued);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+
+    // If search is cleared immediately fetch regular data
+    if (!value) {
+      fetchCustomerData(1, true);
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -282,9 +332,9 @@ const CustomerListPage = () => {
             onHoverProfile={setHoveredProfileId}
             onLoadMore={handleLoadMore}
             searchValue={searchText}
-            onSearch={(e) => setSearchText(e.target.value)}
+            onSearch={handleSearchChange}
             loading={loading}
-            hasMore={hasMore}
+            hasMore={hasMore && !isSearching}
           />
         </Grid>
 
@@ -301,7 +351,11 @@ const CustomerListPage = () => {
             </Box>
           ) : filteredCustomers.length === 0 && !loading ? (
             <Box sx={{ textAlign: "center", mt: 5 }}>
-              <Typography variant="h5">No customers found</Typography>
+              <Typography variant="h5">
+                {debouncedSearch
+                  ? "No matching customers found"
+                  : "No customers found"}
+              </Typography>
             </Box>
           ) : profileDetailData ? (
             <>
@@ -332,8 +386,8 @@ const CustomerListPage = () => {
                 />
               </Grid>
               <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
-                {profileDetailData?.cardIssued.map((card) => (
-                  <Grid item key={card.id}>
+                {profileDetailData?.cardIssued?.map((card) => (
+                  <Grid item key={card.id || card.HopeFuelID}>
                     <CardDisplay
                       hopeFuelID={card.HopeFuelID}
                       transactionStatus={card.TransactionStatus}

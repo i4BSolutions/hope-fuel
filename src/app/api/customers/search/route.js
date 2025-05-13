@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import db from "../../../utilites/db";
 
 async function SearchCustomers(searchTerm) {
-  const query = `SELECT DISTINCT c.*
+  const query = `SELECT c.*
     FROM Customer c
     LEFT JOIN Transactions t ON c.CustomerId = t.CustomerID
     WHERE 
@@ -11,6 +11,7 @@ async function SearchCustomers(searchTerm) {
       OR t.HopeFuelID LIKE ? 
       OR c.CardID LIKE ? 
       OR c.ManyChatId LIKE ?
+    GROUP BY c.CustomerId
   `;
 
   const searchPattern = `%${searchTerm}%`;
