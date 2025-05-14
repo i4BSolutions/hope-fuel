@@ -544,3 +544,36 @@ export const FUNDRAISER_DATA = [
     logo: "/google-logo.png",
   },
 ];
+
+export const AGENT_RATES = [
+  {
+    groupName: "Group A",
+    totalValue: 1000,
+    agents: [
+      { id: 1, name: "Agent Mg Mg", value: 600 },
+      { id: 2, name: "Agent Aung Aung", value: 200 },
+      { id: 3, name: "Agent Ko Ko", value: 100 },
+      { id: 4, name: "Agent Nyi Nyi", value: 100 },
+      // Adding more agents for pagination demo
+      { id: 5, name: "Agent Kyaw Kyaw", value: 300 },
+      { id: 6, name: "Agent Min Min", value: 150 },
+      { id: 7, name: "Agent Tun Tun", value: 250 },
+      { id: 8, name: "Agent Moe Moe", value: 180 },
+    ],
+  },
+  {
+    groupName: "Group B",
+    totalValue: 1500,
+    agents: [
+      { id: 1, name: "Agent Mg Mg", value: 600 },
+      { id: 2, name: "Agent Aung Aung", value: 200 },
+      { id: 3, name: "Agent Ko Ko", value: 100 },
+      { id: 4, name: "Agent Nyi Nyi", value: 100 },
+      // Adding more agents for pagination demo
+      { id: 5, name: "Agent Kyaw Kyaw", value: 100 },
+      { id: 6, name: "Agent Min Min", value: 100 },
+      { id: 7, name: "Agent Tun Tun", value: 100 },
+      { id: 8, name: "Agent Moe Moe", value: 200 },
+    ],
+  },
+];
