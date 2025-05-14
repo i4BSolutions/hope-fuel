@@ -3,14 +3,19 @@
 import {
   Alert,
   Box,
+  Button,
   CircularProgress,
+  Drawer,
   Grid,
+  IconButton,
   Modal,
   Snackbar,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { useAgentStore } from "../../stores/agentStore";
@@ -41,6 +46,10 @@ const CustomerListPage = () => {
     email: "",
     country: "",
   });
+
+  // Mobile view controls
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
@@ -76,6 +85,17 @@ const CustomerListPage = () => {
       fetchCustomerData(1, true);
     }
   }, [debouncedSearch]);
+
+  // Set default view based on screen size
+  useEffect(() => {
+    if (isMobile) {
+      // On mobile, show sidebar first until a profile is selected
+      setShowSidebar(!selectedProfileId);
+    } else {
+      // On desktop, always show both
+      setShowSidebar(true);
+    }
+  }, [isMobile, selectedProfileId]);
 
   const searchCustomers = useCallback(async (term) => {
     if (!term) return;
@@ -224,27 +244,34 @@ const CustomerListPage = () => {
     }
   };
 
-  const fetchProfileDetails = useCallback(async (id) => {
-    if (!id) return;
-    setProfileLoading(true);
-    try {
-      const res = await fetch(`/api/customers/${id}`);
-      if (!res.ok) throw new Error(`Failed to fetch profile`);
-      const { customer } = await res.json();
-      const subscriptions = customer?.HopeFuelID
-        ? await fetchSubscriptionByHopeFuelID(customer.HopeFuelID)
-        : [];
-      const cardIssued = customer?.HopeFuelID
-        ? await fetchCardIssuedByID(customer?.HopeFuelID)
-        : [];
-      setProfileDetailData({ ...customer, subscriptions, cardIssued });
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setProfileLoading(false);
-    }
-  }, []);
+  const fetchProfileDetails = useCallback(
+    async (id) => {
+      if (!id) return;
+      setProfileLoading(true);
+      try {
+        const res = await fetch(`/api/customers/${id}`);
+        if (!res.ok) throw new Error(`Failed to fetch profile`);
+        const { customer } = await res.json();
+        const subscriptions = customer?.HopeFuelID
+          ? await fetchSubscriptionByHopeFuelID(customer.HopeFuelID)
+          : [];
+        const cardIssued = customer?.HopeFuelID
+          ? await fetchCardIssuedByID(customer?.HopeFuelID)
+          : [];
+        setProfileDetailData({ ...customer, subscriptions, cardIssued });
+
+        if (isMobile) {
+          setShowSidebar(false);
+        }
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setProfileLoading(false);
+      }
+    },
+    [isMobile]
+  );
 
   const fetchEditHistory = useCallback(async (id) => {
     setEditHistoryLoading(true);
@@ -268,6 +295,10 @@ const CustomerListPage = () => {
     setSelectedProfileId(id);
     setHoveredProfileId(id);
     fetchProfileDetails(id);
+
+    if (isMobile && drawerOpen) {
+      setDrawerOpen(false);
+    }
   };
 
   const handleSave = useCallback(
@@ -307,11 +338,92 @@ const CustomerListPage = () => {
     const value = e.target.value;
     setSearchText(value);
 
-    // If search is cleared immediately fetch regular data
     if (!value) {
       fetchCustomerData(1, true);
     }
   };
+
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setShowSidebar(!showSidebar);
+    }
+  };
+
+  // Profile detail content
+  const renderProfileDetails = () => (
+    <>
+      {profileLoading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            minHeight: "60vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : filteredCustomers.length === 0 && !loading ? (
+        <Box sx={{ textAlign: "center", mt: 5 }}>
+          <Typography variant="h5">
+            {debouncedSearch
+              ? "No matching customers found"
+              : "No customers found"}
+          </Typography>
+        </Box>
+      ) : profileDetailData ? (
+        <>
+          {isMobile && (
+            <IconButton onClick={() => setShowSidebar(true)} sx={{ mb: 2 }}>
+              <ArrowBackIcon />
+            </IconButton>
+          )}
+          <UserInfoCard
+            userRole={agent.roleId}
+            data={profileDetailData}
+            isMobile={isMobile}
+            onEdit={() => {
+              setCustomerInfo({
+                name: profileDetailData.Name || "",
+                email: profileDetailData.Email || "",
+                country: profileDetailData.UserCountry || "",
+              });
+              setSelectedEditId(profileDetailData.CustomerId);
+              setOpenEditHistoryModal(true);
+            }}
+            onViewEditHistory={(id) => {
+              fetchEditHistory(id);
+              setOpenDetailModal(true);
+            }}
+          />
+          <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
+            <CardInfo data={profileDetailData} />
+          </Box>
+          <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
+            <SubscriptionCard cards={profileDetailData.subscriptions || []} />
+          </Grid>
+          <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
+            {profileDetailData?.cardIssued?.map((card) => (
+              <Grid item key={card.id || card.HopeFuelID}>
+                <CardDisplay
+                  hopeFuelID={card.HopeFuelID}
+                  transactionStatus={card.TransactionStatus}
+                  currency={card.CurrencyCode}
+                  amount={card.Amount}
+                  date={card.TransactionDate}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        </>
+      ) : (
+        <Box sx={{ textAlign: "center", mt: 5 }}>
+          <Typography variant="h5">
+            {error || "No customer data available"}
+          </Typography>
+        </Box>
+      )}
+    </>
+  );
 
   return (
     <Box
@@ -319,99 +431,116 @@ const CustomerListPage = () => {
         height: "100vh",
         overflow: "hidden",
         display: "flex",
+        flexDirection: "column",
         bgcolor: "background.default",
       }}
     >
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
-          <Sidebar
-            profiles={filteredCustomers}
-            selectedProfileId={selectedProfileId}
-            hoveredProfileId={hoveredProfileId}
-            onSelectedProfile={handleProfileSelect}
-            onHoverProfile={setHoveredProfileId}
-            onLoadMore={handleLoadMore}
-            searchValue={searchText}
-            onSearch={handleSearchChange}
-            loading={loading}
-            hasMore={hasMore && !isSearching}
-          />
-        </Grid>
+      {isMobile && (
+        <Box
+          sx={{
+            display: "flex",
+            p: 1,
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          {!showSidebar && (
+            <IconButton onClick={() => setDrawerOpen(true)}>
+              <MenuIcon />
+            </IconButton>
+          )}
+          <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>
+            Customer Management
+          </Typography>
+        </Box>
+      )}
 
-        <Grid item xs={12} md={9}>
-          {profileLoading ? (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                minHeight: "60vh",
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          ) : filteredCustomers.length === 0 && !loading ? (
-            <Box sx={{ textAlign: "center", mt: 5 }}>
-              <Typography variant="h5">
-                {debouncedSearch
-                  ? "No matching customers found"
-                  : "No customers found"}
-              </Typography>
-            </Box>
-          ) : profileDetailData ? (
-            <>
-              <UserInfoCard
-                userRole={agent.roleId}
-                data={profileDetailData}
-                isMobile={isMobile}
-                onEdit={() => {
-                  setCustomerInfo({
-                    name: profileDetailData.Name || "",
-                    email: profileDetailData.Email || "",
-                    country: profileDetailData.UserCountry || "",
-                  });
-                  setSelectedEditId(profileDetailData.CustomerId);
-                  setOpenEditHistoryModal(true);
-                }}
-                onViewEditHistory={(id) => {
-                  fetchEditHistory(id);
-                  setOpenDetailModal(true);
-                }}
+      {isMobile ? (
+        <>
+          {/* Mobile: Show either sidebar or profile details */}
+          {showSidebar ? (
+            <Box sx={{ flex: 1, overflow: "auto" }}>
+              <Sidebar
+                profiles={filteredCustomers}
+                selectedProfileId={selectedProfileId}
+                hoveredProfileId={hoveredProfileId}
+                onSelectedProfile={handleProfileSelect}
+                onHoverProfile={setHoveredProfileId}
+                onLoadMore={handleLoadMore}
+                searchValue={searchText}
+                onSearch={handleSearchChange}
+                loading={loading}
+                hasMore={hasMore && !isSearching}
               />
-              <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
-                <CardInfo data={profileDetailData} />
-              </Box>
-              <Grid container spacing={2} sx={{ pt: theme.spacing(5) }}>
-                <SubscriptionCard
-                  cards={profileDetailData.subscriptions || []}
-                />
-              </Grid>
-              <Grid container spacing={2} sx={{ px: 1, pt: theme.spacing(3) }}>
-                {profileDetailData?.cardIssued?.map((card) => (
-                  <Grid item key={card.id || card.HopeFuelID}>
-                    <CardDisplay
-                      hopeFuelID={card.HopeFuelID}
-                      transactionStatus={card.TransactionStatus}
-                      currency={card.CurrencyCode}
-                      amount={card.Amount}
-                      date={card.TransactionDate}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </>
+            </Box>
           ) : (
-            <Box sx={{ textAlign: "center", mt: 5 }}>
-              <Typography variant="h5">
-                {error || "No customer data available"}
-              </Typography>
+            <Box sx={{ flex: 1, overflow: "auto", p: 2 }}>
+              {renderProfileDetails()}
             </Box>
           )}
+
+          {/* Mobile drawer for sidebar when viewing profile */}
+          <Drawer
+            anchor="left"
+            open={drawerOpen}
+            onClose={() => setDrawerOpen(false)}
+          >
+            <Box sx={{ width: 280 }}>
+              <Sidebar
+                profiles={filteredCustomers}
+                selectedProfileId={selectedProfileId}
+                hoveredProfileId={hoveredProfileId}
+                onSelectedProfile={handleProfileSelect}
+                onHoverProfile={setHoveredProfileId}
+                onLoadMore={handleLoadMore}
+                searchValue={searchText}
+                onSearch={handleSearchChange}
+                loading={loading}
+                hasMore={hasMore && !isSearching}
+              />
+            </Box>
+          </Drawer>
+        </>
+      ) : (
+        /* Desktop: Grid layout with both sidebar and profile details */
+        <Grid container spacing={2} sx={{ height: "100%" }}>
+          <Grid item xs={12} md={3} sx={{ height: "100%", overflow: "auto" }}>
+            <Sidebar
+              profiles={filteredCustomers}
+              selectedProfileId={selectedProfileId}
+              hoveredProfileId={hoveredProfileId}
+              onSelectedProfile={handleProfileSelect}
+              onHoverProfile={setHoveredProfileId}
+              onLoadMore={handleLoadMore}
+              searchValue={searchText}
+              onSearch={handleSearchChange}
+              loading={loading}
+              hasMore={hasMore && !isSearching}
+            />
+          </Grid>
+          <Grid item xs={12} md={9} sx={{ height: "100%", overflow: "auto" }}>
+            {renderProfileDetails()}
+          </Grid>
         </Grid>
-      </Grid>
+      )}
 
       {/* Edit History Modal */}
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
-        <Box sx={{ p: 4, maxHeight: "80vh", overflowY: "auto" }}>
+        <Box
+          sx={{
+            p: 4,
+            maxHeight: "80vh",
+            overflowY: "auto",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: isMobile ? "95%" : "80%",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            borderRadius: 1,
+          }}
+        >
           {editHistoryLoading ? (
             <CircularProgress />
           ) : editHistory ? (
