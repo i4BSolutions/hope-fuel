@@ -577,3 +577,10 @@ export const AGENT_RATES = [
     ],
   },
 ];
+
+export const HOPEFUEL_STATUSES = [
+  { label: "Form Entry", count: 1500, color: "#EF4444" },
+  { label: "Payment Checked", count: 600, color: "#10B981" },
+  { label: "Card Processing", count: 200, color: "#F59E0B" },
+  { label: "Card Issued", count: 200, color: "#6183E4" },
+];
