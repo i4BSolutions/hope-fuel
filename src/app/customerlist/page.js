@@ -65,7 +65,7 @@ const CustomerListPage = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
   const [error, setError] = useState(null);
 
-  const [debouncedSearch] = useDebounce(searchText, 500);
+  const [debouncedSearch] = useDebounce(searchText, 300);
   const initialLoadRef = useRef(false);
 
   const filteredCustomers = customerData;
@@ -86,13 +86,10 @@ const CustomerListPage = () => {
     }
   }, [debouncedSearch]);
 
-  // Set default view based on screen size
   useEffect(() => {
     if (isMobile) {
-      // On mobile, show sidebar first until a profile is selected
       setShowSidebar(!selectedProfileId);
     } else {
-      // On desktop, always show both
       setShowSidebar(true);
     }
   }, [isMobile, selectedProfileId]);
