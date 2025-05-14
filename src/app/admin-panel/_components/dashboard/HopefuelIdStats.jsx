@@ -1,11 +1,24 @@
-import dayjs from "dayjs";
+import { Box, Typography } from "@mui/material";
+import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
+import { HOPEFUEL_STATUSES } from "../../../variables/const";
 
-export default function HopefuelIdStats({ currentMonth }) {
+export default function HopefuelIdStats() {
   return (
-    <div>
-      <h3>
-        HopefuelIdStats Stats for {dayjs(currentMonth).format("MMMM YYYY")}
-      </h3>
-    </div>
+    <Box sx={{ my: 2 }}>
+      <Typography
+        sx={{
+          color: "#0F172A",
+          fontSize: "19px",
+          fontWeight: 600,
+          lineHeight: "23px",
+          letterSpacing: "-2%",
+        }}
+      >
+        Hopefuel IDs by status
+      </Typography>
+      <Box sx={{ mt: 1 }}>
+        <HopeFuelIDStatusChart hopeFuelStatuses={HOPEFUEL_STATUSES} />
+      </Box>
+    </Box>
   );
 }

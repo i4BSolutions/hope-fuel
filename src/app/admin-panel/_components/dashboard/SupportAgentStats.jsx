@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Typography } from "@mui/material";
-import FormFillingAgentRateTable from "../FormFillingAgentRateTable";
+import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
 import { useState } from "react";
 import { AGENT_RATES } from "../../../variables/const";
 
@@ -32,7 +32,7 @@ export default function SupportAgentStats({ currentMonth }) {
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 4,
+          gap: 8.5,
           mt: 1,
         }}
       >
