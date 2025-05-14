@@ -4,10 +4,11 @@ import { NextResponse } from "next/server";
 import { AGENT_ROLE } from "./lib/constants";
 
 const restrictedRoutes = {
-  1: ["/entryForm", "/admin-panel"],
+  1: ["/admin-panel"],
   2: [],
   3: ["/createForm", "/extendForm", "/fundraisers", "/admin-panel"],
 };
+
 const publicApiRoutes = ["/checkAgent"];
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 

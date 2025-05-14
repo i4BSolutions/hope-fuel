@@ -79,6 +79,7 @@ const roleBasedNavItems = {
   1: [
     navItems.createForm,
     navItems.extendUser,
+    navItems.entryForm,
     navItems.hopefuelidlist,
     navItems.customerlist,
     navItems.fundraisers,
