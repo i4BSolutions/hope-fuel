@@ -17,20 +17,15 @@ export async function POST(req) {
       );
     }
 
-    let agent = await prisma.agent.findFirst({
+    const agent = await prisma.agent.upsert({
       where: { AwsId: awsId },
+      update: {},
+      create: {
+        AwsId: awsId,
+        UserRoleId: 1,
+      },
       include: { UserRole: true },
     });
-
-    if (!agent) {
-      agent = await prisma.agent.create({
-        data: {
-          AwsId: awsId,
-          UserRoleId: 1,
-        },
-        include: { UserRole: true },
-      });
-    }
 
     const payload = {
       id: agent.AgentId,
