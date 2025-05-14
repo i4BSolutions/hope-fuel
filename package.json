@@ -11,6 +11,9 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --passWithNoTests"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "dependencies": {
     "@aws-amplify/adapter-nextjs": "^1.0.5",
     "@aws-amplify/api-rest": "^4.0.40",

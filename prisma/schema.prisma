@@ -11,7 +11,7 @@ datasource db {
 
 model Agent {
   AgentId                  Int                        @id @default(autoincrement())
-  AwsId                    String?                    @db.VarChar(255)
+  AwsId                    String?                    @unique
   UserRoleId               Int?
   UserRole                 UserRole?                  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
   Customer                 Customer[]
@@ -121,7 +121,7 @@ model Fundraiser {
   FundraiserCentralID           Int?
   BaseCountry                   BaseCountry?                    @relation(fields: [BaseCountryID], references: [BaseCountryID], onUpdate: Restrict, map: "fundraiser_ibfk_1")
   Fundraiser_AcceptedCurrencies Fundraiser_AcceptedCurrencies[]
-  fundraiser_contactlinks       Fundraiser_Contactlinks[]
+  fundraiser_contactlinks       Fundraiser_ContactLinks[]
 
   @@index([BaseCountryID], map: "BaseCountryID")
 }
@@ -137,7 +137,7 @@ model Fundraiser_AcceptedCurrencies {
   @@index([FundraiserID], map: "FundraiserID")
 }
 
-model Fundraiser_Contactlinks {
+model Fundraiser_ContactLinks {
   ContactID    Int         @id @default(autoincrement())
   FundraiserID Int?
   PlatformID   Int?
@@ -192,7 +192,6 @@ model ScreenShot {
   Transactions   Transactions? @relation(fields: [TransactionID], references: [TransactionID], onDelete: Restrict, onUpdate: Restrict, map: "screenshot_ibfk_1")
 
   @@index([TransactionID], map: "TransactionID")
-  @@map("ScreenShot")
 }
 
 model SupportRegion {
