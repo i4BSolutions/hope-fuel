@@ -1,10 +1,8 @@
-import { useState, useEffect } from "react";
-import dayjs from "dayjs";
-
 import { Box, Typography } from "@mui/material";
-
-import PaymentStatsCard from "./_components/PaymentStatsCard";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import PaymentCheckerTable from "./_components/PaymentCheckerTable";
+import PaymentStatsCard from "./_components/PaymentStatsCard";
 import WalletGrid from "./_components/WalletGrid";
 
 export default function PaymentCheckerStats({ currentMonth }) {
@@ -57,8 +55,16 @@ export default function PaymentCheckerStats({ currentMonth }) {
   }, [currentMonth, formattedDate]);
 
   return (
-    <Box mt={4}>
-      <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
+    <Box>
+      <Typography
+        sx={{
+          color: "#0F172A",
+          fontSize: "19px",
+          fontWeight: 600,
+          lineHeight: "23px",
+          letterSpacing: "-2%",
+        }}
+      >
         Payment Checking Agent Rate
       </Typography>
       <Box
@@ -77,10 +83,10 @@ export default function PaymentCheckerStats({ currentMonth }) {
           <PaymentCheckerTable data={checkerKPI} />
         </Box>
       </Box>
-      <Box sx={{ mt: 2, width: "100%" }}>
+      <Box sx={{ width: "100%" }}>
         <Box
           sx={{
-            mt: 1,
+            mt: 2,
             display: "flex",
             flexDirection: "row",
             gap: 2,

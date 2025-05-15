@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Box, Typography } from "@mui/material";
+import { useState } from "react";
 import WalletCard from "./WalletCard";
 import WalletMultiSelect from "./WalletMultiSelect";
 
@@ -27,13 +27,21 @@ export default function WalletGrid() {
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
-          mb: 2,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          mb: 2,
         }}
       >
-        <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
+        <Typography
+          variant="h8"
+          sx={{
+            color: "#0F172A",
+            fontSize: "19px",
+            fontWeight: 600,
+            lineHeight: "23px",
+          }}
+        >
           Wallets
         </Typography>
 
