@@ -10,6 +10,7 @@ import WalletGrid from "./_components/WalletGrid";
 export default function PaymentCheckerStats({ currentMonth }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [checkedCount, setCheckedCount] = useState(0);
+  const [checkerKPI, setCheckerKPI] = useState([]);
 
   const formattedDate = dayjs(currentMonth).format("YYYY-MM");
 
@@ -33,7 +34,26 @@ export default function PaymentCheckerStats({ currentMonth }) {
       }
     };
 
+    const fetchCheckerKPI = async () => {
+      try {
+        const response = await fetch(
+          `/api/transactions/checker-kpis?month=${formattedDate}`
+        );
+
+        const data = await response.json();
+
+        if (data.status === 200) {
+          setCheckerKPI(data.data);
+        } else {
+          console.error("Error fetching checker KPI:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching checker KPI:", error);
+      }
+    };
+
     fetchPendingCount();
+    fetchCheckerKPI();
   }, [currentMonth, formattedDate]);
 
   return (
@@ -54,7 +74,7 @@ export default function PaymentCheckerStats({ currentMonth }) {
           <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
         </Box>
         <Box sx={{ flex: 3, minWidth: "300px" }}>
-          <PaymentCheckerTable />
+          <PaymentCheckerTable data={checkerKPI} />
         </Box>
       </Box>
       <Box sx={{ mt: 2, width: "100%" }}>

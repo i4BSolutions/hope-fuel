@@ -117,7 +117,7 @@ export async function GET(request) {
         checked: totalChecked,
         pending: checker.pending,
         assignedWallet: [],
-        averageTimeHours: avgTime,
+        averageTimeHours: `${avgTime}%`,
         under48hPercent: `${underPct}%`,
         over48hPercent: `${overPct}%`,
       };
