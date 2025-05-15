@@ -1,13 +1,20 @@
-import dayjs from "dayjs";
 import { Box, Typography } from "@mui/material";
-import PaymentStatsCard from "./_components/PaymentStatsCard";
 import PaymentCheckerTable from "./_components/PaymentCheckerTable";
+import PaymentStatsCard from "./_components/PaymentStatsCard";
 import WalletGrid from "./_components/WalletGrid";
 
 export default function PaymentCheckerStats({ currentMonth }) {
   return (
     <Box>
-      <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
+      <Typography
+        sx={{
+          color: "#0F172A",
+          fontSize: "19px",
+          fontWeight: 600,
+          lineHeight: "23px",
+          letterSpacing: "-2%",
+        }}
+      >
         Payment Checking Agent Rate
       </Typography>
       <Box
@@ -27,7 +34,15 @@ export default function PaymentCheckerStats({ currentMonth }) {
         </Box>
       </Box>
       <Box sx={{ mt: 2, width: "100%" }}>
-        <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
+        <Typography
+          sx={{
+            color: "#0F172A",
+            fontSize: "19px",
+            fontWeight: 600,
+            lineHeight: "23px",
+            letterSpacing: "-2%",
+          }}
+        >
           Wallets
         </Typography>
         <Box

@@ -40,11 +40,11 @@ function ButtonDateField(props) {
       className={pickerContext.rootClassName}
       sx={{
         ...pickerContext.rootSx,
-        borderRadius: "12px",
+        borderRadius: "14px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        p: "0 5px 0 12px",
+        p: "6px 5px 6px 12px",
         borderWidth: "2px",
         gap: "2px",
         color: (theme) =>
