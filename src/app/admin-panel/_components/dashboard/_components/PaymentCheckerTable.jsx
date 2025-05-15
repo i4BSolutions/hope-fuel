@@ -7,55 +7,12 @@ import {
   TableRow,
   Paper,
   Button,
-  Typography,
 } from "@mui/material";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import WalletPopover from "./WalletPopover";
 
-const checkers = [
-  {
-    name: "Hla Hla",
-    checked: 300,
-    pending: 500,
-    wallets: ["Wallet A(500)", "Wallet X"],
-    avgTime: "N/A",
-    over48Percent: "10%",
-  },
-  {
-    name: "Pa Pa",
-    checked: 500,
-    pending: 200,
-    wallets: ["Wallet D(500)", "Wallet Y"],
-    avgTime: "N/A",
-    over48Percent: "10%",
-  },
-  {
-    name: "Mya Mya",
-    checked: 100,
-    pending: 500,
-    wallets: ["Wallet F(200)", "Wallet G(200)", "Wallet H(200)"],
-    avgTime: "N/A",
-    over48Percent: "10%",
-  },
-  {
-    name: "Mya Mya",
-    checked: 100,
-    pending: 500,
-    wallets: ["Wallet F(200)", "Wallet G(200)", "Wallet H(200)"],
-    avgTime: "N/A",
-    over48Percent: "10%",
-  },
-  {
-    name: "Mya Mya",
-    checked: 100,
-    pending: 500,
-    wallets: ["Wallet F(200)", "Wallet G(200)", "Wallet H(200)"],
-    avgTime: "N/A",
-    over48Percent: "10%",
-  },
-];
-
-export default function PaymentCheckerTable() {
+// TODO: Add an assigned wallet (currently wallet assign function is not implemented)
+export default function PaymentCheckerTable({ data }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedWallets, setSelectedWallets] = useState([]);
 
@@ -107,10 +64,10 @@ export default function PaymentCheckerTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {checkers.map((checker, index) => (
+            {data.map((checker, index) => (
               <TableRow key={index} sx={{ borderBottom: "none" }}>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                  {index + 1}. {checker.name}
+                  {index + 1}. {checker.checkerId}
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
                   {checker.checked}
@@ -119,7 +76,7 @@ export default function PaymentCheckerTable() {
                   {checker.pending}
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                  {checker.wallets.slice(0, 1).join(", ")}...
+                  {/* {checker.wallets.slice(0, 1).join(", ")}...
                   <Button
                     size="small"
                     variant="contained"
@@ -135,13 +92,13 @@ export default function PaymentCheckerTable() {
                     onClick={(e) => handleClick(e, checker.wallets)}
                   >
                     View All
-                  </Button>
+                  </Button> */}
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                  {checker.avgTime}
+                  {checker.averageTimeHours}
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                  {checker.over48Percent}
+                  {checker.over48hPercent}
                 </TableCell>
               </TableRow>
             ))}
