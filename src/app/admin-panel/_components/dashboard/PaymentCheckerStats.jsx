@@ -87,7 +87,7 @@ export default function PaymentCheckerStats({ currentMonth }) {
             width: "100%",
           }}
         >
-          <WalletGrid />
+          <WalletGrid currentMonth={formattedDate} />
         </Box>
       </Box>
     </Box>

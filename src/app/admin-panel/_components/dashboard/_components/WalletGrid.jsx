@@ -1,39 +1,72 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import WalletCard from "./WalletCard";
 import WalletMultiSelect from "./WalletMultiSelect";
 
-const dummyData = [
-  { name: "Wallet A", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet B", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet C", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet D", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet E", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet F", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet G", checked: 200, pending: 300, amount: 2000000 },
-  { name: "Wallet H", checked: 200, pending: 300, amount: 2000000 },
-];
+export default function WalletGrid({ currentMonth }) {
+  const [selectedWallets, setSelectedWallets] = useState([]);
+  const [visibleWallets, setVisibleWallets] = useState([]);
+  const [allWalletIds, setAllWalletIds] = useState([]);
 
-export default function WalletGrid() {
-  const [selectedWallets, setSelectedWallets] = useState(
-    dummyData.slice(0, 5).map((w) => w.name)
-  );
+  useEffect(() => {
+    const fetchInitialWallets = async () => {
+      try {
+        const res = await fetch(
+          `/api/transactions/wallet-summary?month=${currentMonth}`
+        );
+        const data = await res.json();
 
-  const visibleWallets = dummyData.filter((wallet) =>
-    selectedWallets.includes(wallet.name)
-  );
+        if (data.status === 200) {
+          const walletIds = data.data.map((wallet) => wallet.walletId);
+          setSelectedWallets(walletIds);
+          setAllWalletIds(walletIds);
+          setVisibleWallets(data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch default wallets:", err);
+      }
+    };
+
+    fetchInitialWallets();
+  }, [currentMonth]);
+
+  useEffect(() => {
+    const fetchWalletSummary = async () => {
+      if (selectedWallets.length === 0) return;
+
+      try {
+        const response = await fetch(
+          `/api/transactions/wallet-summary?month=${currentMonth}&walletIds=${selectedWallets.join(
+            ","
+          )}`
+        );
+        const data = await response.json();
+
+        if (data.status === 200) {
+          setVisibleWallets(data.data);
+        } else {
+          console.error("Error fetching wallet summary:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching wallet summary:", error);
+      }
+    };
+
+    fetchWalletSummary();
+  }, [selectedWallets, currentMonth]);
 
   return (
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
-          mb: 2,
+          mt: 2,
+          mb: 1,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
         }}
       >
-        <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
+        <Typography variant="h8" sx={{ fontWeight: "bold" }}>
           Wallets
         </Typography>
 
@@ -50,9 +83,9 @@ export default function WalletGrid() {
           gap: 2,
         }}
       >
-        {visibleWallets.map((wallet, index) => (
+        {visibleWallets.map((wallet) => (
           <Box
-            key={index}
+            key={wallet.walletId}
             sx={{
               width: "19%",
               minWidth: "200px",
