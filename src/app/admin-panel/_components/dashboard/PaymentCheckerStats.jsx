@@ -78,9 +78,6 @@ export default function PaymentCheckerStats({ currentMonth }) {
         </Box>
       </Box>
       <Box sx={{ mt: 2, width: "100%" }}>
-        <Typography variant="h8" sx={{ mt: 2, mb: 1, fontWeight: "bold" }}>
-          Wallets
-        </Typography>
         <Box
           sx={{
             mt: 1,
