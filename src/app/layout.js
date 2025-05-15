@@ -1,4 +1,5 @@
 import MainProvider from "../lib/MainProvider";
+import "./globals.css";
 
 export default function RootLayout({ children }) {
   return (
