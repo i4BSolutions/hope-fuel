@@ -20,6 +20,9 @@ model Agent {
   Note                     Note[]
   TransactionAgent         TransactionAgent[]
   CSVExportTransactionLogs CSVExportTransactionLogs[]
+  AgentGroupId             Int?
+
+  AgentGroup AgentGroup? @relation(fields: [AgentGroupId], references: [AgentGroupID])
 
   @@index([UserRoleId], map: "UserRoleId")
 }
@@ -44,7 +47,7 @@ model Currency {
 model Customer {
   CustomerId        Int                 @id @default(autoincrement())
   Name              String?             @db.VarChar(255)
-  Email             String?             @db.VarChar(255)
+  Email             String?             @unique
   ManyChatId        String?             @db.VarChar(255)
   ExpireDate        DateTime?           @db.Date
   UserCountry       Int?
@@ -149,7 +152,7 @@ model Fundraiser_ContactLinks {
 
 model ManyChat {
   ManyChatId     Int      @id @default(autoincrement())
-  ConversationId String   @db.VarChar(255)
+  ConversationId String   @unique
   CustomerId     Int
   CreateAt       DateTime @default(now()) @db.Timestamp(0)
   UpdateAt       DateTime @default(now()) @db.Timestamp(0)
@@ -241,7 +244,7 @@ model Transactions {
 
 model TransactionStatus {
   TransactionStatusID Int          @id @default(autoincrement())
-  TransactionStatus   String       @db.VarChar(255)
+  TransactionStatus   String       @unique @db.VarChar(255)
   FormStatus          FormStatus[]
 }
 
@@ -270,6 +273,12 @@ model CSVExportTransactionLogs {
   Agent Agent? @relation(fields: [AgentId], references: [AgentId])
 
   @@index([AgentId], map: "AgentId")
+}
+
+model AgentGroup {
+  AgentGroupID Int     @id @default(autoincrement())
+  GroupName    String  @unique
+  Agents       Agent[]
 }
 
 enum CustomerAuditLogs_FieldChanged {
