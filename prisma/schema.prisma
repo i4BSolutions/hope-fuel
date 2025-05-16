@@ -20,6 +20,7 @@ model Agent {
   Note                     Note[]
   TransactionAgent         TransactionAgent[]
   CSVExportTransactionLogs CSVExportTransactionLogs[]
+  AssignedWallet           AssignedWallet[]
 
   @@index([UserRoleId], map: "UserRoleId")
 }
@@ -256,6 +257,7 @@ model Wallet {
   CurrencyId   Int?
   WalletName   String?        @db.VarChar(255)
   Transactions Transactions[]
+  AssignedWallet AssignedWallet[]
   Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
@@ -270,6 +272,19 @@ model CSVExportTransactionLogs {
   Agent Agent? @relation(fields: [AgentId], references: [AgentId])
 
   @@index([AgentId], map: "AgentId")
+}
+
+model AssignedWallet {
+  AssignedWalletId  Int     @id @default(autoincrement())
+  WalletId          Int
+  AgentId           Int
+
+  Agent   Agent?    @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_2")
+  Wallet  Wallet?   @relation(fields: [WalletId], references: [WalletId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_1")
+
+  @@index([AgentId], map: "AgentId")
+  @@index([WalletId], map: "WalletId")
+  @@unique([AgentId, WalletId], map: "AgentId_WalletId")
 }
 
 enum CustomerAuditLogs_FieldChanged {
