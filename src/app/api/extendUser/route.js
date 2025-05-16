@@ -1,10 +1,11 @@
 export const dynamic = "force-dynamic"; // defaults to force-static
-import db from "../../utilites/db";
-import calculateExpireDate from "../../utilites/calculateExpireDate";
-import recentExpireDate from "../../utilites/recentExpireDate.js";
-import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import moment from "moment-timezone";
 import { NextResponse } from "next/server";
+import calculateExpireDate from "../../utilites/calculateExpireDate";
+import db from "../../utilites/db";
+import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
+import prisma from "../../utilites/prisma";
+
 async function createScreenShot(screenShot, transactionsID) {
   console.log(transactionsID + "  " + screenShot);
 
@@ -17,7 +18,6 @@ async function createScreenShot(screenShot, transactionsID) {
     try {
       const result = await db(query, values);
       console.log("result " + result);
-      // console.log("Result: ", result);
       return result.insertId;
     } catch (error) {
       console.error("Error inserting ScreenShot:", error);
@@ -25,7 +25,22 @@ async function createScreenShot(screenShot, transactionsID) {
     }
   });
   return screenShotLink;
-  // return screenShotLink;
+}
+
+async function InsertSubscription(customerId, month) {
+  const currentDate = new Date();
+  try {
+    const subscription = await prisma.subscription.create({
+      data: {
+        CustomerID: customerId,
+        StartDate: currentDate,
+        EndDate: calculateExpireDate(currentDate, month, true),
+      },
+    });
+    return subscription.SubscriptionID;
+  } catch (error) {
+    console.error("Error inserting subscription:", error);
+  }
 }
 
 export async function POST(request) {
@@ -124,7 +139,6 @@ export async function POST(request) {
   console.log("nextExpireDate is ");
   console.log(nextExpireDate);
 
-
   const sql = `UPDATE Customer 
                 SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?
                 WHERE CustomerID = ?`;
@@ -143,7 +157,8 @@ export async function POST(request) {
       ) VALUES (?, ?, ?)`,
       [transactionId, obj["agentId"], transactionDateWithThailandTimeZone]
     );
-    // add the transaction id and agentid in the same one
+
+    await InsertSubscription(obj["customerId"], obj["month"]);
 
     const screenShotIds = await createScreenShot(
       obj["screenShot"],

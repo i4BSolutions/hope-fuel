@@ -307,7 +307,6 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
         files,
         userInfo,
         setloading,
-        agent.username,
         setAmountValidate,
         setMonthValidate,
         setManyChatValidate,
