@@ -51,15 +51,29 @@ model Customer {
   ContactLink       String?             @db.VarChar(255)
   AgentId           Int?
   CardID            Int?
+
   Agent             Agent?              @relation(fields: [AgentId], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "customer_ibfk_1")
   CustomerAuditLogs CustomerAuditLogs[]
   ManyChat          ManyChat[]
   Transactions      Transactions[]
+  Subscriptions     Subcription[]
 
   BaseCountry BaseCountry? @relation(fields: [UserCountry], references: [BaseCountryID], map: "BaseCountryID")
 
   @@index([AgentId], map: "AgentId")
   @@index([UserCountry], map: "BaseCountryID")
+}
+
+model Subcription {
+  SubscriptionID Int      @id @default(autoincrement())
+  CustomerID     Int
+  StartDate      DateTime @db.Date
+  EndDate        DateTime @db.Date
+  CreateAt       DateTime @default(now()) @db.Timestamp(0)
+  UpdatedAt      DateTime @default(now()) @db.Timestamp(0)
+  Customer       Customer @relation(fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "subscription_ibfk_1")
+  
+  @@index([CustomerID], map: "CustomerID")
 }
 
 model CustomerAuditLogs {
