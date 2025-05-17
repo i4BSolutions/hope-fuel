@@ -1,4 +1,3 @@
-const { Man } = require("@mui/icons-material");
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
@@ -688,7 +687,7 @@ async function main() {
         HopeFuelID: Math.floor(100000 + Math.random() * 900000),
       },
     });
-    await prisma.subcription.create({
+    await prisma.subscription.create({
       data: {
         CustomerID: prismaCustomer.CustomerId,
         StartDate: customer.StartDate,
