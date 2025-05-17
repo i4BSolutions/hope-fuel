@@ -9,7 +9,12 @@ import {
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { Gauge } from "@mui/x-charts/Gauge";
 
-export default function WalletCard({ name, checked, pending, amount }) {
+export default function WalletCard({
+  walletName,
+  checked,
+  pending,
+  totalAmountUSD,
+}) {
   const total = checked + pending;
   const percentage = total === 0 ? 0 : Math.round((checked / total) * 100);
 
@@ -27,7 +32,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-            {name}
+            {walletName}
           </Typography>
           <AccountBalanceWalletIcon />
         </Box>
@@ -45,7 +50,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
           <Gauge
             width={180}
             height={180}
-            value={percentage}
+            value={checked}
             valueMin={0}
             valueMax={total}
             innerRadius="70%"
@@ -111,7 +116,7 @@ export default function WalletCard({ name, checked, pending, amount }) {
           </Box>
           <Box sx={{ display: "flex" }}>
             <Typography variant="h6" fontWeight="bold">
-              {amount.toLocaleString()}{" "}
+              {totalAmountUSD}{" "}
               <Typography variant="caption" component="span">
                 USD
               </Typography>
