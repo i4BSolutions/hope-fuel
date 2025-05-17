@@ -51,6 +51,8 @@ export default function HopefuelIdStats() {
     );
   }
 
+  if (!transactionStatuses) return null;
+
   return (
     <Box>
       <Typography
