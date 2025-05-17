@@ -31,7 +31,7 @@ const FormFillingAgentRateTable = ({
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
-
+  console.log(currentAgents);
   const handlePageChange = (event, value) => {
     setPage(value);
   };
@@ -89,13 +89,14 @@ const FormFillingAgentRateTable = ({
               letterSpacing: "-4%",
             }}
           >
-            {data.totalValue.toLocaleString()}
+            {data.total.toLocaleString()}
           </Typography>
         </Box>
 
-        {currentAgents.map((agent) => (
+        {currentAgents.map((agent, index) => (
           <Box>
             <Box
+              key={index}
               sx={{
                 display: "flex",
                 px: 2,
@@ -120,7 +121,7 @@ const FormFillingAgentRateTable = ({
                     lineHeight: "34px",
                   }}
                 >
-                  {`${agent.id}. ${agent.name}`}
+                  {`${index + 1}. ${agent.agentName}`}
                 </Typography>
                 <Typography
                   variant="h4"
@@ -133,13 +134,13 @@ const FormFillingAgentRateTable = ({
                     letterSpacing: "-2%",
                   }}
                 >
-                  {agent.value}
+                  {agent.count}
                 </Typography>
               </Box>
               <Box sx={{ width: "100%", mt: 1 }}>
                 <LinearProgress
                   variant="determinate"
-                  value={(agent.value / data.totalValue) * 100}
+                  value={(agent.count / data.total) * 100}
                   sx={{
                     height: 12,
                     borderRadius: 2,

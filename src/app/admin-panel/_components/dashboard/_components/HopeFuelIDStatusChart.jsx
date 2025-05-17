@@ -32,68 +32,124 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
             letterSpacing: "-4%",
           }}
         >
-          2,500
+          {hopeFuelStatuses.length > 0 ? totalCount : 0}
         </Typography>
       </Box>
-      <Box
-        sx={{
-          position: "relative",
-          height: 20,
-          width: "100%",
-          borderRadius: "8px",
-          overflow: "hidden",
-          display: "flex",
-        }}
-      >
-        {hopeFuelStatuses.map((stage, index) => {
-          const widthPercent = (stage.count / totalCount) * 100;
-
-          return (
-            <Box
-              key={index}
-              sx={{
-                height: "100%",
-                width: `${widthPercent}%`,
-                bgcolor: stage.color,
-                transition: "all 0.3s ease",
-              }}
-            />
-          );
-        })}
-      </Box>
-      <Stack
-        direction="row"
-        sx={{ width: "100%" }}
-        justifyContent="space-between"
-      >
-        {hopeFuelStatuses.map((stage, index) => (
+      {hopeFuelStatuses.length > 0 ? (
+        <>
           <Box
-            key={index}
             sx={{
+              position: "relative",
+              height: 20,
+              width: "100%",
+              borderRadius: "8px",
+              overflow: "hidden",
               display: "flex",
-              flexDirection: "column",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-              <Box
-                sx={{
-                  width: "12px",
-                  height: "12px",
-                  borderRadius: "50%",
-                  mr: 1,
-                  bgcolor: stage.color,
-                }}
-              />
-              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                {stage.label}
-              </Typography>
-            </Box>
-            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-              {stage.count.toLocaleString()}
-            </Typography>
+            {hopeFuelStatuses.map((stage, index) => {
+              const widthPercent = (stage.count / totalCount) * 100;
+              let bgColor = "";
+
+              switch (stage.status) {
+                case "Form Entry":
+                  bgColor = "#EF4444";
+                  break;
+                case "Payment Checked":
+                  bgColor = "#10B981";
+                  break;
+                case "Card Issued":
+                  bgColor = "#F59E0B";
+                  break;
+                case "Cancel":
+                  bgColor = "#6183E4";
+                  break;
+                default:
+                  bgColor = "#EF4444";
+              }
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    height: "100%",
+                    width: `${widthPercent}%`,
+                    bgcolor: bgColor,
+                    transition: "all 0.3s ease",
+                  }}
+                />
+              );
+            })}
           </Box>
-        ))}
-      </Stack>
+          <Stack
+            direction="row"
+            sx={{ width: "100%" }}
+            justifyContent="space-between"
+          >
+            {hopeFuelStatuses.map((stage, index) => {
+              let bgColor = "";
+
+              switch (stage.status) {
+                case "Form Entry":
+                  bgColor = "#EF4444";
+                  break;
+                case "Payment Checked":
+                  bgColor = "#10B981";
+                  break;
+                case "Card Issued":
+                  bgColor = "#F59E0B";
+                  break;
+                case "Cancel":
+                  bgColor = "#6183E4";
+                  break;
+                default:
+                  bgColor = "#EF4444";
+              }
+              return (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+                    <Box
+                      sx={{
+                        width: "12px",
+                        height: "12px",
+                        borderRadius: "50%",
+                        bgcolor: bgColor,
+                        mr: 1,
+                      }}
+                    />
+                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                      {stage.status}
+                    </Typography>
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    {stage.count.toLocaleString()}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Stack>
+        </>
+      ) : (
+        <Typography
+          sx={{
+            display: "flex",
+            alignSelf: "center",
+            justifyContent: "center",
+            color: "#000000",
+            fontWeight: 600,
+            fontSize: "23px",
+            lineHeight: "28px",
+            letterSpacing: "-2%",
+          }}
+        >
+          There is no hopefuel id status.
+        </Typography>
+      )}
     </Box>
   );
 };

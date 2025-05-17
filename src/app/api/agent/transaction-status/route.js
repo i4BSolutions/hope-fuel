@@ -37,11 +37,16 @@ export async function GET() {
       }
     }
 
+    const statusArray = Object.entries(statusMap).map(([status, count]) => ({
+      status,
+      count,
+    }));
+
     return NextResponse.json({
       status: 200,
       message: "Transaction Status retrieve successfully.",
       total: allTransactions.length,
-      statusBreakdown: statusMap,
+      statusBreakdown: statusArray,
     });
   } catch (error) {
     console.error("Transaction Status API Error:", error);
