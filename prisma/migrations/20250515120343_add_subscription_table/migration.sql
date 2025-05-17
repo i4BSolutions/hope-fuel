@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `Subcription` (
+CREATE TABLE `Subscription` (
     `SubscriptionID` INTEGER NOT NULL AUTO_INCREMENT,
     `CustomerID` INTEGER NOT NULL,
     `StartDate` DATE NOT NULL,
@@ -12,4 +12,4 @@ CREATE TABLE `Subcription` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
-ALTER TABLE `Subcription` ADD CONSTRAINT `subscription_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `Customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `Subscription` ADD CONSTRAINT `subscription_ibfk_1` FOREIGN KEY (`CustomerID`) REFERENCES `Customer`(`CustomerId`) ON DELETE CASCADE ON UPDATE RESTRICT;

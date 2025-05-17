@@ -56,7 +56,7 @@ model Customer {
   CustomerAuditLogs CustomerAuditLogs[]
   ManyChat          ManyChat[]
   Transactions      Transactions[]
-  Subscriptions     Subcription[]
+  Subscriptions     Subscription[]
 
   BaseCountry BaseCountry? @relation(fields: [UserCountry], references: [BaseCountryID], map: "BaseCountryID")
 
@@ -64,7 +64,7 @@ model Customer {
   @@index([UserCountry], map: "BaseCountryID")
 }
 
-model Subcription {
+model Subscription {
   SubscriptionID Int      @id @default(autoincrement())
   CustomerID     Int
   StartDate      DateTime @db.Date
