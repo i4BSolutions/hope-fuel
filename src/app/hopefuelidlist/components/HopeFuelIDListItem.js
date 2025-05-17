@@ -176,7 +176,11 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   ManyChat ID
                 </Typography>
                 <CopyableText
-                  text={stringTruncator(item.ManyChatId, 6)}
+                  text={
+                    item.ManyChatId
+                      ? stringTruncator(item.ManyChatId, 6)
+                      : "N/A"
+                  }
                   fontSize="14px"
                   fontWeight={500}
                 />
