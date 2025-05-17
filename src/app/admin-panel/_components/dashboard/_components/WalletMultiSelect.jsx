@@ -7,21 +7,31 @@ import {
   Typography,
   Box,
 } from "@mui/material";
-import { useState } from "react";
-
-const allWallets = [
-  "Wallet A",
-  "Wallet B",
-  "Wallet C",
-  "Wallet D",
-  "Wallet E",
-  "Wallet F",
-  "Wallet G",
-  "Wallet H",
-];
+import { useState, useEffect } from "react";
 
 export default function WalletMultiSelect({ selected, setSelected }) {
+  const [allWallets, setAllWallets] = useState([]);
   const maxSelect = 5;
+
+  useEffect(() => {
+    console.log("Selected wallets:", selected);
+    const fetchAllWallets = async () => {
+      try {
+        const res = await fetch("/api/wallets");
+        const data = await res.json();
+        console.log("All wallets data:", data.data);
+        if (data.status === 200) {
+          setAllWallets(data.data);
+        } else {
+          console.error("Error fetching wallets:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching wallets:", error);
+      }
+    };
+
+    fetchAllWallets();
+  }, []);
 
   const handleChange = (event) => {
     const value = event.target.value;
@@ -66,10 +76,14 @@ export default function WalletMultiSelect({ selected, setSelected }) {
           </Typography>
         </MenuItem>
         {allWallets.map((wallet) => {
-          const isSelected = selected.includes(wallet);
+          const isSelected = selected.includes(wallet.WalletID);
           const disabled = selected.length >= maxSelect && !isSelected;
           return (
-            <MenuItem key={wallet} value={wallet} disabled={disabled}>
+            <MenuItem
+              key={wallet.WalletID}
+              value={wallet.WalletID}
+              disabled={disabled}
+            >
               <Checkbox
                 checked={isSelected}
                 sx={{
@@ -84,7 +98,7 @@ export default function WalletMultiSelect({ selected, setSelected }) {
                   color: isSelected ? "#000" : "inherit",
                 }}
               >
-                {wallet}
+                {wallet.WalletName}
               </Typography>
             </MenuItem>
           );

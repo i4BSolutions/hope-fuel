@@ -1,10 +1,10 @@
 import { Box, Typography } from "@mui/material";
-import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
 import { HOPEFUEL_STATUSES } from "../../../variables/const";
+import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
 
 export default function HopefuelIdStats() {
   return (
-    <Box sx={{ my: 2 }}>
+    <Box>
       <Typography
         sx={{
           color: "#0F172A",

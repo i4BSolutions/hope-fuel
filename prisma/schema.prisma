@@ -15,12 +15,15 @@ model Agent {
   UserRoleId               Int?
   UserRole                 UserRole?                  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
   Customer                 Customer[]
+  
+  AgentGroupId             Int?
+  
   CustomerAuditlogs        CustomerAuditLogs[]
   FormVisibilityStatus     FormVisibilityStatus[]
   Note                     Note[]
   TransactionAgent         TransactionAgent[]
   CSVExportTransactionLogs CSVExportTransactionLogs[]
-  AgentGroupId             Int?
+  AssignedWallet           AssignedWallet[]
 
   AgentGroup AgentGroup? @relation(fields: [AgentGroupId], references: [AgentGroupID])
 
@@ -259,6 +262,7 @@ model Wallet {
   CurrencyId   Int?
   WalletName   String?        @db.VarChar(255)
   Transactions Transactions[]
+  AssignedWallet AssignedWallet[]
   Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
@@ -279,6 +283,19 @@ model AgentGroup {
   AgentGroupID Int     @id @default(autoincrement())
   GroupName    String  @unique
   Agents       Agent[]
+}
+
+model AssignedWallet {
+  AssignedWalletId  Int     @id @default(autoincrement())
+  WalletId          Int
+  AgentId           Int
+
+  Agent   Agent?    @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_2")
+  Wallet  Wallet?   @relation(fields: [WalletId], references: [WalletId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_1")
+
+  @@index([AgentId], map: "AgentId")
+  @@index([WalletId], map: "WalletId")
+  @@unique([AgentId, WalletId], map: "AgentId_WalletId")
 }
 
 enum CustomerAuditLogs_FieldChanged {

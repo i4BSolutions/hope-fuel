@@ -16,7 +16,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Box sx={{ py: 3 }}>
+    <Box sx={{ py: 3, display: "flex", flexDirection: "column", gap: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography
           sx={{
