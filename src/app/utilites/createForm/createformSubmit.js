@@ -6,7 +6,6 @@ export default async function createFormSubmit(
   files,
   userInfo,
   setloading,
-  formFillingPerson,
   setAmountValidate,
   setmonthValidate,
   setmanyChatValidate,

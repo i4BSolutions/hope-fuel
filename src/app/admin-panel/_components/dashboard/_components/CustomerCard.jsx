@@ -44,7 +44,7 @@ export default function CustomerCard({ stats }) {
       >
         {stats.count.toLocaleString()}
       </Typography>
-      {stats.prevCount && (
+      {stats.prevCount !== null && (
         <Typography
           sx={{
             color: bgRed ? "#FEE2E2" : "#0F172A",
@@ -54,7 +54,10 @@ export default function CustomerCard({ stats }) {
             mt: 3,
           }}
         >
-          Previous Month: {stats.prevCount.toLocaleString()}
+          Previous Month:
+          {stats.prevCount === 0
+            ? stats.prevCount
+            : stats.prevCount.toLocaleString()}
         </Typography>
       )}
     </Box>

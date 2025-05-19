@@ -1,6 +1,6 @@
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import FollowUpCustomers from "../../../../lib/icons/FollowUpCustomers";
 import LegendNode from "../../../../lib/icons/LegendNode";
 import NewCustomers from "../../../../lib/icons/NewCustomers";
@@ -10,45 +10,85 @@ import CustomerCard from "./_components/CustomerCard";
 
 const data = [
   {
+    key: "totalActiveCustomers",
     title: "Total Customers",
     icon: () => <TotalCustomers />,
-    count: 1000,
-    prevCount: 900,
   },
   {
+    key: "newActiveCustomers",
     title: "New Customers",
     icon: () => <NewCustomers />,
-    count: 200,
-    prevCount: 150,
   },
   {
+    key: "oldActiveCustomers",
     title: "Old Customers",
     icon: () => <OldCustomers />,
-    count: 800,
-    prevCount: 750,
   },
   {
+    key: "followUpCustomers",
     title: "Follow Up Customers",
     icon: () => <FollowUpCustomers />,
-    count: 300,
-    prevCount: null,
   },
-];
-
-const chartData = [
-  { month: "January", total: 6500, new: 2100, old: 3000 },
-  { month: "February", total: 8000, new: 2300, old: 2800 },
-  { month: "March", total: 7900, new: 4000, old: 2100 },
-  { month: "April", total: 9000, new: 4000, old: 2200 },
-  { month: "May", total: 9100, new: 4000, old: 2000 },
-  { month: "June", total: 9500, new: 5800, old: 500 },
 ];
 
 export default function CustomerStats({ currentMonth }) {
+  const [chartData, setChartData] = useState([]);
+  const [cardData, setCardData] = useState(data);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    console.log("Current Month for customers:", currentMonth);
+    const year = currentMonth.year();
+    const month = currentMonth.month();
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `/api/customers/stats/?year=${year}&month=${month}`
+        );
+        const result = await response.json();
+        console.log(result);
+        const formattedChartData = result.trend.map((item) => ({
+          month: item.month,
+          total: item.stats.totalActiveCustomers,
+          new: item.stats.newActiveCustomers,
+          old: item.stats.oldActiveCustomers,
+        }));
+        console.log("Formatted Chart Data:", formattedChartData);
+        setChartData(formattedChartData);
+
+        const formattedCardData = data.map((item) => ({
+          ...item,
+          count: result.currentMonth[item.key],
+          prevCount: result.previousMonth[item.key],
+        }));
+        console.log("Formatted Card Data:", formattedCardData);
+        setCardData(formattedCardData);
+      } catch (error) {
+        console.error("Error fetching customer stats:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [currentMonth]);
 
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (!chartData.length || !cardData.length) return null;
   return (
     <Box>
       <Typography
@@ -79,8 +119,8 @@ export default function CustomerStats({ currentMonth }) {
             width: 520,
           }}
         >
-          {data.map((item, index) => (
-            <CustomerCard stats={item} key={index} />
+          {cardData.map((stats) => (
+            <CustomerCard stats={stats} key={stats.key} />
           ))}
         </Box>
         <Box

@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import db from "../../utilites/db";
-import calculateExpireDate from "../../utilites/calculateExpireDate";
-import { max } from "date-fns";
 import moment from "moment-timezone";
+import { NextResponse } from "next/server";
+import calculateExpireDate from "../../utilites/calculateExpireDate";
+import db from "../../utilites/db";
+import prisma from "../../utilites/prisma";
 
 const minimumAmounts = [
   { currencyCode: "USD", amount: 20 },
@@ -183,45 +183,6 @@ async function getExchangeRateByCurrencyId(currencyId) {
   }
 }
 
-// async function getMinimumAmountByCurrencyId(currencyId) {
-//   const query = `
-//     SELECT
-//       *
-//     FROM
-//       MinimumAmount
-//     WHERE
-//       CurrencyId = ?;
-//   `;
-
-//   const values = [currencyId];
-
-//   try {
-//     const result = await db(query, values);
-//     return result.length > 0 ? result[0] : null;
-//   } catch (error) {
-//     throw new Error("[DB] Error getting minimum amount by currency ID");
-//   }
-// }
-
-// async function getMinimumAmountByUSD() {
-//   const query = `
-//     SELECT
-//       Amount 
-//     FROM
-//       MinimumAmount 
-//     WHERE
-//       CurrencyId = (SELECT CurrencyId FROM Currency WHERE CurrencyCode = 'USD')
-//     LIMIT 1;
-//   `;
-
-//   try {
-//     const result = await db(query);
-//     return result.length > 0 ? result[0].Amount : 0;
-//   } catch (error) {
-//     throw new Error("[DB] Error getting USD minimum amount");
-//   }
-// }
-
 function getMinimumAmountByCurrencyCode(currencyCode) {
   const minimumAmount = minimumAmounts.find(
     (item) => item.currencyCode === currencyCode
@@ -242,18 +203,41 @@ async function checkMinimumAmount(amount, month, currencyId, currencyCode) {
   console.log("Minimum amount by month: ", minimumAmountByMonth);
 
   // If currency is NOT MMK, THB, or USD, convert amount to USD before comparison
-  if (currencyCode !== "MMK" && currencyCode !== "THB" && currencyCode !== "USD") {
+  if (
+    currencyCode !== "MMK" &&
+    currencyCode !== "THB" &&
+    currencyCode !== "USD"
+  ) {
     const exchangeRateData = await getExchangeRateByCurrencyId(currencyId);
-    
+
     if (!exchangeRateData) {
       throw new Error("Exchange rate data not found");
     }
 
-    const convertedAmount = convertCurrency(amount, exchangeRateData.ExchangeRate);
+    const convertedAmount = convertCurrency(
+      amount,
+      exchangeRateData.ExchangeRate
+    );
     return convertedAmount >= minimumAmountByMonth;
   }
 
   return amount >= minimumAmountByMonth;
+}
+
+async function InsertSubscription(customerId, month) {
+  const currentDate = new Date();
+  try {
+    const subscription = await prisma.subscription.create({
+      data: {
+        CustomerID: customerId,
+        StartDate: currentDate,
+        EndDate: calculateExpireDate(currentDate, month, true),
+      },
+    });
+    return subscription.SubscriptionID;
+  } catch (error) {
+    console.error("Error inserting subscription:", error);
+  }
 }
 
 export async function POST(req) {
@@ -286,15 +270,25 @@ export async function POST(req) {
     const currency = await getCurrencyByWalletId(walletId);
 
     if (!currency) {
-      return NextResponse.json({ error: "Currency not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Currency not found" },
+        { status: 404 }
+      );
     }
 
     // Check if the amount is above the minimum requirement
-    const isAmountValid = await checkMinimumAmount(amount, month, currency.CurrencyId, currency.CurrencyCode);
+    const isAmountValid = await checkMinimumAmount(
+      amount,
+      month,
+      currency.CurrencyId,
+      currency.CurrencyCode
+    );
 
     if (!isAmountValid) {
       return NextResponse.json(
-        { error: `Amount is less than the required minimum ${currency.CurrencyCode} for ${month} month(s).` },
+        {
+          error: `Amount is less than the required minimum ${currency.CurrencyCode} for ${month} month(s).`,
+        },
         { status: 400 }
       );
     }
@@ -360,16 +354,18 @@ export async function POST(req) {
     ];
     const result = await db(query, values);
 
+    const subscriptionId = await InsertSubscription(customerId, month);
     const transactionId = result.insertId;
     const formStatusId = await InsertFormStatus(transactionId);
     const screenShotIds = await createScreenShot(screenShot, transactionId);
     const logId = await InsertTransactionLog(transactionId, agentId);
-    
+
     return NextResponse.json({
       status: "success",
       transactionId,
       screenShotIds,
       formStatusId,
+      subscriptionId,
     });
   } catch (error) {
     return NextResponse.json(
