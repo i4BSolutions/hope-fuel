@@ -10,14 +10,14 @@ datasource db {
 }
 
 model Agent {
-  AgentId                  Int                        @id @default(autoincrement())
-  AwsId                    String?                    @unique
-  UserRoleId               Int?
-  UserRole                 UserRole?                  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
-  Customer                 Customer[]
-  
-  AgentGroupId             Int?
-  
+  AgentId    Int        @id @default(autoincrement())
+  AwsId      String?    @unique
+  UserRoleId Int?
+  UserRole   UserRole?  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
+  Customer   Customer[]
+
+  AgentGroupId Int?
+
   CustomerAuditlogs        CustomerAuditLogs[]
   FormVisibilityStatus     FormVisibilityStatus[]
   Note                     Note[]
@@ -50,7 +50,7 @@ model Currency {
 model Customer {
   CustomerId        Int                 @id @default(autoincrement())
   Name              String?             @db.VarChar(255)
-  Email             String?             @unique
+  Email             String?             @db.VarChar(255)
   ManyChatId        String?             @db.VarChar(255)
   ExpireDate        DateTime?           @db.Date
   UserCountry       Int?
@@ -258,12 +258,12 @@ model UserRole {
 }
 
 model Wallet {
-  WalletId     Int            @id @default(autoincrement())
-  CurrencyId   Int?
-  WalletName   String?        @db.VarChar(255)
-  Transactions Transactions[]
+  WalletId       Int              @id @default(autoincrement())
+  CurrencyId     Int?
+  WalletName     String?          @db.VarChar(255)
+  Transactions   Transactions[]
   AssignedWallet AssignedWallet[]
-  Currency     Currency?      @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
+  Currency       Currency?        @relation(fields: [CurrencyId], references: [CurrencyId], onDelete: Restrict, onUpdate: Restrict, map: "wallet_ibfk_1")
 
   @@index([CurrencyId], map: "CurrencyId")
 }
@@ -286,16 +286,16 @@ model AgentGroup {
 }
 
 model AssignedWallet {
-  AssignedWalletId  Int     @id @default(autoincrement())
-  WalletId          Int
-  AgentId           Int
+  AssignedWalletId Int @id @default(autoincrement())
+  WalletId         Int
+  AgentId          Int
 
-  Agent   Agent?    @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_2")
-  Wallet  Wallet?   @relation(fields: [WalletId], references: [WalletId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_1")
+  Agent  Agent?  @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_2")
+  Wallet Wallet? @relation(fields: [WalletId], references: [WalletId], onDelete: Cascade, onUpdate: Restrict, map: "assignedwallet_ibfk_1")
 
+  @@unique([AgentId, WalletId], map: "AgentId_WalletId")
   @@index([AgentId], map: "AgentId")
   @@index([WalletId], map: "WalletId")
-  @@unique([AgentId, WalletId], map: "AgentId_WalletId")
 }
 
 enum CustomerAuditLogs_FieldChanged {
