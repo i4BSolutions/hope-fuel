@@ -11,7 +11,6 @@ import {
 import { useState } from "react";
 import WalletPopover from "./WalletPopover";
 
-// TODO: Add an assigned wallet (currently wallet assign function is not implemented)
 export default function PaymentCheckerTable({ data }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedWallets, setSelectedWallets] = useState([]);
@@ -76,7 +75,7 @@ export default function PaymentCheckerTable({ data }) {
                   {checker.pending}
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
-                  {/* {checker.wallets.slice(0, 1).join(", ")}...
+                  {checker.assignedWallet.slice(0, 1).join(", ")}...
                   <Button
                     size="small"
                     variant="contained"
@@ -89,10 +88,10 @@ export default function PaymentCheckerTable({ data }) {
                       color: "#000",
                       fontWeight: "bold",
                     }}
-                    onClick={(e) => handleClick(e, checker.wallets)}
+                    onClick={(e) => handleClick(e, checker.assignedWallet)}
                   >
                     View All
-                  </Button> */}
+                  </Button>
                 </TableCell>
                 <TableCell sx={{ paddingTop: 1, paddingBottom: 1 }}>
                   {checker.averageTimeHours}

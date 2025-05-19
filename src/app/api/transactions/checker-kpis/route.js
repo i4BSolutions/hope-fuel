@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
 import dayjs from "dayjs";
 
-// TODO: Add assignedWallet to the response (currently wallet assign function is not implemented)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const date = searchParams.get("month");
@@ -19,6 +18,19 @@ export async function GET(request) {
     });
 
     const checkerMap = new Map(checkers.map((c) => [c.AgentId, c.AwsId]));
+
+    const assignedWallets = await prisma.assignedWallet.findMany({
+      include: {
+        Wallet: true,
+      },
+    });
+
+    const walletMap = assignedWallets.reduce((acc, curr) => {
+      const agentId = curr.AgentId;
+      if (!acc[agentId]) acc[agentId] = [];
+      if (curr.Wallet?.WalletName) acc[agentId].push(curr.Wallet.WalletName);
+      return acc;
+    }, {});
 
     const txAgents = await prisma.TransactionAgent.findMany({
       orderBy: { LogDate: "desc" },
@@ -114,10 +126,11 @@ export async function GET(request) {
       return {
         date: date,
         checkerId: checker.checkerId,
+        name: checker.name,
         checked: totalChecked,
         pending: checker.pending,
-        assignedWallet: [],
-        averageTimeHours: `${avgTime}%`,
+        assignedWallet: walletMap[checker.checkerId] || [],
+        averageTimeHours: avgTime ? `${avgTime}` : "N/A",
         under48hPercent: `${underPct}%`,
         over48hPercent: `${overPct}%`,
       };
