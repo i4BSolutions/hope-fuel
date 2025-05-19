@@ -12,6 +12,7 @@ datasource db {
 model Agent {
   AgentId    Int        @id @default(autoincrement())
   AwsId      String?    @unique
+  Username   String?    @unique
   UserRoleId Int?
   UserRole   UserRole?  @relation(fields: [UserRoleId], references: [UserRoleID], onDelete: Restrict, onUpdate: Restrict, map: "agent_ibfk_1")
   Customer   Customer[]

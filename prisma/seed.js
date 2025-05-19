@@ -39,12 +39,12 @@ async function main() {
 
   const agentRecords = [];
   for (const { group, agents } of agentGroupData) {
-    for (const awsId of agents) {
+    for (const name of agents) {
       const agentRecord = await prisma.agent.upsert({
-        where: { AwsId: awsId },
-        update: { AgentGroupId: group.AgentGroupID },
+        where: { AwsId: name },
+        update: { AgentGroupId: group.AgentGroupID, Username: name },
         create: {
-          AwsId: awsId,
+          AwsId: name,
           AgentGroupId: group.AgentGroupID,
         },
       });
