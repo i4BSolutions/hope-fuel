@@ -17,7 +17,7 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       t.Month,
       GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
       c.ManyChatId,
-      GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ',') AS 'FormFilledPerson',
+      GROUP_CONCAT(DISTINCT a.Username SEPARATOR ',') AS 'FormFilledPerson',
       ts.TransactionStatus,
       n.Note AS Note
     FROM Transactions t

@@ -18,7 +18,7 @@ export async function POST(req) {
     }
 
     const agent = await prisma.agent.upsert({
-      where: { AwsId: awsId },
+      where: { AwsId: awsId, Username: email.split("@")[0] },
       update: {},
       create: {
         AwsId: awsId,
@@ -28,12 +28,10 @@ export async function POST(req) {
     });
 
     const payload = {
-      id: agent.AgentId,
-      awsId: agent.AwsId,
       roleId: agent.UserRoleId,
       username: email.split("@")[0],
-      email,
     };
+
     const token = await new SignJWT(payload)
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("1d")
