@@ -4,17 +4,9 @@ import {
   Pagination,
   Paper,
   Stack,
-  styled,
-  Table,
-  TableBody,
-  TableCell,
-  tableCellClasses,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 
 const itemsPerPage = 4;
 
