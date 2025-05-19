@@ -1,3 +1,4 @@
+const { startOfMonth, addDays } = require("date-fns");
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
@@ -25,8 +26,10 @@ async function main() {
   ];
   const transactionStatusRecords = [];
   for (const status of transactionStatuses) {
-    const record = await prisma.transactionStatus.create({
-      data: { TransactionStatus: status },
+    const record = await prisma.transactionStatus.upsert({
+      where: { TransactionStatus: status },
+      update: {},
+      create: { TransactionStatus: status },
     });
     transactionStatusRecords.push(record);
   }
@@ -718,6 +721,112 @@ async function main() {
   }
 
   const platforms = [];
+
+  const groupA = await prisma.agentGroup.upsert({
+    where: { GroupName: "Group A" },
+    update: {},
+    create: { GroupName: "Group A" },
+  });
+
+  const groupB = await prisma.agentGroup.upsert({
+    where: { GroupName: "Group B" },
+    update: {},
+    create: { GroupName: "Group B" },
+  });
+
+  const agentGroupData = [
+    {
+      group: groupA,
+      agents: [
+        "Agent Mg Mg",
+        "Agent Aung Aung",
+        "Agent Ko Ko",
+        "Agent Nyi Nyi",
+      ],
+    },
+    {
+      group: groupB,
+      agents: ["Agent Ma Ma", "Agent Phyu Phyu", "Agent Hla Hla"],
+    },
+  ];
+
+  const startDate = startOfMonth(new Date());
+  let agentIndex = 0;
+
+  for (const { group, agents } of agentGroupData) {
+    for (const awsId of agents) {
+      const agent = await prisma.agent.upsert({
+        where: { AwsId: awsId },
+        update: { AgentGroupId: group.AgentGroupID },
+        create: {
+          AwsId: awsId,
+          AgentGroupId: group.AgentGroupID,
+        },
+      });
+
+      const email = `${awsId.toLowerCase().replace(/\s+/g, "")}@example.com`;
+
+      const customer = await prisma.customer.upsert({
+        where: { Email: email },
+        update: { AgentId: agent.AgentId },
+        create: {
+          Name: awsId,
+          Email: email,
+          AgentId: agent.AgentId,
+        },
+      });
+
+      const manyChat = await prisma.manyChat.upsert({
+        where: { ConversationId: `${customer.CustomerId}` },
+        update: {},
+        create: {
+          ConversationId: `${customer.CustomerId}`,
+          CustomerId: customer.CustomerId,
+        },
+      });
+
+      await prisma.customer.update({
+        where: { CustomerId: customer.CustomerId },
+        data: { ManyChatId: manyChat.ConversationId },
+      });
+
+      const transactionDate = addDays(startDate, agentIndex + 1);
+      const randomWallet = walletRecords[agentIndex % walletRecords.length];
+      const amount = Math.floor(Math.random() * 90) + 10;
+
+      const transaction = await prisma.transactions.create({
+        data: {
+          CustomerID: customer.CustomerId,
+          TransactionDate: transactionDate,
+          Month: transactionDate.getMonth() + 1,
+          HopeFuelID: 1 + agentIndex,
+          Amount: amount,
+          WalletID: randomWallet.WalletId,
+        },
+      });
+
+      await prisma.transactionAgent.create({
+        data: {
+          TransactionID: transaction.TransactionID,
+          AgentID: agent.AgentId,
+        },
+      });
+
+      const randomStatus =
+        transactionStatusRecords[
+          Math.floor(Math.random() * transactionStatusRecords.length)
+        ];
+
+      await prisma.formStatus.create({
+        data: {
+          TransactionID: transaction.TransactionID,
+          TransactionStatusID: randomStatus.TransactionStatusID,
+        },
+      });
+
+      agentIndex++;
+    }
+  }
 }
 
 main()

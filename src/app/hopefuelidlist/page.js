@@ -33,7 +33,7 @@ const HopeFuelIdListPage = () => {
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
-
+  console.log(data);
   const [debouncedSearch] = useDebounce(searchText, 100);
 
   useEffect(() => {
