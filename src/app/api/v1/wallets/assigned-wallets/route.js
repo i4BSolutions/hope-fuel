@@ -30,26 +30,33 @@ export async function POST(request) {
 // Get all function
 export async function GET(request) {
   try {
-    const assignedWallets = await prisma.AssignedWallet.findMany({
+    const agents = await prisma.agent.findMany({
+      where: {
+        UserRoleId: 3, // Support Agent
+      },
+      select: {
+        AgentId: true,
+        AwsId: true,
+      },
+    });
+
+    const assignedWallets = await prisma.assignedWallet.findMany({
       include: {
         Wallet: true,
       },
     });
 
-    const grouped = assignedWallets.reduce((acc, curr) => {
-      const { AgentId, Wallet } = curr;
-      const agentIdInt =
-        typeof AgentId === "string" ? parseInt(AgentId, 10) : AgentId;
-      if (!acc[agentIdInt]) {
-        acc[agentIdInt] = [];
-      }
-      acc[agentIdInt].push(Wallet);
+    const walletMap = assignedWallets.reduce((acc, curr) => {
+      const agentId = curr.AgentId;
+      if (!acc[agentId]) acc[agentId] = [];
+      acc[agentId].push(curr.Wallet);
       return acc;
     }, {});
 
-    const result = Object.entries(grouped).map(([AgentId, wallets]) => ({
-      AgentId: parseInt(AgentId, 10),
-      wallets,
+    const result = agents.map((agent) => ({
+      AgentId: agent.AgentId,
+      AwsId: agent.AwsId,
+      wallets: walletMap[agent.AgentId] || [],
     }));
 
     return NextResponse.json({
