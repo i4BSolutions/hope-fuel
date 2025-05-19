@@ -3,6 +3,7 @@
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
 import Dashboard from "./_components/dashboard/page";
+import AssignDashboard from "./_components/assign-dashboard/page";
 import ExchangeRates from "./_components/exchangeRate/page";
 import ExportCSVPage from "./_components/exportCsv/page";
 import FormOpenClosePage from "./_components/formOpenClose/page";
@@ -20,6 +21,7 @@ const tabSx = {
 
 const tabs = [
   { label: "Dashboard", component: () => <Dashboard /> },
+  { label: "Groups & Wallets Assign", component: () => <AssignDashboard /> },
   { label: "Form Open/Close", component: () => <FormOpenClosePage /> },
   { label: "Currency Exchange Rate", component: () => <ExchangeRates /> },
   { label: "Export CSV", component: () => <ExportCSVPage /> },
