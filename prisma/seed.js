@@ -1,5 +1,4 @@
-const { startOfMonth, addDays } = require("date-fns");
-const { PrismaClient } = require("../generated/prisma");
+import { PrismaClient } from "../generated/prisma/index.js";
 const prisma = new PrismaClient();
 
 async function main() {
@@ -10,13 +9,48 @@ async function main() {
     userRoleRecords.push(record);
   }
 
-  const adminAgent = await prisma.agent.create({
-    data: {
-      AwsId: "fakeAwsId",
-      UserRoleId: userRoleRecords.find((role) => role.UserRole === "ADMIN")
-        .UserRoleID,
-    },
+  const groupA = await prisma.agentGroup.upsert({
+    where: { GroupName: "Group A" },
+    update: {},
+    create: { GroupName: "Group A" },
   });
+
+  const groupB = await prisma.agentGroup.upsert({
+    where: { GroupName: "Group B" },
+    update: {},
+    create: { GroupName: "Group B" },
+  });
+
+  const agentGroupData = [
+    {
+      group: groupA,
+      agents: [
+        "Agent Mg Mg",
+        "Agent Aung Aung",
+        "Agent Ko Ko",
+        "Agent Nyi Nyi",
+      ],
+    },
+    {
+      group: groupB,
+      agents: ["Agent Ma Ma", "Agent Phyu Phyu", "Agent Hla Hla"],
+    },
+  ];
+
+  const agentRecords = [];
+  for (const { group, agents } of agentGroupData) {
+    for (const awsId of agents) {
+      const agentRecord = await prisma.agent.upsert({
+        where: { AwsId: awsId },
+        update: { AgentGroupId: group.AgentGroupID },
+        create: {
+          AwsId: awsId,
+          AgentGroupId: group.AgentGroupID,
+        },
+      });
+      agentRecords.push(agentRecord);
+    }
+  }
 
   const transactionStatuses = [
     "Form Entry",
@@ -24,6 +58,7 @@ async function main() {
     "Card Issued",
     "Cancel",
   ];
+
   const transactionStatusRecords = [];
   for (const status of transactionStatuses) {
     const record = await prisma.transactionStatus.upsert({
@@ -201,7 +236,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2024-12-25"),
       EndDate: new Date("2025-01-31"),
       Amount: 100,
@@ -220,7 +254,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-05"),
       EndDate: new Date("2025-03-31"),
       Amount: 100,
@@ -238,7 +271,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-15"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -257,7 +289,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-01-25"),
       EndDate: new Date("2025-02-28"),
       Amount: 100,
@@ -276,7 +307,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-05-30"),
       Amount: 100,
@@ -295,7 +325,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-05-30"),
       Amount: 100,
@@ -314,7 +343,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2024-12-02"),
       EndDate: new Date("2025-01-31"),
       Amount: 100,
@@ -333,7 +361,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-21"),
       EndDate: new Date("2025-03-31"),
       Amount: 100,
@@ -352,7 +379,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-25"),
       EndDate: new Date("2025-03-31"),
       Amount: 100,
@@ -371,7 +397,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-20"),
       EndDate: new Date("2025-03-31"),
       Amount: 100,
@@ -390,7 +415,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-12"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -409,7 +433,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-06-30"),
       Amount: 100,
@@ -428,7 +451,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-03-27"),
       EndDate: new Date("2025-04-31"),
       Amount: 100,
@@ -447,7 +469,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -466,7 +487,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-03-11"),
       EndDate: new Date("2025-04-30"),
       Amount: 100,
@@ -485,7 +505,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-02-20"),
       EndDate: new Date("2025-04-30"),
       Amount: 100,
@@ -504,7 +523,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2024-04-25"),
       EndDate: new Date("2025-04-30"),
       Amount: 100,
@@ -523,7 +541,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -542,7 +559,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-12"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -561,7 +577,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-06-30"),
       Amount: 100,
@@ -580,7 +595,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-25"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -599,7 +613,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-04-15"),
       EndDate: new Date("2025-05-31"),
       Amount: 100,
@@ -618,7 +631,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-03-22"),
       EndDate: new Date("2025-06-30"),
       Amount: 100,
@@ -637,7 +649,6 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      AgentId: adminAgent.AgentId,
       StartDate: new Date("2025-01-23"),
       EndDate: new Date("2025-03-31"),
       Amount: 100,
@@ -649,6 +660,11 @@ async function main() {
   ];
 
   for (const customer of customersData) {
+    const randomWalletId =
+      walletRecords[Math.floor(Math.random() * walletRecords.length)].WalletId;
+    const randomAgentId =
+      agentRecords[Math.floor(Math.random() * agentRecords.length)].AgentId;
+
     const prismaCustomer = await prisma.customer.create({
       data: {
         Name: customer.Name,
@@ -664,18 +680,20 @@ async function main() {
         },
         Agent: {
           connect: {
-            AgentId: customer.AgentId,
+            AgentId: randomAgentId,
           },
         },
       },
     });
+
     const note = await prisma.note.create({
       data: {
         Note: "Tesing customers data!",
         Date: customer.StartDate,
-        AgentID: adminAgent.AgentId,
+        AgentID: randomAgentId,
       },
     });
+
     const transaction = await prisma.transactions.create({
       data: {
         CustomerID: prismaCustomer.CustomerId,
@@ -683,13 +701,14 @@ async function main() {
         SupportRegionID: supportRegionRecords.find(
           (s) => s.Region === "North America"
         ).SupportRegionID,
-        WalletID: walletRecords[0].WalletId,
+        WalletID: randomWalletId,
         TransactionDate: customer.StartDate,
         NoteID: note.NoteID,
         Month: customer.Month,
         HopeFuelID: Math.floor(100000 + Math.random() * 900000),
       },
     });
+
     await prisma.subscription.create({
       data: {
         CustomerID: prismaCustomer.CustomerId,
@@ -697,12 +716,14 @@ async function main() {
         EndDate: customer.EndDate,
       },
     });
+
     await prisma.screenShot.create({
       data: {
         TransactionID: transaction.TransactionID,
         ScreenShotLink: customer.ScreenShotLink,
       },
     });
+
     await prisma.formStatus.create({
       data: {
         TransactionID: transaction.TransactionID,
@@ -711,121 +732,14 @@ async function main() {
         ).TransactionStatusID,
       },
     });
+
     await prisma.transactionAgent.create({
       data: {
         TransactionID: transaction.TransactionID,
-        AgentID: adminAgent.AgentId,
+        AgentID: randomAgentId,
         LogDate: customer.StartDate,
       },
     });
-  }
-
-  const platforms = [];
-
-  const groupA = await prisma.agentGroup.upsert({
-    where: { GroupName: "Group A" },
-    update: {},
-    create: { GroupName: "Group A" },
-  });
-
-  const groupB = await prisma.agentGroup.upsert({
-    where: { GroupName: "Group B" },
-    update: {},
-    create: { GroupName: "Group B" },
-  });
-
-  const agentGroupData = [
-    {
-      group: groupA,
-      agents: [
-        "Agent Mg Mg",
-        "Agent Aung Aung",
-        "Agent Ko Ko",
-        "Agent Nyi Nyi",
-      ],
-    },
-    {
-      group: groupB,
-      agents: ["Agent Ma Ma", "Agent Phyu Phyu", "Agent Hla Hla"],
-    },
-  ];
-
-  const startDate = startOfMonth(new Date());
-  let agentIndex = 0;
-
-  for (const { group, agents } of agentGroupData) {
-    for (const awsId of agents) {
-      const agent = await prisma.agent.upsert({
-        where: { AwsId: awsId },
-        update: { AgentGroupId: group.AgentGroupID },
-        create: {
-          AwsId: awsId,
-          AgentGroupId: group.AgentGroupID,
-        },
-      });
-
-      const email = `${awsId.toLowerCase().replace(/\s+/g, "")}@example.com`;
-
-      const customer = await prisma.customer.upsert({
-        where: { Email: email },
-        update: { AgentId: agent.AgentId },
-        create: {
-          Name: awsId,
-          Email: email,
-          AgentId: agent.AgentId,
-        },
-      });
-
-      const manyChat = await prisma.manyChat.upsert({
-        where: { ConversationId: `${customer.CustomerId}` },
-        update: {},
-        create: {
-          ConversationId: `${customer.CustomerId}`,
-          CustomerId: customer.CustomerId,
-        },
-      });
-
-      await prisma.customer.update({
-        where: { CustomerId: customer.CustomerId },
-        data: { ManyChatId: manyChat.ConversationId },
-      });
-
-      const transactionDate = addDays(startDate, agentIndex + 1);
-      const randomWallet = walletRecords[agentIndex % walletRecords.length];
-      const amount = Math.floor(Math.random() * 90) + 10;
-
-      const transaction = await prisma.transactions.create({
-        data: {
-          CustomerID: customer.CustomerId,
-          TransactionDate: transactionDate,
-          Month: transactionDate.getMonth() + 1,
-          HopeFuelID: 1 + agentIndex,
-          Amount: amount,
-          WalletID: randomWallet.WalletId,
-        },
-      });
-
-      await prisma.transactionAgent.create({
-        data: {
-          TransactionID: transaction.TransactionID,
-          AgentID: agent.AgentId,
-        },
-      });
-
-      const randomStatus =
-        transactionStatusRecords[
-          Math.floor(Math.random() * transactionStatusRecords.length)
-        ];
-
-      await prisma.formStatus.create({
-        data: {
-          TransactionID: transaction.TransactionID,
-          TransactionStatusID: randomStatus.TransactionStatusID,
-        },
-      });
-
-      agentIndex++;
-    }
   }
 }
 
