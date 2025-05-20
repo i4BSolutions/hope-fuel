@@ -23,7 +23,7 @@ const FormFillingAgentRateTable = ({
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
-  console.log(currentAgents);
+
   const handlePageChange = (event, value) => {
     setPage(value);
   };
