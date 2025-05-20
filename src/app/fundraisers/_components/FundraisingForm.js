@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Alert, Box, Button, Grid, TextField } from "@mui/material";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FundraisingSchema } from "../schema";
@@ -11,8 +10,6 @@ import BaseCountry from "./BaseCountry";
 import { LogoUpload } from "./LogoUpload";
 
 const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
-  const router = useRouter();
-
   const [logoFile, setLogoFile] = useState(null);
   const [Completed, setCompleted] = useState(false);
   const initialValues = useMemo(
@@ -38,6 +35,7 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
     handleSubmit,
     setValue,
     clearErrors,
+    setError,
     reset,
     formState: { errors },
   } = useForm({
@@ -55,13 +53,12 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
   const onSubmit = async (data) => {
     if (onSubmitHandler) {
       try {
-        onSubmitHandler(data);
+        await onSubmitHandler(data);
         setCompleted(true);
         setTimeout(() => {
           setCompleted(false);
         }, 5000);
       } catch (error) {
-        console.log("Error:", error);
         throw new Error("Failed to update fundraiser");
       }
       return;
@@ -71,37 +68,30 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
       delete data.NewCountry;
     }
 
-    try {
-      //send data to the server
-      const response = await fetch("/api/v1/fundraisers/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+    const response = await fetch("/api/v1/fundraisers/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
-        body: JSON.stringify(data),
-      });
-      const result = await response.json();
-      if (response.ok && result) {
-        reset();
-        setLogoFile(null);
-        setCompleted(true);
-
-        setTimeout(() => {
-          setCompleted(false);
-        }, 3000);
-      } else {
+    const result = await response.json();
+    if (response.ok && result) {
+      onCancel && onCancel();
+      reset();
+      setLogoFile(null);
+      setCompleted(true);
+      setTimeout(() => {
         setCompleted(false);
-        throw new Error(result.message);
-      }
-    } catch (error) {
-      console.log("Error:", error);
-      throw new Error("Failed to create fundraiser");
+      }, 3000);
+    } else {
+      setCompleted(false);
+      setError("FundraiserEmail", {
+        type: "server",
+        message: result.message || "Failed to create fundraiser",
+      });
     }
-  };
-
-  const onError = (errors) => {
-    console.log("Form Errors", errors);
   };
 
   return (
@@ -113,7 +103,7 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
         borderRadius: 3,
       }}
     >
-      <Box component="form" onSubmit={handleSubmit(onSubmit, onError)}>
+      <Box component="form" onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={2}>
           <Grid item xs={4} sx={{ textAlign: "center", marginX: "auto" }}>
             <LogoUpload
@@ -226,6 +216,7 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
               helperText={errors.OtherLink2?.message}
             />
           </Grid>
+
           <Grid item xs={6}>
             <Button
               fullWidth
