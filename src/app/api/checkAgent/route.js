@@ -23,17 +23,16 @@ export async function POST(req) {
       create: {
         AwsId: awsId,
         UserRoleId: 1,
+        Username: email.split("@")[0],
       },
       include: { UserRole: true },
     });
 
     const payload = {
-      id: agent.AgentId,
-      awsId: agent.AwsId,
       roleId: agent.UserRoleId,
       username: email.split("@")[0],
-      email,
     };
+
     const token = await new SignJWT(payload)
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("1d")
