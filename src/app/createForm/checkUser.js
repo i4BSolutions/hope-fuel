@@ -1,94 +1,108 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Box, Typography, CircularProgress, Modal } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { Box, Modal, TextField, Typography } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-import { useEffect, useState } from "react";
+
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
 import { AGENT_ROLE } from "../../lib/constants";
 import { useAgentStore } from "../../stores/agentStore";
-import CustomButton from "../components/Button";
-import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import checkUserSubmit from "../utilites/checkUserSubmit";
+import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
+import CustomButton from "../components/Button";
+import CustomInput from "../components/Input";
+
+// Zod Schema
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+});
 
 export default function CheckUser({ onUserCheck }) {
-  const [loading, setLoading] = useState(false);
-  const [hasPermissionThisMonth, sethasPermissionThisMonth] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(null);
-  const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const { agent } = useAgentStore();
-  const [open, setOpen] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(null);
+  const [hasPermissionThisMonth, setHasPermissionThisMonth] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
 
   useEffect(() => {
     const fetchFormStatus = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const response = await fetch("/api/formOpenClose");
-        const result = await response.json();
-        setIsFormOpen(result.data[0].IsFormOpen);
-      } catch (error) {
-        console.error("Error fetching form status:", error);
-        setError("Failed to fetch form status");
-        setSnackbarOpen(true);
+        const { data } = await response.json();
+        setIsFormOpen(data[0]?.IsFormOpen);
+      } catch (err) {
+        console.error("Error fetching form status:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchFormStatus();
   }, []);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
+  const checkUserPermission = async (name, email) => {
+    const headers = { "Content-Type": "application/json" };
+    const body = JSON.stringify({ name, email });
 
-    const formData = new FormData(event.currentTarget);
-    const name = formData.get("name").trim();
-    const email = formData.get("email").trim();
-    const user = await checkUserSubmit(name, email);
-
-    // // check if the user has permission
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    var raw = JSON.stringify({
-      name: name,
-      email: email,
+    const response = await fetch("/api/checkolduserpermission/", {
+      method: "POST",
+      headers,
+      body,
     });
 
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
-    };
+    const result = await response.json();
+    return result;
+  };
 
-    let bool = true;
+  const onSubmit = async ({ name, email }) => {
+    setLoading(true);
+
+    const user = await checkUserSubmit(name.trim(), email.trim());
+
+    let hasPermission = true;
 
     if (agent.roleId !== AGENT_ROLE.ADMIN) {
-      let response = await fetch(
-        "/api/checkolduserpermission/",
-        requestOptions
-      );
-      bool = await response.json();
+      hasPermission = await checkUserPermission(name, email);
     }
 
-    if (!bool) {
-      sethasPermissionThisMonth(bool);
-      setOpen(true);
-      setLoading(bool);
+    setHasPermissionThisMonth(hasPermission);
+
+    if (!hasPermission) {
+      setOpenModal(true);
+      setLoading(false);
       return;
-    } else if (bool && user) {
-      setOpen(true);
-      onUserCheck(user, true); // User exists, show ExtendForm
-    } else if (!user) {
-      // if user don't exist
-      onUserCheck({ name, email }, false); // New user, show CreateForm
     }
+
+    if (user) {
+      setOpenModal(true);
+      onUserCheck(user, true);
+    } else {
+      onUserCheck({ name, email }, false);
+    }
+
     setLoading(false);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <Box
         sx={{
@@ -101,6 +115,7 @@ export default function CheckUser({ onUserCheck }) {
         <CircularProgress />
       </Box>
     );
+  }
 
   if (isFormOpen === false && agent.roleId !== AGENT_ROLE.ADMIN) {
     return <ServiceUnavailable />;
@@ -109,81 +124,51 @@ export default function CheckUser({ onUserCheck }) {
   return (
     <>
       <Typography
-        component="h1"
-        sx={{ fontSize: "23px", marginTop: 8 }}
         variant="h5"
         fontWeight="bold"
         align="center"
+        sx={{ fontSize: 23, mt: 8 }}
       >
         Customer Membership Registration
       </Typography>
+
       <Box
         component="form"
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         sx={{ width: 360, mx: "auto", mt: 4 }}
       >
-        <Typography sx={{ fontSize: "12px" }}>
-          Name <span style={{ color: "red" }}>*</span>
-        </Typography>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Mg Mg"
-          sx={{
-            mb: 2,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "12px",
-              height: "48px",
-            },
-            "& .MuiInputBase-input": {
-              height: "100%",
-              padding: "0px 0px 0px 12px",
-            },
-          }}
+        <Controller
           name="name"
-          id="name"
-          type="text"
-          required
+          control={control}
+          render={({ field }) => (
+            <CustomInput
+              label="Name"
+              placeholder="Mg Mg"
+              {...field}
+              error={!!errors.name}
+              helperText={errors.name?.message}
+            />
+          )}
         />
-
-        <Typography sx={{ fontSize: "12px" }}>
-          Email <span style={{ color: "red" }}>*</span>
-        </Typography>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="mgmg@gmail.com"
-          sx={{
-            mb: 4,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "12px",
-              height: "48px",
-            },
-            "& .MuiInputBase-input": {
-              height: "100%",
-              padding: "0px 0px 0px 12px",
-            },
-          }}
+        <Controller
           name="email"
-          id="email"
-          type="email"
-          required
+          control={control}
+          render={({ field }) => (
+            <CustomInput
+              label="Email"
+              placeholder="mgmg@gmail.com"
+              type="email"
+              {...field}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
+          )}
         />
-
-        <CustomButton
-          width={true}
-          variant="contained"
-          type="submit"
-          text="Check"
-        />
+        <CustomButton width variant="contained" type="submit" text="Check" />
       </Box>
 
-      {hasPermissionThisMonth == false && (
-        <Modal
-          open={open}
-          onClose={() => setOpen(false)}
-          aria-labelledby="error-modal"
-        >
+      {!hasPermissionThisMonth && (
+        <Modal open={openModal} onClose={() => setOpenModal(false)}>
           <Box
             sx={{
               position: "absolute",
@@ -192,23 +177,23 @@ export default function CheckUser({ onUserCheck }) {
               transform: "translate(-50%, -50%)",
               width: 500,
               bgcolor: "white",
-              borderRadius: "12px",
+              borderRadius: 3,
               boxShadow: 24,
               p: 4,
               textAlign: "center",
             }}
           >
-            <Typography sx={{ fontSize: "18px", fontWeight: "bold" }}>
+            <Typography sx={{ fontSize: 18, fontWeight: "bold" }}>
               Customer already existed.
             </Typography>
-            <Typography sx={{ fontSize: "16px", mb: 3, fontWeight: "bold" }}>
+            <Typography sx={{ fontSize: 16, mb: 3, fontWeight: "bold" }}>
               Do you wish to extend his/her membership instead?
             </Typography>
 
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
               <CustomButton
                 variant="outlined"
-                onClick={() => setOpen(false)}
+                onClick={() => setOpenModal(false)}
                 text="Back"
                 icon={<ArrowBackIcon />}
                 sx={{
@@ -216,29 +201,22 @@ export default function CheckUser({ onUserCheck }) {
                   color: "#b71c1c",
                   borderRadius: "25px",
                   px: 3,
-                  "&:hover": {
-                    backgroundColor: "#fce8e6",
-                  },
+                  "&:hover": { backgroundColor: "#fce8e6" },
                   fontSize: "12px",
                 }}
-                type="button"
               />
-
               <CustomButton
                 variant="contained"
-                icon={<ArrowForwardIcon />}
                 text="Proceed to Membership Extension"
+                icon={<ArrowForwardIcon />}
                 sx={{
                   backgroundColor: "#b71c1c",
                   color: "white",
                   borderRadius: "25px",
                   px: 3,
-                  "&:hover": {
-                    backgroundColor: "#9a0007",
-                  },
+                  "&:hover": { backgroundColor: "#9a0007" },
                   fontSize: "12px",
                 }}
-                type="button"
               />
             </Box>
           </Box>

@@ -1,12 +1,26 @@
-import React from "react";
-import { TextField, Select, MenuItem, InputAdornment, IconButton } from "@mui/material";
-import RemoveIcon from "@mui/icons-material/Remove";
-import AddIcon from "@mui/icons-material/Add";
+import {
+  TextField,
+  Select,
+  MenuItem,
+  FormHelperText,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 
-const CustomInput = ({ mb, type, options, value, onChange, error, helperText, readOnly, min, step, endAdornment, width, ...props }) => {
+const CustomInput = ({
+  name,
+  label,
+  type = "text",
+  options = [],
+  value,
+  onChange,
+  error,
+  helperText,
+  disabled,
+  readOnly,
+  ...props
+}) => {
   const commonStyles = {
-    mb: mb ?? 0,
-    width: width ?? "",
     borderRadius: "12px",
     "& .MuiOutlinedInput-root": {
       borderRadius: "12px",
@@ -14,66 +28,53 @@ const CustomInput = ({ mb, type, options, value, onChange, error, helperText, re
     },
     "& .MuiInputBase-input": {
       height: "100%",
-      padding: "0px 0px 0px 12px",
+      padding: "0px 12px",
       fontSize: "14px",
     },
   };
 
   if (type === "select") {
     return (
-      <Select
-        fullWidth
-        sx={{
-          ...commonStyles,
-          "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "rgba(0, 0, 0, 0.23)",
-          },
-          "&:hover .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#000",
-          },
-          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#1976d2",
-          },
-          "& .MuiSelect-select": {
-            padding: "12px",
-            display: "flex",
-            alignItems: "center",
-            fontSize: "14px",
-          },
-        }}
-        value={value ?? ""}
-        onChange={onChange}
-        {...props}
-      >
-        {options?.map((option, index) => (
-          <MenuItem key={option.value || index} value={option.value}>
-            {option.label}
-          </MenuItem>
-        ))}
-      </Select>
+      <FormControl fullWidth error={!!error} sx={{ mb: 2 }}>
+        <InputLabel id={`${name}-label`} sx={{ fontSize: "14px" }}>
+          {label}
+        </InputLabel>
+        <Select
+          labelId={`${name}-label`}
+          id={name}
+          name={name}
+          value={value ?? ""}
+          onChange={onChange}
+          disabled={disabled}
+          label={label}
+          sx={commonStyles}
+          {...props}
+        >
+          {options.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+        {error && <FormHelperText>{helperText}</FormHelperText>}
+      </FormControl>
     );
   }
 
   return (
     <TextField
       fullWidth
-      sx={commonStyles}
+      id={name}
+      name={name}
       type={type}
+      label={label}
       value={value}
       onChange={onChange}
-      error={error}
+      error={!!error}
       helperText={helperText}
-      slotProps={{
-        readOnly: readOnly,
-        min: min,
-        step: step,
-        endAdornment: endAdornment && (
-          <InputAdornment position="end">
-            <IconButton onClick={endAdornment.decrease}><RemoveIcon /></IconButton>
-            <IconButton onClick={endAdornment.increase}><AddIcon /></IconButton>
-          </InputAdornment>
-        ),
-      }}
+      disabled={disabled}
+      InputProps={{ readOnly }}
+      sx={{ ...commonStyles, mb: 2 }}
       {...props}
     />
   );
