@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Skeleton } from "@mui/material";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import PaymentCheckerTable from "./_components/PaymentCheckerTable";
@@ -9,49 +9,44 @@ export default function PaymentCheckerStats({ currentMonth }) {
   const [pendingCount, setPendingCount] = useState(0);
   const [checkedCount, setCheckedCount] = useState(0);
   const [checkerKPI, setCheckerKPI] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const formattedDate = dayjs(currentMonth).format("YYYY-MM");
 
   useEffect(() => {
-    const fetchPendingCount = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await fetch(
+        const pendingRes = await fetch(
           `/api/transactions/status-summary?month=${formattedDate}`
         );
+        const pendingData = await pendingRes.json();
 
-        const data = await response.json();
-
-        if (data.status === 200) {
-          setPendingCount(data.data.pending);
-          setCheckedCount(data.data.checked);
+        if (pendingData.status === 200) {
+          setPendingCount(pendingData.data.pending);
+          setCheckedCount(pendingData.data.checked);
         } else {
-          console.error("Error fetching pending count:", data.message);
+          console.error("Error fetching pending count:", pendingData.message);
         }
-      } catch (error) {
-        console.error("Error fetching pending count:", error);
-      }
-    };
 
-    const fetchCheckerKPI = async () => {
-      try {
-        const response = await fetch(
+        const kpiRes = await fetch(
           `/api/transactions/checker-kpis?month=${formattedDate}`
         );
+        const kpiData = await kpiRes.json();
 
-        const data = await response.json();
-
-        if (data.status === 200) {
-          setCheckerKPI(data.data);
+        if (kpiData.status === 200) {
+          setCheckerKPI(kpiData.data);
         } else {
-          console.error("Error fetching checker KPI:", data.message);
+          console.error("Error fetching checker KPI:", kpiData.message);
         }
       } catch (error) {
-        console.error("Error fetching checker KPI:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchPendingCount();
-    fetchCheckerKPI();
+    fetchData();
   }, [currentMonth, formattedDate]);
 
   return (
@@ -77,10 +72,18 @@ export default function PaymentCheckerStats({ currentMonth }) {
         }}
       >
         <Box sx={{ flex: 1, minWidth: 250 }}>
-          <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
+          {loading ? (
+            <Skeleton variant="rounded" width={250} height={130} />
+          ) : (
+            <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
+          )}
         </Box>
         <Box sx={{ flex: 3, minWidth: "300px" }}>
-          <PaymentCheckerTable data={checkerKPI} />
+          {loading ? (
+            <Skeleton variant="rounded" width="100%" height={300} />
+          ) : (
+            <PaymentCheckerTable data={checkerKPI} />
+          )}
         </Box>
       </Box>
       <Box sx={{ width: "100%" }}>
@@ -93,7 +96,11 @@ export default function PaymentCheckerStats({ currentMonth }) {
             width: "100%",
           }}
         >
-          <WalletGrid currentMonth={formattedDate} />
+          {loading ? (
+            <Skeleton variant="rounded" width="100%" height={400} />
+          ) : (
+            <WalletGrid currentMonth={formattedDate} />
+          )}
         </Box>
       </Box>
     </Box>
