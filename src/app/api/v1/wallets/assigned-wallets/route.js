@@ -30,26 +30,33 @@ export async function POST(request) {
 // Get all function
 export async function GET(request) {
   try {
-    const assignedWallets = await prisma.AssignedWallet.findMany({
+    const agents = await prisma.agent.findMany({
+      where: {
+        UserRoleId: 3, // Support Agent
+      },
+      select: {
+        AgentId: true,
+        AwsId: true,
+      },
+    });
+
+    const assignedWallets = await prisma.assignedWallet.findMany({
       include: {
         Wallet: true,
       },
     });
 
-    const grouped = assignedWallets.reduce((acc, curr) => {
-      const { AgentId, Wallet } = curr;
-      const agentIdInt =
-        typeof AgentId === "string" ? parseInt(AgentId, 10) : AgentId;
-      if (!acc[agentIdInt]) {
-        acc[agentIdInt] = [];
-      }
-      acc[agentIdInt].push(Wallet);
+    const walletMap = assignedWallets.reduce((acc, curr) => {
+      const agentId = curr.AgentId;
+      if (!acc[agentId]) acc[agentId] = [];
+      acc[agentId].push(curr.Wallet);
       return acc;
     }, {});
 
-    const result = Object.entries(grouped).map(([AgentId, wallets]) => ({
-      AgentId: parseInt(AgentId, 10),
-      wallets,
+    const result = agents.map((agent) => ({
+      AgentId: agent.AgentId,
+      AwsId: agent.AwsId,
+      wallets: walletMap[agent.AgentId] || [],
     }));
 
     return NextResponse.json({
@@ -70,9 +77,7 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("agentId");
-
-    console.log("agentId", id);
+    const id = parseInt(searchParams.get("agentId"));
 
     if (!id) {
       return NextResponse.json(
@@ -83,24 +88,45 @@ export async function PUT(request) {
 
     const { walletId } = await request.json();
 
-    const updatedAssignedWallet = await prisma.AssignedWallet.updateMany({
-      where: { AgentId: id },
-      data: {
-        WalletId: walletId,
-      },
-    });
-
-    if (updatedAssignedWallet.count === 0) {
+    if (!Array.isArray(walletId)) {
       return NextResponse.json(
-        { message: "No assigned wallets found for this agent" },
-        { status: 404 }
+        { message: "walletId must be an array" },
+        { status: 400 }
       );
     }
 
+    const currentAssignments = await prisma.assignedWallet.findMany({
+      where: { AgentId: id },
+      select: { WalletId: true },
+    });
+
+    const currentWalletIds = currentAssignments.map((a) => a.WalletId);
+
+    const walletsToAdd = walletId.filter((w) => !currentWalletIds.includes(w));
+    const walletsToRemove = currentWalletIds.filter(
+      (w) => !walletId.includes(w)
+    );
+
+    await Promise.all(
+      walletsToAdd.map((walletId) =>
+        prisma.assignedWallet.create({
+          data: { AgentId: id, WalletId: walletId },
+        })
+      )
+    );
+
+    await prisma.assignedWallet.deleteMany({
+      where: {
+        AgentId: id,
+        WalletId: { in: walletsToRemove },
+      },
+    });
+
     return NextResponse.json({
       status: 200,
-      message: "Assigned wallet(s) updated successfully",
-      data: updatedAssignedWallet,
+      message: "Assigned wallets updated successfully",
+      added: walletsToAdd,
+      removed: walletsToRemove,
     });
   } catch (error) {
     console.error("[PUT] Error updating assigned wallet(s):", error);
