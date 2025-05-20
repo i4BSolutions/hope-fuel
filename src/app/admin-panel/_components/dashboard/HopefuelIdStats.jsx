@@ -54,19 +54,19 @@ export default function HopefuelIdStats() {
   if (!transactionStatuses) return null;
 
   return (
-    <Box>
+    <Box sx={{ width: "100%" }}>
       <Typography
         sx={{
           color: "#0F172A",
-          fontSize: "19px",
+          fontSize: { xs: "16px", sm: "17px", md: "19px" },
           fontWeight: 600,
-          lineHeight: "23px",
+          lineHeight: { xs: "20px", sm: "21px", md: "23px" },
           letterSpacing: "-2%",
         }}
       >
         Hopefuel IDs by status
       </Typography>
-      <Box sx={{ mt: 1 }}>
+      <Box sx={{ mt: 1, width: "100%" }}>
         <HopeFuelIDStatusChart hopeFuelStatuses={transactionStatuses} />
       </Box>
       <Snackbar

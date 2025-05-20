@@ -10,7 +10,7 @@ import {
 import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
 import { useEffect, useState } from "react";
 
-export default function SupportAgentStats({ currentMonth }) {
+export default function SupportAgentStats() {
   const [pages, setPages] = useState({});
   const [agentRates, setAgentRates] = useState([]);
   const [loading, setLoading] = useState(false);
