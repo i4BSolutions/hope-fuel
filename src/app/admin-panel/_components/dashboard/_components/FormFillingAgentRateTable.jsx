@@ -17,9 +17,9 @@ const FormFillingAgentRateTable = ({
   headerColor = "#DC2626",
   progressColor = "#DC2626",
 }) => {
-  const totalPages = Math.ceil(data.agents.length / itemsPerPage);
+  const totalPages = Math.ceil(data.AssignedAgents.length / itemsPerPage);
 
-  const currentAgents = data.agents.slice(
+  const currentAgents = data.AssignedAgents.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
@@ -67,7 +67,7 @@ const FormFillingAgentRateTable = ({
               letterSpacing: "-2%",
             }}
           >
-            {data.groupName}
+            {data.GroupName}
           </Typography>
           <Typography
             variant="h2"
@@ -81,7 +81,7 @@ const FormFillingAgentRateTable = ({
               letterSpacing: "-4%",
             }}
           >
-            {data.total.toLocaleString()}
+            {data.TotalTransactionCount.toLocaleString()}
           </Typography>
         </Box>
 
@@ -113,7 +113,9 @@ const FormFillingAgentRateTable = ({
                     lineHeight: "34px",
                   }}
                 >
-                  {`${index + 1}. ${agent.agentName}`}
+                  {`${index + 1 + (page - 1) * itemsPerPage}. ${
+                    agent.Username
+                  }`}
                 </Typography>
                 <Typography
                   variant="h4"
@@ -126,13 +128,18 @@ const FormFillingAgentRateTable = ({
                     letterSpacing: "-2%",
                   }}
                 >
-                  {agent.count}
+                  {agent.TransactionCount}
                 </Typography>
               </Box>
               <Box sx={{ width: "100%", mt: 1 }}>
                 <LinearProgress
                   variant="determinate"
-                  value={(agent.count / data.total) * 100}
+                  value={
+                    data.TotalTransactionCount > 0
+                      ? (agent.TransactionCount / data.TotalTransactionCount) *
+                        100
+                      : 0
+                  }
                   sx={{
                     height: 12,
                     borderRadius: 2,
@@ -148,7 +155,7 @@ const FormFillingAgentRateTable = ({
           </Box>
         ))}
 
-        {data.agents.length > 4 && (
+        {data.AssignedAgents.length > itemsPerPage && (
           <Box
             sx={{
               display: "flex",

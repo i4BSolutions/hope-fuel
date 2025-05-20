@@ -23,10 +23,10 @@ export default function SupportAgentStats() {
       setError(null);
       setSnackbarOpen(false);
       try {
-        const response = await fetch("api/agent/agent-rates");
+        const response = await fetch("api/agent/agent-group");
         const data = await response.json();
         if (data.status === 200) {
-          setAgentRates(data.data);
+          setAgentRates(data.data.result);
         } else {
           console.error("Error fetching transactions count:", data.error);
           setError(data.error);
@@ -60,6 +60,7 @@ export default function SupportAgentStats() {
       </Box>
     );
   }
+  console.log("Agent Rates:", agentRates);
 
   if (!agentRates) return null;
 
