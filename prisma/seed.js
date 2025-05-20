@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/index.js";
+const { PrismaClient } = require("../generated/prisma/index.js");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -42,10 +42,11 @@ async function main() {
     for (const name of agents) {
       const agentRecord = await prisma.agent.upsert({
         where: { AwsId: name },
-        update: { AgentGroupId: group.AgentGroupID, Username: name },
+        update: { AgentGroupId: group.AgentGroupID },
         create: {
           AwsId: name,
           AgentGroupId: group.AgentGroupID,
+          Username: name,
         },
       });
       agentRecords.push(agentRecord);
@@ -626,13 +627,13 @@ async function main() {
       Email: "customer81@example.com",
       ManyChatId: "5971523959",
       ContactLink: "https://manychat.com/profile/71644",
-      ExpireDate: new Date("2025-06-30"),
+      ExpireDate: new Date("2025-08-30"),
       CardID: 1235567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-03-22"),
-      EndDate: new Date("2025-06-30"),
+      StartDate: new Date("2025-05-01"),
+      EndDate: new Date("2025-08-30"),
       Amount: 100,
       Month: 3,
       ScreenShotLink:

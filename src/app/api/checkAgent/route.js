@@ -18,11 +18,12 @@ export async function POST(req) {
     }
 
     const agent = await prisma.agent.upsert({
-      where: { AwsId: awsId, Username: email.split("@")[0] },
+      where: { AwsId: awsId },
       update: {},
       create: {
         AwsId: awsId,
         UserRoleId: 1,
+        Username: email.split("@")[0],
       },
       include: { UserRole: true },
     });
