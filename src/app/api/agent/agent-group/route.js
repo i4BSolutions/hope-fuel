@@ -5,14 +5,29 @@ export async function POST(request) {
   try {
     const { groupName, agentIds } = await request.json();
 
-    let group = await prisma.agentGroup.findUnique({
+    if (groupName !== "Group A" && groupName !== "Group B") {
+      return NextResponse.json(
+        {
+          status: 400,
+          message:
+            "Invalid group name. Only 'Group A' and 'Group B' are allowed.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const group = await prisma.agentGroup.findUnique({
       where: { GroupName: groupName },
     });
 
     if (!group) {
-      group = await prisma.agentGroup.create({
-        data: { GroupName: groupName },
-      });
+      return NextResponse.json(
+        {
+          status: 404,
+          message: "Group not found. Only predefined groups are allowed.",
+        },
+        { status: 404 }
+      );
     }
 
     const existingAssignments = await prisma.assignedAgent.findMany({
@@ -20,42 +35,35 @@ export async function POST(request) {
         AgentId: { in: agentIds },
         AgentGroupID: { not: group.AgentGroupID },
       },
-      include: {
-        Agent: true,
-        AgentGroup: true,
-      },
+      include: { Agent: true },
     });
 
     if (existingAssignments.length > 0) {
-      const conflictedAgents = existingAssignments.map(
-        (assign) => assign.Agent.Username || `Agent ID: ${assign.AgentId}`
+      const conflicted = existingAssignments.map(
+        (a) => a.Agent.Username || `AgentId: ${a.AgentId}`
       );
       return NextResponse.json(
         {
           status: 409,
-          message: `These agent(s) are already assigned to a different group.`,
-          conflictedAgents,
+          message: "These agent(s) are already assigned to another group.",
+          conflictedAgents: conflicted,
         },
         { status: 409 }
       );
     }
 
-    const assignments = agentIds.map((id) => ({
-      AgentId: id,
-      AgentGroupID: group.AgentGroupID,
-    }));
-
     await prisma.assignedAgent.createMany({
-      data: assignments,
+      data: agentIds.map((id) => ({
+        AgentId: id,
+        AgentGroupID: group.AgentGroupID,
+      })),
       skipDuplicates: true,
     });
 
     const assignedAgents = await prisma.agent.findMany({
       where: {
         AssignedAgents: {
-          some: {
-            AgentGroupID: group.AgentGroupID,
-          },
+          some: { AgentGroupID: group.AgentGroupID },
         },
       },
       select: {
@@ -84,6 +92,9 @@ export async function POST(request) {
 export async function GET(request) {
   try {
     const groups = await prisma.agentGroup.findMany({
+      where: {
+        GroupName: { in: ["Group A", "Group B"] },
+      },
       include: {
         AssignedAgents: {
           include: {
@@ -143,9 +154,13 @@ export async function PUT(request) {
   try {
     const { groupName, agentIds } = await request.json();
 
-    if (!groupName || !Array.isArray(agentIds)) {
+    if (!["Group A", "Group B"].includes(groupName)) {
       return NextResponse.json(
-        { status: 400, message: "GroupName and agentIds are required." },
+        {
+          status: 400,
+          message:
+            "Invalid group name. Only 'Group A' and 'Group B' are allowed.",
+        },
         { status: 400 }
       );
     }
@@ -156,7 +171,7 @@ export async function PUT(request) {
 
     if (!group) {
       return NextResponse.json(
-        { status: 404, message: "Agent group not found." },
+        { status: 404, message: "Group not found." },
         { status: 404 }
       );
     }
@@ -168,22 +183,19 @@ export async function PUT(request) {
       },
     });
 
-    const existingAssignments = await prisma.assignedAgent.findMany({
-      where: {
-        AgentGroupID: group.AgentGroupID,
-      },
+    const currentAssignments = await prisma.assignedAgent.findMany({
+      where: { AgentGroupID: group.AgentGroupID },
       select: { AgentId: true },
     });
 
-    const existingAgentIds = existingAssignments.map((a) => a.AgentId);
-
-    const addToExistingAgents = agentIds.filter(
-      (id) => !existingAgentIds.includes(id)
+    const alreadyAssigned = currentAssignments.map((a) => a.AgentId);
+    const newAssignments = agentIds.filter(
+      (id) => !alreadyAssigned.includes(id)
     );
 
-    if (addToExistingAgents.length > 0) {
+    if (newAssignments.length > 0) {
       await prisma.assignedAgent.createMany({
-        data: addToExistingAgents.map((id) => ({
+        data: newAssignments.map((id) => ({
           AgentId: id,
           AgentGroupID: group.AgentGroupID,
         })),
@@ -206,15 +218,12 @@ export async function PUT(request) {
     return NextResponse.json({
       status: 200,
       message: "Agent group updated successfully.",
-      data: {
-        group,
-        assignedAgents,
-      },
+      data: { group, assignedAgents },
     });
   } catch (error) {
-    console.error("[PUT] Error updating agent group assign:", error);
+    console.error("[PUT] Error updating group:", error);
     return NextResponse.json(
-      { status: 500, message: "Error updating agent group assign" },
+      { status: 500, message: "Internal server error." },
       { status: 500 }
     );
   }
