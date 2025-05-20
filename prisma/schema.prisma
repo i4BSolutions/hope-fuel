@@ -25,8 +25,7 @@ model Agent {
   TransactionAgent         TransactionAgent[]
   CSVExportTransactionLogs CSVExportTransactionLogs[]
   AssignedWallet           AssignedWallet[]
-
-  AgentGroup AgentGroup? @relation(fields: [AgentGroupId], references: [AgentGroupID])
+  AssignedAgents           AssignedAgent[]
 
   @@index([UserRoleId], map: "UserRoleId")
 }
@@ -49,15 +48,15 @@ model Currency {
 }
 
 model Customer {
-  CustomerId        Int                 @id @default(autoincrement())
-  Name              String?             @db.VarChar(255)
-  Email             String?             @db.VarChar(255)
-  ManyChatId        String?             @db.VarChar(255)
-  ExpireDate        DateTime?           @db.Date
-  UserCountry       Int?
-  ContactLink       String?             @db.VarChar(255)
-  AgentId           Int?
-  CardID            Int?
+  CustomerId  Int       @id @default(autoincrement())
+  Name        String?   @db.VarChar(255)
+  Email       String?   @db.VarChar(255)
+  ManyChatId  String?   @db.VarChar(255)
+  ExpireDate  DateTime? @db.Date
+  UserCountry Int?
+  ContactLink String?   @db.VarChar(255)
+  AgentId     Int?
+  CardID      Int?
 
   Agent             Agent?              @relation(fields: [AgentId], references: [AgentId], onDelete: Restrict, onUpdate: Restrict, map: "customer_ibfk_1")
   CustomerAuditLogs CustomerAuditLogs[]
@@ -79,7 +78,7 @@ model Subscription {
   CreateAt       DateTime @default(now()) @db.Timestamp(0)
   UpdatedAt      DateTime @default(now()) @db.Timestamp(0)
   Customer       Customer @relation(fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "subscription_ibfk_1")
-  
+
   @@index([CustomerID], map: "CustomerID")
 }
 
@@ -295,9 +294,20 @@ model CSVExportTransactionLogs {
 }
 
 model AgentGroup {
-  AgentGroupID Int     @id @default(autoincrement())
-  GroupName    String  @unique
-  Agents       Agent[]
+  AgentGroupID   Int             @id @default(autoincrement())
+  GroupName      String          @unique
+  AssignedAgents AssignedAgent[]
+}
+
+model AssignedAgent {
+  AssignedAgentId Int @id @default(autoincrement())
+  AgentId         Int
+  AgentGroupID    Int
+
+  Agent      Agent      @relation(fields: [AgentId], references: [AgentId])
+  AgentGroup AgentGroup @relation(fields: [AgentGroupID], references: [AgentGroupID])
+
+  @@unique([AgentId, AgentGroupID])
 }
 
 model AssignedWallet {
