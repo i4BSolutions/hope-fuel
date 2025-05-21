@@ -61,7 +61,7 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
           {hopeFuelStatuses.length > 0 ? totalCount : 0}
         </Typography>
       </Box>
-      {hopeFuelStatuses.length < 0 ? (
+      {hopeFuelStatuses.length > 0 ? (
         <>
           <Box
             sx={{
