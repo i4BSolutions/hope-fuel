@@ -28,9 +28,9 @@ import { useCallback, useEffect, useState } from "react";
 import { AGENT_ROLE } from "../..//lib/constants";
 import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
-import FundraiserCard from "./components/FundraiserCard";
-import FundraiserDetails from "./components/FundraiserDetails";
-import FundraisingForm from "./components/FundraisingForm";
+import FundraiserCard from "./_components/FundraiserCard";
+import FundraiserDetails from "./_components/FundraiserDetails";
+import FundraisingForm from "./_components/FundraisingForm";
 
 const FundraisingFormPage = () => {
   const router = useRouter();
@@ -62,7 +62,7 @@ const FundraisingFormPage = () => {
 
   useEffect(() => {
     getAllFundraisers();
-  }, []);
+  }, [openCreateFundraiserModal]);
 
   useEffect(() => {
     if (!fundraisers || fundraisers.length === 0) return;

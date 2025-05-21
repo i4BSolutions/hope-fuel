@@ -13,9 +13,7 @@ export default function AuthGuard({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("AuthGuard mounted");
     if (hasHydrated) return;
-    console.log("Hydrating from cookie");
     const cookie = getCookie(COOKIE_KEY);
     if (cookie) {
       const decoded = decodeJwt(cookie);
@@ -25,7 +23,6 @@ export default function AuthGuard({ children }) {
       return;
     }
 
-    console.log("Cookie not found, calling checkAgent API");
     const callCheckOrCreate = async () => {
       try {
         const { userId, email } = await getAuthCurrentUser();

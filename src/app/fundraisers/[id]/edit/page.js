@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import FundraisingForm from "../../components/FundraisingForm";
-import { useParams, useRouter } from "next/navigation";
-import Modal from "../../../components/Modal";
 import { Box, CircularProgress } from "@mui/material";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Modal from "../../../components/Modal";
+import FundraisingForm from "../../_components/FundraisingForm";
 
 function FundraiserEditPage() {
   const { id } = useParams();
@@ -38,6 +38,7 @@ function FundraiserEditPage() {
         },
         body: JSON.stringify(data),
       });
+      router.push("/fundraisers");
     } catch (error) {
       console.log("Error:", error);
       throw new Error("Failed to update fundraiser");

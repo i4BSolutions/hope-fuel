@@ -742,6 +742,10 @@ async function main() {
       },
     });
   }
+
+  await prisma.platform.createMany({
+    data: [{ PlatformName: "Facebook" }, { PlatformName: "Telegram" }],
+  });
 }
 
 main()

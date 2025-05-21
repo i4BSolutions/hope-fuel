@@ -29,6 +29,7 @@ const FundraiserDetails = ({
         borderRadius: 4,
         overflow: "hidden",
         m: "auto",
+        p: 1,
       }}
     >
       {userRole === AGENT_ROLE.ADMIN && (
