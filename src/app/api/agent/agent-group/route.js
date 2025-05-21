@@ -114,7 +114,7 @@ export async function GET(request) {
       },
     });
 
-    const result = groups.map((group) => {
+    const groupedResults = groups.map((group) => {
       const agents = group.AssignedAgents.map((a) => ({
         AgentId: a.Agent.AgentId,
         Username: a.Agent.Username,
@@ -133,6 +133,43 @@ export async function GET(request) {
         TotalTransactionCount: totalTransactionCount,
       };
     });
+
+    const assignedAgentIds = groups.flatMap((g) =>
+      g.AssignedAgents.map((a) => a.Agent.AgentId)
+    );
+
+    const unassignedAgents = await prisma.agent.findMany({
+      where: {
+        AgentId: {
+          notIn: assignedAgentIds,
+        },
+      },
+      select: {
+        AgentId: true,
+        Username: true,
+        _count: {
+          select: {
+            TransactionAgent: true,
+          },
+        },
+      },
+    });
+
+    const unassignedGroup = {
+      AgentGroupID: null,
+      GroupName: "Unassigned",
+      AssignedAgents: unassignedAgents.map((a) => ({
+        AgentId: a.AgentId,
+        Username: a.Username,
+        TransactionCount: a._count.TransactionAgent,
+      })),
+      TotalTransactionCount: unassignedAgents.reduce(
+        (sum, a) => sum + a._count.TransactionAgent,
+        0
+      ),
+    };
+
+    const result = [...groupedResults, unassignedGroup];
 
     return NextResponse.json({
       status: 200,
@@ -153,6 +190,19 @@ export async function GET(request) {
 export async function PUT(request) {
   try {
     const { groupName, agentIds } = await request.json();
+
+    if (groupName === "Unassigned") {
+      await prisma.assignedAgent.deleteMany({
+        where: {
+          AgentId: { in: agentIds },
+        },
+      });
+
+      return NextResponse.json({
+        status: 200,
+        message: "Agents unassigned successfully.",
+      });
+    }
 
     if (!["Group A", "Group B"].includes(groupName)) {
       return NextResponse.json(
