@@ -92,7 +92,7 @@ export default function SupportAgentStats() {
               mt: 1,
             }}
           >
-            {agentRates.length < 0 ? (
+            {agentRates.length > 0 ? (
               agentRates.map((groupData, index) => (
                 <FormFillingAgentRateTable
                   key={groupData.groupName}
