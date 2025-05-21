@@ -164,6 +164,7 @@ model Fundraiser_ContactLinks {
   PlatformID   Int?
   ContactURL   String      @db.VarChar(255)
   Fundraiser   Fundraiser? @relation(fields: [FundraiserID], references: [FundraiserID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_contactlinks_ibfk_1")
+  Platform     Platform?   @relation(fields: [PlatformID], references: [PlatformID], onDelete: Cascade, onUpdate: Restrict, map: "fundraiser_contactlinks_ibfk_2")
 
   @@index([FundraiserID], map: "FundraiserID")
 }
@@ -204,6 +205,8 @@ model Note {
 model Platform {
   PlatformID   Int    @id @default(autoincrement())
   PlatformName String @unique(map: "PlatformName") @db.VarChar(191)
+
+  Fundraiser_ContactLinks Fundraiser_ContactLinks[] @relation(map: "fundraiser_contactlinks_ibfk_2")
 }
 
 model ScreenShot {

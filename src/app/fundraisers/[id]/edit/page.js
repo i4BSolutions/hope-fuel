@@ -38,6 +38,7 @@ function FundraiserEditPage() {
         },
         body: JSON.stringify(data),
       });
+      router.push("/fundraisers");
     } catch (error) {
       console.log("Error:", error);
       throw new Error("Failed to update fundraiser");
