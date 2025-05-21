@@ -29,6 +29,7 @@ export async function POST(req) {
     });
 
     const payload = {
+      id: agent.AgentId,
       roleId: agent.UserRoleId,
       username: email.split("@")[0],
     };

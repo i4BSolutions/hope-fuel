@@ -4,10 +4,8 @@ import { COOKIE_KEY } from "../lib/constants";
 
 const defaultAgent = {
   id: null,
-  awsId: null,
   roleId: null,
   username: null,
-  email: null,
 };
 
 export const useAgentStore = create((set) => ({
