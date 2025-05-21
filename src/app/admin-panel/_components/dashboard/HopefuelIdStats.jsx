@@ -2,7 +2,10 @@ import {
   Alert,
   Box,
   CircularProgress,
+  Skeleton,
   Snackbar,
+  TableCell,
+  TableRow,
   Typography,
 } from "@mui/material";
 import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
@@ -41,48 +44,53 @@ export default function HopefuelIdStats() {
     getTransactionStatuses();
   }, []);
 
-  if (loading) {
-    return (
-      <Box
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
-
   if (!transactionStatuses) return null;
 
   return (
-    <Box sx={{ width: "100%" }}>
-      <Typography
-        sx={{
-          color: "#0F172A",
-          fontSize: { xs: "16px", sm: "17px", md: "19px" },
-          fontWeight: 600,
-          lineHeight: { xs: "20px", sm: "21px", md: "23px" },
-          letterSpacing: "-2%",
-        }}
-      >
-        Hopefuel IDs by status
-      </Typography>
-      <Box sx={{ mt: 1, width: "100%" }}>
-        <HopeFuelIDStatusChart hopeFuelStatuses={transactionStatuses} />
-      </Box>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
-    </Box>
+    <>
+      {loading ? (
+        Array.from({ length: 5 }).map((_, index) => (
+          <TableRow key={index}>
+            <TableCell>
+              <Skeleton variant="text" width={120} height={20} />
+            </TableCell>
+            <TableCell>
+              <Skeleton variant="rectangular" width={220} height={36} />
+            </TableCell>
+          </TableRow>
+        ))
+      ) : (
+        <Box sx={{ width: "100%" }}>
+          <Typography
+            sx={{
+              color: "#0F172A",
+              fontSize: { xs: "16px", sm: "17px", md: "19px" },
+              fontWeight: 600,
+              lineHeight: { xs: "20px", sm: "21px", md: "23px" },
+              letterSpacing: "-2%",
+            }}
+          >
+            Hopefuel IDs by status
+          </Typography>
+          <Box sx={{ mt: 1, width: "100%" }}>
+            <HopeFuelIDStatusChart hopeFuelStatuses={transactionStatuses} />
+          </Box>
+          <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={6000}
+            onClose={() => setSnackbarOpen(false)}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          >
+            <Alert
+              onClose={() => setSnackbarOpen(false)}
+              severity="error"
+              sx={{ width: "100%" }}
+            >
+              {error}
+            </Alert>
+          </Snackbar>
+        </Box>
+      )}
+    </>
   );
 }

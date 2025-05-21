@@ -36,7 +36,7 @@ const FormFillingAgentRateTable = ({
           overflow: "hidden",
           borderRadius: 4,
           maxWidth: 620,
-          minHeight: 392,
+          minHeight: 510,
           borderRight: 2,
           borderLeft: 2,
           borderBottom: 2,
@@ -179,9 +179,9 @@ const FormFillingAgentRateTable = ({
                     mx: 0.5,
                   },
                   "& .Mui-selected": {
-                    backgroundColor: "#fff",
-                    border: "1px solid #1976d2",
-                    color: "#1976d2",
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #EF4444",
+                    color: "#EF4444",
                   },
                 }}
               />

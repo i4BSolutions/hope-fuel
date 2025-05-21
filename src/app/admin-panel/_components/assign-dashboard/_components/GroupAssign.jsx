@@ -12,6 +12,7 @@ import {
   Select,
   MenuItem,
   CircularProgress,
+  Skeleton,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 
@@ -125,16 +126,16 @@ export default function GroupAssignTable() {
         }}
       >
         {loading ? (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <CircularProgress />
-          </Box>
+          Array.from({ length: 5 }).map((_, index) => (
+            <TableRow key={index}>
+              <TableCell>
+                <Skeleton variant="text" width={120} height={20} />
+              </TableCell>
+              <TableCell>
+                <Skeleton variant="rectangular" width={220} height={36} />
+              </TableCell>
+            </TableRow>
+          ))
         ) : (
           <Table size="small">
             <TableHead>

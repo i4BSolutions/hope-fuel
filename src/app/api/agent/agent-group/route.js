@@ -191,6 +191,19 @@ export async function PUT(request) {
   try {
     const { groupName, agentIds } = await request.json();
 
+    if (groupName === "Unassigned") {
+      await prisma.assignedAgent.deleteMany({
+        where: {
+          AgentId: { in: agentIds },
+        },
+      });
+
+      return NextResponse.json({
+        status: 200,
+        message: "Agents unassigned successfully.",
+      });
+    }
+
     if (!["Group A", "Group B"].includes(groupName)) {
       return NextResponse.json(
         {
