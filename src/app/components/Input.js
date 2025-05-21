@@ -1,3 +1,4 @@
+import React, { forwardRef } from "react";
 import {
   TextField,
   Select,
@@ -7,77 +8,90 @@ import {
   InputLabel,
 } from "@mui/material";
 
-const CustomInput = ({
-  name,
-  label,
-  type = "text",
-  options = [],
-  value,
-  onChange,
-  error,
-  helperText,
-  disabled,
-  readOnly,
-  ...props
-}) => {
-  const commonStyles = {
-    borderRadius: "12px",
-    "& .MuiOutlinedInput-root": {
+const CustomInput = forwardRef(
+  (
+    {
+      name,
+      label,
+      type = "text",
+      options = [],
+      value,
+      onChange,
+      error,
+      helperText,
+      disabled,
+      readOnly,
+      fullWidth = true,
+      placeholder,
+      ...props
+    },
+    ref
+  ) => {
+    const commonStyles = {
       borderRadius: "12px",
-      height: "48px",
-    },
-    "& .MuiInputBase-input": {
-      height: "100%",
-      padding: "0px 12px",
-      fontSize: "14px",
-    },
-  };
+      "& .MuiOutlinedInput-root": {
+        borderRadius: "12px",
+        height: "48px",
+      },
+      "& .MuiInputBase-input": {
+        height: "100%",
+        padding: "0px 12px",
+        fontSize: "14px",
+      },
+    };
 
-  if (type === "select") {
-    return (
-      <FormControl fullWidth error={!!error} sx={{ mb: 2 }}>
-        <InputLabel id={`${name}-label`} sx={{ fontSize: "14px" }}>
-          {label}
-        </InputLabel>
-        <Select
-          labelId={`${name}-label`}
-          id={name}
-          name={name}
-          value={value ?? ""}
-          onChange={onChange}
-          disabled={disabled}
-          label={label}
-          sx={commonStyles}
-          {...props}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
+    if (type === "select") {
+      return (
+        <FormControl fullWidth={fullWidth} error={!!error} sx={{ mb: 2 }}>
+          <Select
+            id={name}
+            name={name}
+            value={value ?? ""}
+            onChange={onChange}
+            inputRef={ref}
+            disabled={disabled}
+            sx={{
+              ...commonStyles,
+              "& .MuiSelect-select": {
+                padding: "12px",
+              },
+            }}
+            displayEmpty
+            {...props}
+          >
+            <MenuItem value="" disabled hidden>
+              {placeholder || `Select ${label}`}
             </MenuItem>
-          ))}
-        </Select>
-        {error && <FormHelperText>{helperText}</FormHelperText>}
-      </FormControl>
+            {options.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+          {error && <FormHelperText m={0}>{helperText}</FormHelperText>}
+        </FormControl>
+      );
+    }
+
+    return (
+      <TextField
+        id={name}
+        name={name}
+        type={type}
+        value={value}
+        fullWidth={fullWidth}
+        onChange={onChange}
+        inputRef={ref}
+        error={!!error}
+        helperText={helperText}
+        disabled={disabled}
+        placeholder={placeholder}
+        InputProps={{ readOnly }}
+        sx={commonStyles}
+        {...props}
+      />
     );
   }
-
-  return (
-    <TextField
-      fullWidth
-      id={name}
-      name={name}
-      type={type}
-      label={label}
-      value={value}
-      onChange={onChange}
-      error={!!error}
-      helperText={helperText}
-      disabled={disabled}
-      InputProps={{ readOnly }}
-      sx={{ ...commonStyles, mb: 2 }}
-      {...props}
-    />
-  );
-};
+);
 
 export default CustomInput;
