@@ -43,117 +43,122 @@ const FormFillingAgentRateTable = ({
           borderRightColor: "#CBD5E1",
           borderLeftColor: "#CBD5E1",
           borderBottomColor: "#CBD5E1",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
         }}
       >
-        <Box
-          sx={{
-            backgroundColor: headerColor,
-            color: "white",
-            py: 2,
-            px: 4,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography
-            variant="h5"
-            component="h5"
-            fontWeight="bold"
+        <Box>
+          <Box
             sx={{
-              color: "#FFFFFF",
-              fontSize: "28px",
-              fontWeight: 600,
-              letterSpacing: "-2%",
+              backgroundColor: headerColor,
+              color: "white",
+              py: 2,
+              px: 4,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             }}
           >
-            {data.GroupName}
-          </Typography>
-          <Typography
-            variant="h2"
-            component="div"
-            fontWeight="bold"
-            sx={{
-              color: "#FFFFFF",
-              fontSize: "48px",
-              fontWeight: 700,
-              lineHeight: "56px",
-              letterSpacing: "-4%",
-            }}
-          >
-            {data.TotalTransactionCount.toLocaleString()}
-          </Typography>
-        </Box>
-
-        {currentAgents.map((agent, index) => (
-          <Box>
-            <Box
-              key={index}
+            <Typography
+              variant="h5"
+              component="h5"
+              fontWeight="bold"
               sx={{
-                display: "flex",
-                px: 2,
-                py: 2,
-                flexDirection: "column",
+                color: "#FFFFFF",
+                fontSize: "28px",
+                fontWeight: 600,
+                letterSpacing: "-2%",
               }}
             >
+              {data.GroupName}
+            </Typography>
+            <Typography
+              variant="h2"
+              component="div"
+              fontWeight="bold"
+              sx={{
+                color: "#FFFFFF",
+                fontSize: "48px",
+                fontWeight: 700,
+                lineHeight: "56px",
+                letterSpacing: "-4%",
+              }}
+            >
+              {data.TotalTransactionCount.toLocaleString()}
+            </Typography>
+          </Box>
+
+          <Box sx={{ px: 2 }}>
+            {currentAgents.map((agent, index) => (
               <Box
+                key={index}
                 sx={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
+                  py: 2,
                 }}
               >
-                <Typography
-                  variant="h6"
-                  component="div"
+                <Box
                   sx={{
-                    color: "#0F172A",
-                    fontSize: "20px",
-                    fontWeight: 500,
-                    letterSpacing: "-2%",
-                    lineHeight: "34px",
+                    display: "flex",
+                    justifyContent: "space-between",
                   }}
                 >
-                  {`${index + 1 + (page - 1) * itemsPerPage}. ${
-                    agent.Username
-                  }`}
-                </Typography>
-                <Typography
-                  variant="h4"
-                  component="div"
-                  sx={{
-                    color: "#0F172A",
-                    fontWeight: 500,
-                    fontSize: "20px",
-                    lineHeight: "34px",
-                    letterSpacing: "-2%",
-                  }}
-                >
-                  {agent.TransactionCount}
-                </Typography>
-              </Box>
-              <Box sx={{ width: "100%", mt: 1 }}>
-                <LinearProgress
-                  variant="determinate"
-                  value={
-                    data.TotalTransactionCount > 0
-                      ? (agent.TransactionCount / data.TotalTransactionCount) *
-                        100
-                      : 0
-                  }
-                  sx={{
-                    height: 12,
-                    borderRadius: 2,
-                    backgroundColor: "#E2E8F0",
-                    "& .MuiLinearProgress-bar": {
-                      backgroundColor: progressColor,
+                  <Typography
+                    variant="h6"
+                    component="div"
+                    sx={{
+                      color: "#0F172A",
+                      fontSize: "20px",
+                      fontWeight: 500,
+                      letterSpacing: "-2%",
+                      lineHeight: "34px",
+                    }}
+                  >
+                    {`${index + 1 + (page - 1) * itemsPerPage}. ${
+                      agent.Username
+                    }`}
+                  </Typography>
+                  <Typography
+                    variant="h4"
+                    component="div"
+                    sx={{
+                      color: "#0F172A",
+                      fontWeight: 500,
+                      fontSize: "20px",
+                      lineHeight: "34px",
+                      letterSpacing: "-2%",
+                    }}
+                  >
+                    {agent.TransactionCount}
+                  </Typography>
+                </Box>
+                <Box sx={{ width: "100%", mt: 1 }}>
+                  <LinearProgress
+                    variant="determinate"
+                    value={
+                      data.TotalTransactionCount > 0
+                        ? (agent.TransactionCount /
+                            data.TotalTransactionCount) *
+                          100
+                        : 0
+                    }
+                    sx={{
+                      height: 12,
                       borderRadius: 2,
-                    },
-                  }}
-                />
+                      backgroundColor: "#E2E8F0",
+                      "& .MuiLinearProgress-bar": {
+                        backgroundColor: progressColor,
+                        borderRadius: 2,
+                      },
+                    }}
+                  />
+                </Box>
               </Box>
-            </Box>
+            ))}
           </Box>
-        ))}
+        </Box>
 
         {data.AssignedAgents.length > itemsPerPage && (
           <Box
