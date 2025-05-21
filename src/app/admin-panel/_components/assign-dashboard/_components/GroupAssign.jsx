@@ -25,7 +25,7 @@ export default function GroupAssignTable() {
 
   useEffect(() => {
     fetchAssignedAgents();
-  }, []);
+  }, [isEditing]);
 
   const fetchAssignedAgents = async () => {
     setLoading(true);
@@ -99,7 +99,6 @@ export default function GroupAssignTable() {
           throw new Error(`Failed to update ${groupName}: ${result.message}`);
         }
       }
-      fetchAssignedAgents();
       setIsEditing(false);
       setEditedAssignAgents({});
     } catch (err) {
