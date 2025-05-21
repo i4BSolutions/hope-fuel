@@ -184,7 +184,7 @@ const FormFillingAgentRateTable = ({
                     mx: 0.5,
                   },
                   "& .Mui-selected": {
-                    backgroundColor: "#ffffff",
+                    backgroundColor: "#FFFFFF",
                     border: "1px solid #EF4444",
                     color: "#EF4444",
                   },
