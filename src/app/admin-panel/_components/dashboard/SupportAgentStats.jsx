@@ -3,13 +3,13 @@
 import {
   Alert,
   Box,
-  CircularProgress,
   Skeleton,
   Snackbar,
   TableCell,
   TableRow,
   Typography,
 } from "@mui/material";
+import InboxIcon from "@mui/icons-material/Inbox";
 import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
 import { useEffect, useState } from "react";
 
@@ -92,7 +92,7 @@ export default function SupportAgentStats() {
               mt: 1,
             }}
           >
-            {agentRates.length > 0 ? (
+            {agentRates.length < 0 ? (
               agentRates.map((groupData, index) => (
                 <FormFillingAgentRateTable
                   key={groupData.groupName}
@@ -104,17 +104,31 @@ export default function SupportAgentStats() {
                 />
               ))
             ) : (
-              <Typography
+              <Box
                 sx={{
-                  color: "#000000",
-                  fontWeight: 600,
-                  fontSize: "23px",
-                  lineHeight: "28px",
-                  letterSpacing: "-2%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  py: 2,
+                  justifyContent: "center",
+                  width: "100%",
+                  height: "300px",
                 }}
               >
-                There is no hopefuel id status.
-              </Typography>
+                <InboxIcon sx={{ fontSize: 60, color: "#999999" }} />
+                <Typography
+                  sx={{
+                    color: "#000000",
+                    fontWeight: 600,
+                    fontSize: "23px",
+                    lineHeight: "28px",
+                    letterSpacing: "-2%",
+                    mt: 1,
+                  }}
+                >
+                  There is no form filling agent rates.
+                </Typography>
+              </Box>
             )}
           </Box>
           <Snackbar

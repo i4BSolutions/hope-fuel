@@ -6,6 +6,8 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import React from "react";
 
 const itemsPerPage = 4;
@@ -166,11 +168,10 @@ const FormFillingAgentRateTable = ({
               display: "flex",
               justifyContent: "center",
               py: 2,
-              borderTop: "1px solid #eee",
             }}
           >
             <Stack spacing={2} direction="row" alignItems="center">
-              <Typography>&lt;</Typography>
+              <KeyboardArrowLeftIcon />
               <Pagination
                 count={totalPages}
                 page={page}
@@ -190,7 +191,7 @@ const FormFillingAgentRateTable = ({
                   },
                 }}
               />
-              <Typography>&gt;</Typography>
+              <KeyboardArrowRightIcon />
             </Stack>
           </Box>
         )}

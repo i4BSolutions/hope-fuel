@@ -1,5 +1,6 @@
 import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import InboxIcon from "@mui/icons-material/Inbox";
+import React from "react";
 
 const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
   const theme = useTheme();
@@ -60,7 +61,7 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
           {hopeFuelStatuses.length > 0 ? totalCount : 0}
         </Typography>
       </Box>
-      {hopeFuelStatuses.length > 0 ? (
+      {hopeFuelStatuses.length < 0 ? (
         <>
           <Box
             sx={{
@@ -217,21 +218,31 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
           )}
         </>
       ) : (
-        <Typography
+        <Box
           sx={{
             display: "flex",
-            alignSelf: "center",
+            flexDirection: "column",
+            alignItems: "center",
+            py: 2,
             justifyContent: "center",
-            color: "#000000",
-            fontWeight: 600,
-            fontSize: { xs: "18px", sm: "20px", md: "23px" },
-            lineHeight: { xs: "22px", sm: "24px", md: "28px" },
-            letterSpacing: "-2%",
-            mt: 2,
+            width: "100%",
+            height: "100px",
           }}
         >
-          There is no hopefuel id status.
-        </Typography>
+          <InboxIcon sx={{ fontSize: 60, color: "#999999" }} />
+          <Typography
+            sx={{
+              color: "#000000",
+              fontWeight: 600,
+              fontSize: "23px",
+              lineHeight: "28px",
+              letterSpacing: "-2%",
+              mt: 1,
+            }}
+          >
+            There is no hopefuel id stats.
+          </Typography>
+        </Box>
       )}
     </Box>
   );
