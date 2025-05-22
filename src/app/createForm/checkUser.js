@@ -137,33 +137,48 @@ export default function CheckUser({ onUserCheck }) {
         onSubmit={handleSubmit(onSubmit)}
         sx={{ width: 360, mx: "auto", mt: 4 }}
       >
-        <Controller
-          name="name"
-          control={control}
-          render={({ field }) => (
-            <CustomInput
-              label="Name"
-              placeholder="Mg Mg"
-              {...field}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-          )}
-        />
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <CustomInput
-              label="Email"
-              placeholder="mgmg@gmail.com"
-              type="email"
-              {...field}
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
-          )}
-        />
+        <Box mb={2}>
+          <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
+            Name <span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <CustomInput
+                label="Name"
+                placeholder="Mg Mg"
+                fullWidth={true}
+                type="text"
+                {...field}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+            )}
+          />
+        </Box>
+
+        <Box mb={2}>
+          <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
+            Email <span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <CustomInput
+                label="Email"
+                placeholder="mgmg@gmail.com"
+                type="email"
+                fullWidth={true}
+                {...field}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
+          />
+        </Box>
+
         <CustomButton width variant="contained" type="submit" text="Check" />
       </Box>
 

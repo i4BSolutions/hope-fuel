@@ -131,7 +131,7 @@ function CreateOrExtendPage() {
             variant="contained"
             onClick={() => {
               setIsSuccessModalOpen(false);
-              router.push("/");
+              location.reload();
             }}
           >
             OK
