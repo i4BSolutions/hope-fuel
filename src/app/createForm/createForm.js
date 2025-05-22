@@ -39,6 +39,8 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
 
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
   const {
     control,
     handleSubmit,
@@ -125,6 +127,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   };
 
   const onSubmit = async (data) => {
+    setHasSubmitted(true);
     if (!files.length) return;
     setloading(true);
     await createFormSubmit(
@@ -448,7 +451,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
               files={uploadedFiles}
               onDelete={handleDeleteFile}
             />
-            {!files.length && (
+            {hasSubmitted && !files.length && (
               <ErrorMessage message="Please upload at least one screenshot." />
             )}
           </Box>
