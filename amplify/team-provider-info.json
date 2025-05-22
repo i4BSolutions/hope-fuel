@@ -1,0 +1,15 @@
+{
+  "arleyne": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-hopefuel-arleyne-92ec0-authRole",
+      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-arleyne-92ec0-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-arleyne-92ec0-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-hopefuel-arleyne-92ec0-deployment",
+      "UnauthRoleName": "amplify-hopefuel-arleyne-92ec0-unauthRole",
+      "StackName": "amplify-hopefuel-arleyne-92ec0",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-arleyne-92ec0/b61e5f10-3715-11f0-89bd-0abaa37ccdd3",
+      "AmplifyAppId": "d21tc40zhkpcd1"
+    }
+  }
+}
