@@ -1,0 +1,14 @@
+{
+  "resourceName": "s3hopefuelstaging9055d67b",
+  "bucketName": "hope-fuel-staging-9055d67b",
+  "policyUUID": "0c8654f0",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}

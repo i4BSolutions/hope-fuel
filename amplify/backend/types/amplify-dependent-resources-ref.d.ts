@@ -9,5 +9,11 @@ export type AmplifyDependentResourcesAttributes = {
       "UserPoolId": "string",
       "UserPoolName": "string"
     }
+  },
+  "storage": {
+    "s3hopefuelstaging9055d67b": {
+      "BucketName": "string",
+      "Region": "string"
+    }
   }
 }
