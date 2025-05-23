@@ -10,6 +10,11 @@
       "StackName": "amplify-hopefuel-arleyne-92ec0",
       "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-arleyne-92ec0/b61e5f10-3715-11f0-89bd-0abaa37ccdd3",
       "AmplifyAppId": "d21tc40zhkpcd1"
+    },
+    "categories": {
+      "auth": {
+        "hopefuel": {}
+      }
     }
   }
 }
