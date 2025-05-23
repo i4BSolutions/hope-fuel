@@ -1,41 +1,24 @@
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  Skeleton,
-  Snackbar,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Skeleton, TableCell, TableRow, Typography } from "@mui/material";
 import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
 import { useEffect, useState } from "react";
 
 export default function HopefuelIdStats() {
   const [transactionStatuses, setTransactionStatuses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   useEffect(() => {
     const getTransactionStatuses = async () => {
       setLoading(true);
-      setError(null);
-      setSnackbarOpen(false);
       try {
-        const response = await fetch("api/agent/transaction-status");
+        const response = await fetch("/api/agent/transaction-status");
         const data = await response.json();
         if (data.status === 200) {
           setTransactionStatuses(data.statusBreakdown);
         } else {
-          console.error("Error fetching transactions count:", data.error);
-          setError(data.error);
-          setSnackbarOpen(true);
+          console.error("Error fetching transaction statuses:", data.message);
         }
       } catch (error) {
-        console.error("Error fetching transactions count:", error);
-        setError(error.message);
-        setSnackbarOpen(true);
+        console.error("Fetch error:", error);
         setTransactionStatuses([]);
       } finally {
         setLoading(false);
@@ -75,20 +58,6 @@ export default function HopefuelIdStats() {
           <Box sx={{ mt: 1, width: "100%" }}>
             <HopeFuelIDStatusChart hopeFuelStatuses={transactionStatuses} />
           </Box>
-          <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={6000}
-            onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          >
-            <Alert
-              onClose={() => setSnackbarOpen(false)}
-              severity="error"
-              sx={{ width: "100%" }}
-            >
-              {error}
-            </Alert>
-          </Snackbar>
         </Box>
       )}
     </>
