@@ -1,29 +1,46 @@
 export default async function extendFormSubmit(
-  event,
-  currency,
-  supportRegion,
+  formData,
   files,
   userInfo,
-  setloading,
-  formFillingPerson,
-  setAmountValidate,
-  setmonthValidate,
-  setmanyChatValidate,
-  fileExist,
-  setfileExist,
-  agentID,
-  contactLink,
-  notes,
-  manyChatId,
-  walletId,
-  amount,
-  month
+  setLoading,
+  agentId,
+  customerId,
+  onSuccess
 ) {
-  event.preventDefault();
+  const {
+    currency,
+    amount,
+    walletId,
+    month,
+    supportRegion,
+    donorCountry,
+    manyChatId,
+    contactLink,
+    note,
+  } = formData;
 
-  setAmountValidate(false);
-  setmonthValidate(false);
-  setmanyChatValidate(false);
+  setLoading(true);
+
+  const transactionDate = new Date();
+
+  const payload = {
+    customerName: userInfo.name,
+    customerEmail: userInfo.email,
+    agentId,
+    customerId,
+    supportRegionId: supportRegion,
+    countryId: donorCountry,
+    manyChatId,
+    contactLink,
+    amount,
+    month,
+    note,
+    walletId,
+    transactionDate,
+    screenShot: files.map((f) => ({
+      url: f.url.href,
+    })),
+  };
 
   let cardId = userInfo["prf_no"];
 
@@ -66,8 +83,8 @@ export default async function extendFormSubmit(
   if (Object.hasOwn(ans, "Name")) {
     // create a note
     raw = JSON.stringify({
-      note: notes,
-      agentID: agentID,
+      note: note,
+      agentID: agentId,
     });
     requestOptions = {
       method: "POST",
@@ -76,25 +93,13 @@ export default async function extendFormSubmit(
       redirect: "follow",
     };
 
-    let note = await fetch("/api/insertNote/", requestOptions);
-    note = await note.json();
+    let noteResponse = await fetch("/api/insertNote/", requestOptions);
+    noteResponse = await noteResponse.json();
 
     myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     //console.log(ans);
-    raw = JSON.stringify({
-      customerId: ans["CustomerId"],
-      supportRegionId: supportRegion,
-      walletId: walletId,
-      amount: amount,
-      agentId: agentID,
-      noteId: note["id"],
-      transactionDate: new Date(),
-      month: month,
-      screenShot: files.map((file) => ({ url: file.url.href })),
-      cardId: cardId,
-      manyChatId: manyChatId,
-    });
+    raw = JSON.stringify(payload);
 
     requestOptions = {
       method: "POST",
@@ -104,7 +109,7 @@ export default async function extendFormSubmit(
     };
 
     try {
-      const response = await fetch(`/api/extendUser`, requestOptions);
+      const response = await fetch("/api/extendUser", requestOptions);
       console.log(response);
 
       const data = await response.json();
@@ -117,7 +122,7 @@ export default async function extendFormSubmit(
         };
       }
 
-      setloading(false);
+      setLoading(false);
 
       return {
         success: true,
@@ -139,13 +144,13 @@ export default async function extendFormSubmit(
     let raw = JSON.stringify({
       customerName: userInfo.name,
       customerEmail: userInfo.email,
-      agentId: agentID,
+      agentId: agentId,
       supportRegionId: supportRegionID,
       manyChatId: manyChatId,
       contactLink: contactLink,
       amount: amount,
       month: month,
-      note: notes,
+      note: note,
       walletId: walletId,
       screenShot: files.map((file) => ({ url: file.url.href })),
       expireDate: expireDate,
@@ -168,7 +173,7 @@ export default async function extendFormSubmit(
 
       const data = await response.json();
 
-      if (response.status == 400) {
+      if (data.status == 400) {
         return {
           success: false,
           status: 400,
@@ -176,12 +181,9 @@ export default async function extendFormSubmit(
         };
       }
 
-      setloading(false);
+      setLoading(false);
 
-      return {
-        success: true,
-        status: 200,
-      };
+      onSuccess?.();
     } catch (error) {
       console.error("Error submitting payment", error);
 

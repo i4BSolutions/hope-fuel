@@ -94,7 +94,7 @@ function CreateOrExtendPage() {
         ) : (
           <ExtendForm
             userInfo={userInfo}
-            setloading={setLoading}
+            setLoading={setLoading}
             onSuccess={() => setIsSuccessModalOpen(true)}
           />
         )}
