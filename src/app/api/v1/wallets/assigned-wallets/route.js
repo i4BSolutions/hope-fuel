@@ -37,6 +37,7 @@ export async function GET(request) {
       select: {
         AgentId: true,
         AwsId: true,
+        Username: true,
       },
     });
 
@@ -56,6 +57,7 @@ export async function GET(request) {
     const result = agents.map((agent) => ({
       AgentId: agent.AgentId,
       AwsId: agent.AwsId,
+      Username: agent.Username,
       wallets: walletMap[agent.AgentId] || [],
     }));
 

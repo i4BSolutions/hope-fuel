@@ -149,7 +149,7 @@ export default function WalletAssignTable() {
                 ))
               : assignedData.map((agent, index) => (
                   <TableRow key={agent.AgentId}>
-                    <TableCell>{`${index + 1}. ${agent.AgentId}`}</TableCell>
+                    <TableCell>{`${index + 1}. ${agent.Username}`}</TableCell>
                     <TableCell>
                       {isEditing ? (
                         <Select

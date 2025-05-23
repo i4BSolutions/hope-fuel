@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
-  const date = searchParams.get("month");
+  const date = searchParams.get("month"); // Format: "YYYY-MM"
 
   const [year, monthStr] = date.split("-");
   const monthNum = parseInt(monthStr);
@@ -12,26 +12,43 @@ export async function GET(request) {
   const endDate = new Date(new Date(startDate).setMonth(monthNum));
 
   try {
+    // Get payment checkers (UserRoleId 3)
     const checkers = await prisma.Agent.findMany({
       where: { UserRoleId: 3 },
-      select: { AgentId: true, AwsId: true },
+      select: { AgentId: true, AwsId: true, Username: true },
     });
 
     const checkerMap = new Map(checkers.map((c) => [c.AgentId, c.AwsId]));
 
-    const assignedWallets = await prisma.assignedWallet.findMany({
-      include: {
-        Wallet: true,
-      },
+    // Get assigned wallets (wallets assigned to agents)
+    const assignedWallets = await prisma.assignedWallet.findMany();
+
+    // Build AgentId → WalletID[] mapping
+    const agentWalletMap = {};
+    const walletMap = {};
+
+    for (const aw of assignedWallets) {
+      if (!agentWalletMap[aw.AgentId]) {
+        agentWalletMap[aw.AgentId] = new Set();
+      }
+      agentWalletMap[aw.AgentId].add(aw.WalletId);
+    }
+
+    const wallets = await prisma.wallet.findMany({
+      select: { WalletId: true, WalletName: true },
     });
 
-    const walletMap = assignedWallets.reduce((acc, curr) => {
-      const agentId = curr.AgentId;
-      if (!acc[agentId]) acc[agentId] = [];
-      if (curr.Wallet?.WalletName) acc[agentId].push(curr.Wallet.WalletName);
-      return acc;
-    }, {});
+    const walletNameMap = new Map(
+      wallets.map((w) => [w.WalletId, w.WalletName])
+    );
 
+    for (const [agentId, walletSet] of Object.entries(agentWalletMap)) {
+      walletMap[agentId] = [...walletSet]
+        .map((walletId) => walletNameMap.get(walletId))
+        .filter(Boolean);
+    }
+
+    // Get transaction agent assignments
     const txAgents = await prisma.TransactionAgent.findMany({
       orderBy: { LogDate: "desc" },
       select: {
@@ -48,6 +65,7 @@ export async function GET(request) {
       }
     }
 
+    // Get transactions within date range
     const transactions = await prisma.Transactions.findMany({
       where: {
         TransactionDate: {
@@ -60,6 +78,7 @@ export async function GET(request) {
         TransactionDate: true,
         PaymentCheckTime: true,
         PaymentCheck: true,
+        WalletID: true,
       },
     });
 
@@ -68,6 +87,9 @@ export async function GET(request) {
     for (const tx of transactions) {
       const agentId = latestAssignment[tx.TransactionID];
       if (!agentId || !checkerMap.has(agentId)) continue;
+
+      const walletSet = agentWalletMap[agentId];
+      if (!walletSet || !walletSet.has(tx.WalletID)) continue;
 
       if (!grouped[agentId]) {
         grouped[agentId] = {
