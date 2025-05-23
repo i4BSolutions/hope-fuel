@@ -1,0 +1,15 @@
+{
+  "nanon": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-hopefuel-nanon-96f66-authRole",
+      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-nanon-96f66-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-nanon-96f66-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-hopefuel-nanon-96f66-deployment",
+      "UnauthRoleName": "amplify-hopefuel-nanon-96f66-unauthRole",
+      "StackName": "amplify-hopefuel-nanon-96f66",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-nanon-96f66/18633b70-37ff-11f0-a06a-0a15bb6ec7bb",
+      "AmplifyAppId": "d21tc40zhkpcd1"
+    }
+  }
+}
