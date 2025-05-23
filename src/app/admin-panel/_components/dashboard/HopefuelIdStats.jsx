@@ -2,15 +2,21 @@ import { Box, Skeleton, TableCell, TableRow, Typography } from "@mui/material";
 import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
 import { useEffect, useState } from "react";
 
-export default function HopefuelIdStats() {
+export default function HopefuelIdStats({ currentMonth }) {
   const [transactionStatuses, setTransactionStatuses] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getTransactionStatuses = async () => {
       setLoading(true);
+
+      const year = currentMonth.year();
+      const month = currentMonth.month() + 1;
+
       try {
-        const response = await fetch("/api/agent/transaction-status");
+        const response = await fetch(
+          `/api/agent/transaction-status?year=${year}&month=${month}`
+        );
         const data = await response.json();
         if (data.status === 200) {
           setTransactionStatuses(data.statusBreakdown);
@@ -25,7 +31,7 @@ export default function HopefuelIdStats() {
       }
     };
     getTransactionStatuses();
-  }, []);
+  }, [currentMonth]);
 
   if (!transactionStatuses) return null;
 
