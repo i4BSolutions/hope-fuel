@@ -94,7 +94,7 @@ export async function GET(request) {
       }
 
       if (rate) {
-        summary[walletId].totalAmountUSD += amount * rate;
+        summary[walletId].totalAmountUSD += amount / rate;
       }
     }
 
