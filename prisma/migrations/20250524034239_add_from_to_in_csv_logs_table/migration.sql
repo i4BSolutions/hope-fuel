@@ -1,5 +1,5 @@
 -- AlterTable
-ALTER TABLE `csvexporttransactionlogs` ADD COLUMN `FromDate` DATE NULL,
+ALTER TABLE `CSVExportTransactionLogs` ADD COLUMN `FromDate` DATE NULL,
     ADD COLUMN `ToDate` DATE NULL;
 
 -- AddForeignKey
