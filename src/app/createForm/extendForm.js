@@ -19,7 +19,7 @@ const schema = z.object({
   amount: z.coerce.number().positive("Amount must be positive"),
   walletId: z.coerce.number().min(1, "Wallet is required"),
   supportRegion: z.coerce.number().min(1, "Support region is required"),
-  donorCountry: z.coerce.string().optional(),
+  donorCountry: z.string().optional(),
   month: z.coerce.number().min(1, "Month must be at least 1"),
   manyChatId: z.string().regex(/^\d+$/, "Numeric ID only"),
   contactLink: z.string().optional(),
