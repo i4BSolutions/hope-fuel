@@ -290,6 +290,8 @@ model CSVExportTransactionLogs {
   AgentId                      Int?
   CSVExportTransactionDateTime DateTime? @db.Timestamp(0)
   CSVExportTransactionFileName String?   @db.VarChar(255)
+  FromDate                     DateTime? @db.Date
+  ToDate                       DateTime? @db.Date
 
   Agent Agent? @relation(fields: [AgentId], references: [AgentId])
 
