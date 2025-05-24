@@ -19,7 +19,7 @@ const schema = z.object({
   amount: z.coerce.number().positive("Amount must be positive"),
   walletId: z.coerce.number().min(1, "Wallet is required"),
   supportRegion: z.coerce.number().min(1, "Support region is required"),
-  donorCountry: z.coerce.number().optional(),
+  donorCountry: z.coerce.string().optional(),
   month: z.coerce.number().min(1, "Month must be at least 1"),
   manyChatId: z.string().regex(/^\d+$/, "Numeric ID only"),
   contactLink: z.string().optional(),
@@ -76,7 +76,6 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
         body: JSON.stringify({ name: userInfo.name, email: userInfo.email }),
       });
       const ans = await res.json();
-      console.log("Userinfo:", ans);
       setValue("donorCountry", ans.UserCountryName);
       setCustomerId(ans.CustomerId);
     };
