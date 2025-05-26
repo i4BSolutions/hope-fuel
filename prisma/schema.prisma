@@ -328,6 +328,11 @@ model AssignedWallet {
   @@index([WalletId], map: "WalletId")
 }
 
+model FollowUpStatus {
+  FollowUpStatusID Int      @id @default(autoincrement())
+  StatusName       String   @unique @db.VarChar(255)
+}
+
 enum CustomerAuditLogs_FieldChanged {
   Name
   Email
