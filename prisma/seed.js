@@ -747,7 +747,7 @@ async function main() {
     data: [{ PlatformName: "Facebook" }, { PlatformName: "Telegram" }],
   });
 
-  await prisma.FollowUpStatus.createMany({
+  await prisma.followUpStatus.createMany({
     data: [
       { StatusName: "Not Contacted" },
       { StatusName: "Contacted" },
