@@ -1,7 +1,4 @@
-"use client";
-
-import { Avatar, Box, Card, Paper, Stack, Typography } from "@mui/material";
-import React from "react";
+import { Avatar, Box, Card, Typography } from "@mui/material";
 
 const FundraiserCard = ({ fundraiser, onClick }) => {
   return (

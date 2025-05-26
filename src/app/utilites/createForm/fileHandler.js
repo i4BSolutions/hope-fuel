@@ -2,7 +2,6 @@
 //input is setfile functions and files
 import { getUrl, uploadData } from "aws-amplify/storage";
 import { v4 as uuidv4 } from "uuid";
-import { remove } from "aws-amplify/storage";
 
 export default async function filehandler(
   files,
@@ -25,6 +24,7 @@ export default async function filehandler(
         key: uuidv4() + file.name,
         data: file,
         options: {
+          accessLevel: "protected",
           onProgress: ({ transferredBytes, totalBytes }) => {
             if (totalBytes) {
               const progress = Math.round(transferredBytes / totalBytes) * 100;

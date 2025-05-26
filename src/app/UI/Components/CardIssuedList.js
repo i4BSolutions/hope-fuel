@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import CardItem from "./CardItem";
 
 const CardsIssuedList = ({ data }) => {
@@ -18,7 +18,6 @@ const CardsIssuedList = ({ data }) => {
             throw new Error("Failed to fetch cards issued");
           }
           const result = await response.json();
-          console.log("Fetched Cards Data:", result);
           setCards(result.cardIssuedData || []); // Update state with the fetched data
         } catch (error) {
           console.error("Error fetching cards issued:", error);

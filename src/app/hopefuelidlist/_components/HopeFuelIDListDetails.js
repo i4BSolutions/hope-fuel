@@ -1,3 +1,4 @@
+import getSignedUrl from "@/app/utilites/getSignedUrl";
 import {
   Box,
   Container,
@@ -7,9 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment-timezone";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
-import ImageCarouselModal from "../components/ImageCarousel";
+import ImageCarouselModal from "./ImageCarousel";
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -60,11 +61,18 @@ const ImageItem = styled("img")({
 const HopeFuelIDListDetails = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [imageUrls, setImageUrls] = useState([]);
 
-  // const activeImageHandler = (index) => {
-  //   setActiveImage(index);
-  // };
+  useEffect(() => {
+    (async () => {
+      const urls = await Promise.all(
+        data.ScreenShot.map((key) => getSignedUrl(key))
+      );
+      setImageUrls(urls);
+    })();
+  }, []);
 
+  if (imageUrls.length === 0) return null;
   return (
     <>
       <div key={data.HopeFuelID}>
@@ -292,7 +300,7 @@ const HopeFuelIDListDetails = ({ data }) => {
                 disableHoverListener={data.ScreenShot.length <= 2}
               >
                 <ScrollableImageContainer>
-                  {data.ScreenShot?.map((image, index) => (
+                  {imageUrls.map((image, index) => (
                     <ImageItem
                       onClick={() => {
                         setShowModal((prev) => !prev);

@@ -79,12 +79,11 @@ async function createScreenShot(screenShot, transactionsID) {
   let screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
 
-    const path = String(item.url).substring(0, String(item.url).indexOf("?"));
-    const values = [transactionsID, path];
+    const key = item.key;
+    const values = [transactionsID, key];
 
     try {
       const result = await db(query, values);
-
       return result.insertId;
     } catch (error) {
       console.error("Error inserting screenshot:", error);

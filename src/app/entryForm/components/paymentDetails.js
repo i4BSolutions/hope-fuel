@@ -1,5 +1,6 @@
 "use client";
 
+import getSignedUrl from "@/app/utilites/getSignedUrl";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
@@ -12,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AGENT_ROLE } from "../../../lib/constants";
 import { useAgentStore } from "../../../stores/agentStore";
 import ActionButtons from "../../UI/Components/ActionButton";
@@ -29,8 +30,22 @@ export default function PaymentDetails({ data, clearHopeFuelID }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { agent } = useAgentStore();
+  const [screenShots, setScreenShots] = useState([]);
 
-  // Fetch data based on HopeFuelID
+  useEffect(() => {
+    if (data.ScreenShotLinks && data.ScreenShotLinks.length > 0) {
+      const fetchSignedUrls = async () => {
+        const signedUrls = await Promise.all(
+          data.ScreenShotLinks.map(async (link) => {
+            return await getSignedUrl(link);
+          })
+        );
+        setScreenShots(signedUrls);
+      };
+      fetchSignedUrls();
+    }
+  }, [data]);
+
   async function handleNoteSave() {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -69,7 +84,7 @@ export default function PaymentDetails({ data, clearHopeFuelID }) {
                   direction={{ xs: "column", sm: "column" }}
                   spacing={{ xs: 1, sm: 2, md: 4 }}
                 >
-                  {data.ScreenShotLinks.map((link, index) => (
+                  {screenShots.map((link, index) => (
                     <Box
                       key={index}
                       component="img"

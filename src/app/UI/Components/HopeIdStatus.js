@@ -1,7 +1,6 @@
-import { Stack, Chip } from "@mui/material";
+import { Chip, Stack } from "@mui/material";
 
 export default function HopeFuelIdStatus({ data }) {
-  console.log("HopeFuelIdStatus data:", data);
   if (!data) {
     return (
       <div>

@@ -78,7 +78,6 @@ export default function EntryForm() {
     );
   }
 
-  // Handle loading state
   if (data === null)
     return (
       <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
