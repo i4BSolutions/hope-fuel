@@ -108,12 +108,12 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
           <Grid item xs={4} sx={{ textAlign: "center", marginX: "auto" }}>
             <LogoUpload
               logoFile={logoFile}
-              setLogoFile={(url) => {
-                if (!url) {
+              setLogoFile={(key) => {
+                if (!key) {
                   return;
                 }
-                setLogoFile(url);
-                setValue("FundraiserLogo", url);
+                setLogoFile(key);
+                setValue("FundraiserLogo", key);
               }}
               errors={errors}
               clearErrors={clearErrors}

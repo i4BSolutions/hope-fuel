@@ -34,7 +34,7 @@ export default async function createFormSubmit(
     month,
     note,
     walletId,
-    screenShot: files.map((file) => ({ url: file.url.href })),
+    screenShot: files.map((file) => ({ key: file.key })),
   };
 
   try {

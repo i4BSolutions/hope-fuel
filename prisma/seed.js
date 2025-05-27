@@ -242,7 +242,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -277,7 +277,7 @@ async function main() {
       Amount: 100,
       Month: 3,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -295,7 +295,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -313,7 +313,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -331,7 +331,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -349,7 +349,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -367,7 +367,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -385,7 +385,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -403,7 +403,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -421,7 +421,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -439,7 +439,7 @@ async function main() {
       Amount: 100,
       Month: 2,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -457,7 +457,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -475,7 +475,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -493,7 +493,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -511,7 +511,7 @@ async function main() {
       Amount: 100,
       Month: 2,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -529,7 +529,7 @@ async function main() {
       Amount: 100,
       Month: 12,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -547,7 +547,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -565,7 +565,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -583,7 +583,7 @@ async function main() {
       Amount: 100,
       Month: 2,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -601,7 +601,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -619,7 +619,7 @@ async function main() {
       Amount: 100,
       Month: 1,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -637,7 +637,7 @@ async function main() {
       Amount: 100,
       Month: 3,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
     {
@@ -655,7 +655,7 @@ async function main() {
       Amount: 100,
       Month: 2,
       ScreenShotLink:
-        "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com/public/7744ecb2-ef90-4c34-aabb-6fc77d0b54bb86d3e24b8647e52cc6c815a52ff6e445.jpg",
+        "69c5e4f0-6cc2-4e68-a983-22957b666801Geek Squad LogoIcon.png",
       Note: "Testing customers data!",
     },
   ];
