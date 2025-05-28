@@ -7,6 +7,7 @@ import NewCustomers from "../../../../lib/icons/NewCustomers";
 import OldCustomers from "../../../../lib/icons/OldCustomers";
 import TotalCustomers from "../../../../lib/icons/TotalCustomers";
 import CustomerCard from "./_components/CustomerCard";
+import FollowUpModal from "./_components/CustomerFollowUpModal";
 
 const data = [
   {
@@ -31,10 +32,71 @@ const data = [
   },
 ];
 
+const followUpData = [
+  {
+    name: "Geek Squad Studio",
+    email: "geeksquadstudio@gmail.com",
+    cardId: 12345678,
+    manyChatId: "777777",
+    lastFormAgent: "Ko Ko",
+    note: "Asked to follow up in May.",
+  },
+  {
+    name: "BrightTech Innovations",
+    email: "support@brighttech.com",
+    cardId: 88442211,
+    manyChatId: "11223344",
+    lastFormAgent: "Jane Smith",
+    note: "Requested new subscription plan details.",
+  },
+  {
+    name: "GreenMarket",
+    email: "info@greenmarket.co",
+    cardId: 55667788,
+    manyChatId: "99887766",
+    lastFormAgent: "John Lee",
+    note: "Agent will re-check payment issue.",
+  },
+  {
+    name: "Future Labs",
+    email: "contact@futurelabs.io",
+    cardId: 33445566,
+    manyChatId: "66778899",
+    lastFormAgent: "Emma Doe",
+    note: "Waiting for document upload.",
+  },
+  {
+    name: "Skyline Retail",
+    email: "skyline@retailhub.com",
+    cardId: 99887744,
+    manyChatId: "22334455",
+    lastFormAgent: "David Kim",
+    note: "Needs invoice reissue.",
+  },
+  {
+    name: "Wellness Pro",
+    email: "hello@wellnesspro.org",
+    cardId: 22331155,
+    manyChatId: "12344321",
+    lastFormAgent: "Liam Park",
+    note: "Requested assistance on setup.",
+  },
+];
+
 export default function CustomerStats({ currentMonth }) {
   const [chartData, setChartData] = useState([]);
   const [cardData, setCardData] = useState(data);
   const [loading, setLoading] = useState(true);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+
+  const handleCardClick = (stats) => {
+    if (stats.key === "followUpCustomers") {
+      setSelectedCard(stats);
+      setOpenModal(true);
+    }
+  };
 
   useEffect(() => {
     const year = currentMonth.year();
@@ -120,7 +182,11 @@ export default function CustomerStats({ currentMonth }) {
           }}
         >
           {cardData.map((stats) => (
-            <CustomerCard stats={stats} key={stats.key} />
+            <CustomerCard
+              stats={stats}
+              key={stats.key}
+              onClick={() => handleCardClick(stats)}
+            />
           ))}
         </Box>
         <Box
@@ -188,6 +254,11 @@ export default function CustomerStats({ currentMonth }) {
           />
         </Box>
       </Box>
+      <FollowUpModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        customers={followUpData}
+      />
     </Box>
   );
 }
