@@ -7,6 +7,7 @@ import AssignDashboard from "./_components/assign-dashboard/page";
 import ExchangeRates from "./_components/exchangeRate/page";
 import ExportCSVPage from "./_components/exportCsv/page";
 import FormOpenClosePage from "./_components/formOpenClose/page";
+import RoleManagementPage from "./_components/role-management/page";
 
 const tabSx = {
   fontSize: "16px",
@@ -22,6 +23,7 @@ const tabSx = {
 const tabs = [
   { label: "Dashboard", component: () => <Dashboard /> },
   { label: "Groups & Wallets Assign", component: () => <AssignDashboard /> },
+  { label: "Role Management", component: () => <RoleManagementPage /> },
   { label: "Form Open/Close", component: () => <FormOpenClosePage /> },
   { label: "Currency Exchange Rate", component: () => <ExchangeRates /> },
   { label: "Export CSV", component: () => <ExportCSVPage /> },
