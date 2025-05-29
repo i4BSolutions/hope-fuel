@@ -71,12 +71,22 @@ export default function PaymentCheckerStats({ currentMonth }) {
         }}
       >
         {loading ? (
-          <Skeleton variant="rounded" width={320} height={280} />
+          <Skeleton
+            variant="rounded"
+            width={320}
+            height={280}
+            sx={{ borderRadius: 5 }}
+          />
         ) : (
           <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
         )}
         {loading ? (
-          <Skeleton variant="rounded" width="100%" height={280} />
+          <Skeleton
+            variant="rounded"
+            width="100%"
+            height={280}
+            sx={{ borderRadius: 5 }}
+          />
         ) : (
           <PaymentCheckerTable data={checkerKPI} />
         )}

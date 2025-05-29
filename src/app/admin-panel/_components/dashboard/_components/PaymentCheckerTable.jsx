@@ -80,6 +80,7 @@ export default function PaymentCheckerTable({ data }) {
                     py: 7,
                     fontStyle: "italic",
                     color: "#888",
+                    borderBottom: "none",
                   }}
                 >
                   <InboxIcon sx={{ fontSize: 40, color: "#999999" }} />
