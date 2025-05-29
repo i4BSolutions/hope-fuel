@@ -23,41 +23,41 @@ export async function GET(req) {
     orderBy: { StartDate: "asc" },
   });
 
-  const customerSubs = new Map();
+  console.log("allSubscriptions", allSubscriptions);
+  const subscriptionMap = new Map();
   for (const { CustomerID, StartDate, EndDate } of allSubscriptions) {
-    if (!customerSubs.has(CustomerID)) customerSubs.set(CustomerID, []);
-    customerSubs.get(CustomerID).push({
+    if (!subscriptionMap.has(CustomerID)) subscriptionMap.set(CustomerID, []);
+    subscriptionMap.get(CustomerID).push({
       startDate: new Date(StartDate),
       endDate: new Date(EndDate),
     });
   }
 
   function computeStats(year, month) {
-    const monthStart = new Date(year, month - 1, 1);
-    const monthEnd = new Date(year, month, 0);
-    const twoMonthsAgoStart = new Date(year, month - 3, 1);
-    const oneMonthAgoEnd = new Date(year, month - 1, 0);
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, month + 1, 0);
+    const twoMonthsAgoStart = new Date(year, month - 2, 1);
+    const lastMonthEnd = new Date(year, month, 0);
 
     let newActive = 0;
     let oldActive = 0;
     let followUp = 0;
 
-    for (const subs of customerSubs.values()) {
-      const activeInTarget = subs.some(
+    for (const subs of subscriptionMap.values()) {
+      const currentActive = subs.some(
         ({ startDate, endDate }) =>
-          startDate <= monthEnd && endDate >= monthStart
+          startDate <= monthEnd && endDate > monthStart
+      );
+      const recentActive = subs.some(
+        ({ startDate, endDate }) =>
+          endDate >= twoMonthsAgoStart && endDate <= lastMonthEnd
       );
 
-      const activeInRecentPast = subs.some(
-        ({ startDate, endDate }) =>
-          startDate <= oneMonthAgoEnd && endDate >= twoMonthsAgoStart
-      );
-
-      if (subs.length === 1 && activeInTarget) {
+      if (currentActive) {
         newActive++;
-      } else if (subs.length > 1 && activeInTarget) {
+      } else if (subs.length > 1 && currentActive) {
         oldActive++;
-      } else if (subs.length >= 1 && !activeInTarget && activeInRecentPast) {
+      } else if (!currentActive && recentActive) {
         followUp++;
       }
     }
