@@ -1,4 +1,4 @@
-import { Box, Typography, Skeleton } from "@mui/material";
+import { Box, Skeleton, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import PaymentCheckerTable from "./_components/PaymentCheckerTable";
@@ -66,25 +66,20 @@ export default function PaymentCheckerStats({ currentMonth }) {
         sx={{
           mt: 1,
           display: "flex",
-          flexWrap: "wrap",
           gap: 2,
           width: "100%",
         }}
       >
-        <Box sx={{ flex: 1, minWidth: 250 }}>
-          {loading ? (
-            <Skeleton variant="rounded" width={250} height={130} />
-          ) : (
-            <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
-          )}
-        </Box>
-        <Box sx={{ flex: 3, minWidth: "300px" }}>
-          {loading ? (
-            <Skeleton variant="rounded" width="100%" height={300} />
-          ) : (
-            <PaymentCheckerTable data={checkerKPI} />
-          )}
-        </Box>
+        {loading ? (
+          <Skeleton variant="rounded" width={320} height={280} />
+        ) : (
+          <PaymentStatsCard checked={checkedCount} pending={pendingCount} />
+        )}
+        {loading ? (
+          <Skeleton variant="rounded" width="100%" height={280} />
+        ) : (
+          <PaymentCheckerTable data={checkerKPI} />
+        )}
       </Box>
       <Box sx={{ width: "100%" }}>
         <Box
