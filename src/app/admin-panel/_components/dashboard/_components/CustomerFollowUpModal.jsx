@@ -8,16 +8,28 @@ import {
   TextField,
   InputAdornment,
   Button,
-  Chip,
+  Skeleton,
+  Tooltip,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import StatusDropdown from "./StatusDropdown";
 import StatusFilter from "./StatusFilter";
+import { useRouter } from "next/navigation";
 
-export default function FollowUpModal({ open, onClose, customers }) {
+export default function FollowUpModal({
+  open,
+  onClose,
+  customers,
+  loading = false,
+  onStatusChange,
+  onFilterApply,
+  onFilterClear,
+  onSearch,
+}) {
+  const router = useRouter();
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogTitle
@@ -80,110 +92,177 @@ export default function FollowUpModal({ open, onClose, customers }) {
                 borderRadius: "24px",
               },
             }}
+            onChange={(e) => onSearch(e.target.value)}
           />
-          <StatusFilter
-            onApply={(statusId) => {
-              console.log("Filter applied with status:", statusId);
-              // Update filter state or fetch from API
-            }}
-            onClear={() => {
-              console.log("Filter cleared");
-              // Reset filter logic
-            }}
-          />
+          <StatusFilter onApply={onFilterApply} onClear={onFilterClear} />
         </Box>
 
         <Box display="flex" flexDirection="column" gap={2} px={3} pb={3}>
-          {customers.map((customer, idx) => (
-            <Box
-              key={idx}
-              sx={{
-                border: "1px solid #E2E8F0",
-                borderRadius: 3,
-                p: 2,
-                backgroundColor: "white",
-                boxShadow: 1,
-              }}
-            >
+          {loading ? (
+            Array.from({ length: 4 }).map((_, idx) => (
               <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                flexWrap="wrap"
-                gap={1}
-                mb={1}
+                key={idx}
+                sx={{
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 3,
+                  p: 2,
+                  backgroundColor: "white",
+                  boxShadow: 1,
+                }}
               >
-                <Box flex={1}>
-                  <Typography fontWeight={700}>{customer.name}</Typography>
-                </Box>
-
-                <Box flex={1}>
-                  <Typography fontSize={14} color="text.secondary">
-                    {customer.email}
-                  </Typography>
-                </Box>
-
-                <Box minWidth={130}>
-                  <Typography fontSize={14}>
-                    Card ID: {customer.cardId}
-                  </Typography>
-                </Box>
-
-                <Box flex={1}>
-                  <Typography fontSize={14}>
-                    Manychat ID: {customer.manyChatId}
-                    <IconButton size="small">
-                      <ContentCopyIcon fontSize="small" />
-                    </IconButton>
-                  </Typography>
-                </Box>
-
-                <Box flex={1}>
-                  <StatusDropdown
-                    statusId={2}
-                    onChange={(newStatusId) => {
-                      console.log("Selected Status:", newStatusId);
-                    }}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={2}
+                  flexWrap="wrap"
+                  mb={2}
+                >
+                  <Skeleton variant="text" width="20%" height={28} />
+                  <Skeleton variant="text" width="30%" height={20} />
+                  <Skeleton variant="text" width="15%" height={20} />
+                  <Skeleton variant="text" width="25%" height={20} />
+                  <Skeleton
+                    variant="rectangular"
+                    width={150}
+                    height={36}
+                    sx={{ borderRadius: 2 }}
+                  />
+                  <Skeleton
+                    variant="rectangular"
+                    width={160}
+                    height={36}
+                    sx={{ borderRadius: 2 }}
                   />
                 </Box>
+                <Skeleton
+                  variant="text"
+                  width="100%"
+                  height={20}
+                  sx={{ mb: 1 }}
+                />
+                <Skeleton variant="text" width="80%" height={20} />
+              </Box>
+            ))
+          ) : customers.length === 0 ? (
+            <Typography
+              variant="body1"
+              color="text.secondary"
+              sx={{ textAlign: "center", mt: 4 }}
+            >
+              No customers found.
+            </Typography>
+          ) : (
+            customers.map((customer, idx) => (
+              <Box
+                key={idx}
+                sx={{
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 3,
+                  p: 2,
+                  backgroundColor: "white",
+                  boxShadow: 1,
+                }}
+              >
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  flexWrap="wrap"
+                  gap={1}
+                  mb={1}
+                >
+                  <Box flex={1}>
+                    <Typography fontWeight={700}>{customer.name}</Typography>
+                  </Box>
 
-                <Box flex={1}>
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: "#DC2626",
-                      "&:hover": { backgroundColor: "#b91c1c" },
-                      borderRadius: "24px",
-                      fontSize: 14,
-                      textTransform: "none",
-                    }}
-                  >
-                    Extend Subscription
-                  </Button>
+                  <Box flex={1}>
+                    <Typography fontSize={14} color="text.secondary">
+                      {customer.email}
+                    </Typography>
+                  </Box>
+
+                  <Box minWidth={130}>
+                    <Typography fontSize={14}>
+                      Card ID: {customer.cardId}
+                    </Typography>
+                  </Box>
+
+                  <Box display="flex" alignItems="center" flex={1}>
+                    <Typography fontSize={14}>
+                      Manychat ID: {customer.manyChatId}
+                    </Typography>
+                    <Tooltip title="Copy">
+                      <IconButton
+                        size="small"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            customer.manyChatId || ""
+                          );
+                        }}
+                      >
+                        <ContentCopyIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+
+                  <Box flex={1}>
+                    <StatusDropdown
+                      statusId={customer.followUpStatus?.statusId || 1}
+                      onChange={async (newStatusId) => {
+                        await fetch("/api/v1/follow-up/update-status", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            customerId: customer.customerId,
+                            statusId: newStatusId,
+                          }),
+                        });
+                        onStatusChange();
+                      }}
+                    />
+                  </Box>
+
+                  <Box flex={1}>
+                    <Button
+                      variant="contained"
+                      sx={{
+                        backgroundColor: "#DC2626",
+                        "&:hover": { backgroundColor: "#b91c1c" },
+                        borderRadius: "24px",
+                        fontSize: 14,
+                        textTransform: "none",
+                      }}
+                      onClick={() => {
+                        router.push("/extendUser");
+                      }}
+                    >
+                      Extend Subscription
+                    </Button>
+                  </Box>
+                </Box>
+
+                <Box sx={{ borderBottom: "1px solid #E2E8F0", mb: 2, mt: 2 }} />
+
+                <Box
+                  display="flex"
+                  gap={2}
+                  flexWrap="wrap"
+                  mt={1}
+                  justifyContent="space-between"
+                  maxWidth="md"
+                >
+                  <Typography fontSize={14} sx={{ textAlign: "left", flex: 1 }}>
+                    <strong>Last Form Filling Agent:</strong>{" "}
+                    {customer.lastFormAgent || "-"}
+                  </Typography>
+                  <Box sx={{ borderRight: "1px solid #E2E8F0" }} />
+                  <Typography fontSize={14} sx={{ textAlign: "left", flex: 1 }}>
+                    <strong>Agent's Note:</strong> {customer.note || "-"}
+                  </Typography>
                 </Box>
               </Box>
-
-              <Box sx={{ borderBottom: "1px solid #E2E8F0", mb: 2, mt: 2 }} />
-
-              <Box
-                display="flex"
-                gap={2}
-                flexWrap="wrap"
-                mt={1}
-                justifyContent="space-between"
-                maxWidth="md"
-              >
-                <Typography fontSize={14} sx={{ textAlign: "left", flex: 1 }}>
-                  <strong>Last Form Filling Agent:</strong>{" "}
-                  {customer.lastFormAgent || "-"}
-                </Typography>
-                <Box sx={{ borderRight: "1px solid #E2E8F0" }} />
-                <Typography fontSize={14} sx={{ textAlign: "left", flex: 1 }}>
-                  <strong>Agent's Note:</strong> {customer.note || "-"}
-                </Typography>
-              </Box>
-            </Box>
-          ))}
+            ))
+          )}
         </Box>
       </DialogContent>
     </Dialog>

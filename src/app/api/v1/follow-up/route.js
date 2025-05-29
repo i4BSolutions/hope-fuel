@@ -10,6 +10,7 @@ export async function GET(req) {
     searchParams.get("year") || now.getFullYear(),
     10
   );
+
   const currentMonth = parseInt(
     searchParams.get("month") || now.getMonth() + 1,
     10
@@ -108,6 +109,7 @@ export async function GET(req) {
       const statusId = followUp?.FollowUpStatusID ?? 1;
 
       return {
+        customerId: customer.CustomerId,
         name: customer.Name,
         email: customer.Email,
         cardId: customer.CardID,
