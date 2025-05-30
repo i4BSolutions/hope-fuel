@@ -117,7 +117,7 @@ export default function CheckUser({ onUserCheck }) {
     );
   }
 
-  if (isFormOpen === false && agent.roleId !== AGENT_ROLE.ADMIN) {
+  if (isFormOpen === 0 || agent.roleId !== AGENT_ROLE.ADMIN) {
     return <ServiceUnavailable />;
   }
 
