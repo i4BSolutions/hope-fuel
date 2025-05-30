@@ -92,6 +92,7 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
 
   return transactions.map((t) => ({
     HopeFuelID: t.HopeFuelID,
+    TransactionID: t.TransactionID,
     Name: t.Customer?.Name || null,
     Email: t.Customer?.Email || null,
     CardID: t.Customer?.CardID || null,
