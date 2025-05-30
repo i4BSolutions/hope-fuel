@@ -32,76 +32,80 @@ const data = [
   },
 ];
 
-const followUpData = [
-  {
-    name: "Geek Squad Studio",
-    email: "geeksquadstudio@gmail.com",
-    cardId: 12345678,
-    manyChatId: "777777",
-    lastFormAgent: "Ko Ko",
-    note: "Asked to follow up in May.",
-  },
-  {
-    name: "BrightTech Innovations",
-    email: "support@brighttech.com",
-    cardId: 88442211,
-    manyChatId: "11223344",
-    lastFormAgent: "Jane Smith",
-    note: "Requested new subscription plan details.",
-  },
-  {
-    name: "GreenMarket",
-    email: "info@greenmarket.co",
-    cardId: 55667788,
-    manyChatId: "99887766",
-    lastFormAgent: "John Lee",
-    note: "Agent will re-check payment issue.",
-  },
-  {
-    name: "Future Labs",
-    email: "contact@futurelabs.io",
-    cardId: 33445566,
-    manyChatId: "66778899",
-    lastFormAgent: "Emma Doe",
-    note: "Waiting for document upload.",
-  },
-  {
-    name: "Skyline Retail",
-    email: "skyline@retailhub.com",
-    cardId: 99887744,
-    manyChatId: "22334455",
-    lastFormAgent: "David Kim",
-    note: "Needs invoice reissue.",
-  },
-  {
-    name: "Wellness Pro",
-    email: "hello@wellnesspro.org",
-    cardId: 22331155,
-    manyChatId: "12344321",
-    lastFormAgent: "Liam Park",
-    note: "Requested assistance on setup.",
-  },
-];
-
 export default function CustomerStats({ currentMonth }) {
   const [chartData, setChartData] = useState([]);
   const [cardData, setCardData] = useState(data);
+  const [followUpData, setFollowUpData] = useState([]);
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [loading, setLoading] = useState(true);
+  const [loadingFollowUps, setLoadingFollowUps] = useState(false);
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
 
+  const year = currentMonth.year();
+  const month = currentMonth.month();
+
   const handleCardClick = (stats) => {
     if (stats.key === "followUpCustomers") {
       setSelectedCard(stats);
+      fetchFollowUpData(statusFilter);
       setOpenModal(true);
     }
   };
 
-  useEffect(() => {
-    const year = currentMonth.year();
-    const month = currentMonth.month();
+  const handleStatusFilter = (statusId) => {
+    setStatusFilter(statusId);
+    fetchFollowUpData(statusId);
+  };
 
+  const handleClearFilter = () => {
+    setStatusFilter(null);
+    fetchFollowUpData(null);
+  };
+
+  const handleSearch = (value) => {
+    setSearchTerm(value);
+    fetchFollowUpData(statusFilter);
+  };
+
+  const fetchFollowUpData = async (status = null) => {
+    try {
+      setLoadingFollowUps(true);
+
+      const url = `/api/v1/follow-up?year=${year}&month=${month}${
+        status ? `&statusId=${status}` : ""
+      }`;
+      const res = await fetch(url);
+      const json = await res.json();
+
+      if (json.success) {
+        const rawData = json.data || [];
+
+        const term = searchTerm.trim().toLowerCase();
+        const filtered = term
+          ? rawData.filter((c) => {
+              return (
+                c.name?.toLowerCase().includes(term) ||
+                c.email?.toLowerCase().includes(term) ||
+                c.manyChatId?.toLowerCase().includes(term) ||
+                (c.cardId + "").includes(term)
+              );
+            })
+          : rawData;
+
+        setFollowUpData(filtered);
+      }
+    } catch (err) {
+      console.error("Failed to fetch follow-up data", err);
+    } finally {
+      setLoadingFollowUps(false);
+    }
+  };
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(
@@ -258,6 +262,11 @@ export default function CustomerStats({ currentMonth }) {
         open={openModal}
         onClose={() => setOpenModal(false)}
         customers={followUpData}
+        loading={loadingFollowUps}
+        onStatusChange={() => fetchFollowUpData(statusFilter)}
+        onFilterApply={handleStatusFilter}
+        onFilterClear={handleClearFilter}
+        onSearch={handleSearch}
       />
     </Box>
   );
