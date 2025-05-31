@@ -53,7 +53,7 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
               >
                 <Typography variant="body2" color="text.secondary">
                   {moment(history.CSVExportTransactionDateTime).format(
-                    "YYYY-MM-DD hh:mm"
+                    "YYYY-MM-DD HH:mm"
                   )}
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
@@ -71,7 +71,10 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                 }}
               >
                 <CalendarMonthIcon size={16} />
-                <Typography variant="body2">2025-04-01 ⟶ 2025-04-30</Typography>
+                <Typography variant="body2">
+                  {moment(history.FromDate).format("YYYY-MM-DD")} ⟶{" "}
+                  {moment(history.ToDate).format("YYYY-MM-DD")}
+                </Typography>
               </Box>
 
               <Button
