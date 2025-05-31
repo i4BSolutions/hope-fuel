@@ -224,13 +224,15 @@ async function checkMinimumAmount(amount, month, currencyId, currencyCode) {
 }
 
 async function InsertSubscription(customerId, month) {
-  const currentDate = new Date();
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1 + month, 0);
   try {
     const subscription = await prisma.subscription.create({
       data: {
         CustomerID: customerId,
-        StartDate: currentDate,
-        EndDate: calculateExpireDate(currentDate, month, true),
+        StartDate: startDate,
+        EndDate: endDate,
       },
     });
     return subscription.SubscriptionID;
