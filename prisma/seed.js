@@ -519,13 +519,13 @@ async function main() {
       Email: "customer61@example.com",
       ManyChatId: "2859651193",
       ContactLink: "https://manychat.com/profile/48511",
-      ExpireDate: new Date("2025-04-30"),
+      ExpireDate: new Date("2025-05-30"),
       CardID: 1244567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
       StartDate: new Date("2024-04-25"),
-      EndDate: new Date("2025-04-30"),
+      EndDate: new Date("2025-05-30"),
       Amount: 100,
       Month: 12,
       ScreenShotLink:

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import WalletCard from "./WalletCard";
 import WalletMultiSelect from "./WalletMultiSelect";
 
@@ -59,9 +59,12 @@ export default function WalletGrid({ currentMonth }) {
     <Box sx={{ width: "100%" }}>
       <Box
         sx={{
-          mt: 2,
+          mt: 1,
           mb: 1,
           display: "flex",
+          fontSize: "19px",
+          fontWeight: 600,
+          lineHeight: "23px",
           justifyContent: "space-between",
           alignItems: "center",
         }}

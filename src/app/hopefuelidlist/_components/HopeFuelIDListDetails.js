@@ -344,7 +344,7 @@ const HopeFuelIDListDetails = ({ data }) => {
       <ImageCarouselModal
         open={showModal}
         onClose={() => setShowModal((prev) => !prev)}
-        screenshots={data?.ScreenShot}
+        screenshots={imageUrls}
         activeImage={activeImage}
         activeImageHandler={setActiveImage}
       />

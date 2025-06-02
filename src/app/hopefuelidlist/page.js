@@ -90,6 +90,7 @@ const HopeFuelIdListPage = () => {
         throw new Error("Failed to fetch details");
       }
       const result = await response.json();
+
       setDetails(result.data);
     } catch (error) {
       console.error(error);

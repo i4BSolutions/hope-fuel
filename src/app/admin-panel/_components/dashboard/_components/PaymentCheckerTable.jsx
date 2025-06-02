@@ -1,12 +1,14 @@
+import InboxIcon from "@mui/icons-material/Inbox";
 import {
+  Button,
+  Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Button,
+  Typography,
 } from "@mui/material";
 import { useState } from "react";
 import WalletPopover from "./WalletPopover";
@@ -35,9 +37,15 @@ export default function PaymentCheckerTable({ data }) {
           boxShadow: "none",
           border: "1px solid #E0E0E0",
           overflowX: "auto",
+          width: "100%",
         }}
       >
-        <Table sx={{ borderCollapse: "separate", borderSpacing: 0 }}>
+        <Table
+          sx={{
+            borderCollapse: "separate",
+            borderSpacing: 0,
+          }}
+        >
           <TableHead>
             <TableRow
               sx={{ paddingTop: 1, paddingBottom: 1, textAlign: "left" }}
@@ -68,9 +76,26 @@ export default function PaymentCheckerTable({ data }) {
                 <TableCell
                   colSpan={6}
                   align="center"
-                  sx={{ py: 3, fontStyle: "italic", color: "#888" }}
+                  sx={{
+                    py: 7,
+                    fontStyle: "italic",
+                    color: "#888",
+                    borderBottom: "none",
+                  }}
                 >
-                  No data available
+                  <InboxIcon sx={{ fontSize: 40, color: "#999999" }} />
+                  <Typography
+                    sx={{
+                      color: "#999999",
+                      fontWeight: 500,
+                      fontSize: "18px",
+                      lineHeight: "28px",
+                      letterSpacing: "-2%",
+                      mt: 1,
+                    }}
+                  >
+                    No data available yet!
+                  </Typography>
                 </TableCell>
               </TableRow>
             ) : (

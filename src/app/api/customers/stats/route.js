@@ -23,70 +23,74 @@ export async function GET(req) {
     orderBy: { StartDate: "asc" },
   });
 
-  const customerSubs = new Map();
+  const subscriptionMap = new Map();
   for (const { CustomerID, StartDate, EndDate } of allSubscriptions) {
-    if (!customerSubs.has(CustomerID)) customerSubs.set(CustomerID, []);
-    customerSubs.get(CustomerID).push({
+    if (!subscriptionMap.has(CustomerID)) subscriptionMap.set(CustomerID, []);
+    subscriptionMap.get(CustomerID).push({
       startDate: new Date(StartDate),
       endDate: new Date(EndDate),
     });
   }
 
   function computeStats(year, month) {
-    const monthStart = new Date(year, month - 1, 1);
-    const monthEnd = new Date(year, month, 0);
-    const twoMonthsAgoStart = new Date(year, month - 3, 1);
-    const oneMonthAgoEnd = new Date(year, month - 1, 0);
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, month + 1, 0);
+    const lastMonthEnd = new Date(year, month, 0);
+    const twoMonthsAgo = new Date(year, month - 2, 1);
+    const now = new Date();
 
-    let newActive = 0;
-    let oldActive = 0;
-    let followUp = 0;
+    let active = new Set();
+    let newActive = new Set();
+    let oldActive = new Set();
+    let followUp = new Set();
 
-    for (const subs of customerSubs.values()) {
-      const activeInTarget = subs.some(
-        ({ startDate, endDate }) =>
-          startDate <= monthEnd && endDate >= monthStart
-      );
+    for (const [customerId, subs] of subscriptionMap.entries()) {
+      const sorted = subs.sort((a, b) => a.startDate - b.startDate);
+      const firstSub = sorted[0];
+      const lastSub = sorted[sorted.length - 1];
+      const isActive = sorted.some(({ _, endDate }) => endDate >= now);
+      const isNew =
+        firstSub.startDate >= monthStart && firstSub.startDate <= monthEnd;
+      const expiredRecently =
+        lastSub.endDate >= lastMonthEnd && lastSub.endDate <= twoMonthsAgo;
 
-      const activeInRecentPast = subs.some(
-        ({ startDate, endDate }) =>
-          startDate <= oneMonthAgoEnd && endDate >= twoMonthsAgoStart
-      );
-
-      if (subs.length === 1 && activeInTarget) {
-        newActive++;
-      } else if (subs.length > 1 && activeInTarget) {
-        oldActive++;
-      } else if (subs.length >= 1 && !activeInTarget && activeInRecentPast) {
-        followUp++;
+      if (isActive) {
+        active.add(customerId);
+        if (isNew) {
+          newActive.add(customerId);
+        } else {
+          oldActive.add(customerId);
+        }
+      } else if (expiredRecently) {
+        followUp.add(customerId);
       }
     }
 
     return {
-      totalActiveCustomers: newActive + oldActive,
-      newActiveCustomers: newActive,
-      oldActiveCustomers: oldActive,
-      followUpCustomers: followUp,
+      totalActiveCustomers: active.size,
+      newActiveCustomers: newActive.size,
+      oldActiveCustomers: oldActive.size,
+      followUpCustomers: followUp.size,
     };
   }
 
   const currentStats = computeStats(currentYear, currentMonth);
 
+  const previousMonthDate = new Date(currentYear, currentMonth - 2, 1);
+  const previousStats = computeStats(
+    previousMonthDate.getFullYear(),
+    previousMonthDate.getMonth() + 1
+  );
+
   const trend = [];
   for (let i = 6; i > 0; i--) {
-    const d = new Date(currentYear, currentMonth - i);
-    const trendStats = computeStats(d.getFullYear(), d.getMonth() + 1);
+    const date = new Date(currentYear, currentMonth - i - 1, 1);
+    const stats = computeStats(date.getFullYear(), date.getMonth() + 1);
     trend.push({
-      month: d.toLocaleString("default", { month: "long" }),
-      stats: trendStats,
+      month: date.toLocaleString("default", { month: "long" }),
+      stats,
     });
   }
-
-  const previousMonth = new Date(currentYear, currentMonth - 2, 1);
-  const previousStats = computeStats(
-    previousMonth.getFullYear(),
-    previousMonth.getMonth() + 1
-  );
 
   return NextResponse.json({
     currentMonth: { ...currentStats },

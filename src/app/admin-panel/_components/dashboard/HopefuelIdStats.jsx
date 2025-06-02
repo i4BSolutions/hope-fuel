@@ -1,6 +1,6 @@
-import { Box, Skeleton, TableCell, TableRow, Typography } from "@mui/material";
-import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
+import { Box, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import HopeFuelIDStatusChart from "../dashboard/_components/HopeFuelIDStatusChart";
 
 export default function HopefuelIdStats({ currentMonth }) {
   const [transactionStatuses, setTransactionStatuses] = useState([]);
@@ -38,16 +38,12 @@ export default function HopefuelIdStats({ currentMonth }) {
   return (
     <>
       {loading ? (
-        Array.from({ length: 5 }).map((_, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Skeleton variant="text" width={120} height={20} />
-            </TableCell>
-            <TableCell>
-              <Skeleton variant="rectangular" width={220} height={36} />
-            </TableCell>
-          </TableRow>
-        ))
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={200}
+          sx={{ borderRadius: "8px" }}
+        />
       ) : (
         <Box sx={{ width: "100%" }}>
           <Typography
