@@ -1,5 +1,6 @@
 "use client";
 
+import getSignedUrl from "@/app/utilites/getSignedUrl";
 import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
@@ -143,7 +144,16 @@ const FundraisingFormPage = () => {
       }
 
       const data = await response.json();
-      const fundraisersList = data.fundraisers || [];
+      const fundraisersList = await Promise.all(
+        data.fundraisers.map(async (fundraiser) => {
+          const signedUrl = await getSignedUrl(fundraiser.FundraiserLogo);
+          return {
+            ...fundraiser,
+            FundraiserLogo: signedUrl,
+          };
+        })
+      );
+
       setFundraisers(fundraisersList);
       setFilteredFundraisers(fundraisersList);
     } catch (error) {
@@ -172,9 +182,13 @@ const FundraisingFormPage = () => {
         );
       }
 
-      const details = await response.json();
+      const { data } = await response.json();
+      const details = {
+        ...data,
+        FundraiserLogo: await getSignedUrl(data.FundraiserLogo),
+      };
 
-      setFundraiserDetails(details.data);
+      setFundraiserDetails(details);
     } catch (error) {
       console.error("Error fetching fundraiser details:", err);
       setError(`Failed to load fundraiser details: ${err.message}`);

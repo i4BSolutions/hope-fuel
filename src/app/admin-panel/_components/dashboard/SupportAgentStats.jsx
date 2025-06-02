@@ -1,17 +1,9 @@
 "use client";
 
-import {
-  Alert,
-  Box,
-  Skeleton,
-  Snackbar,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@mui/material";
 import InboxIcon from "@mui/icons-material/Inbox";
-import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
+import { Alert, Box, Skeleton, Snackbar, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
 
 export default function SupportAgentStats() {
   const [pages, setPages] = useState({});
@@ -58,95 +50,110 @@ export default function SupportAgentStats() {
 
   if (!agentRates) return null;
 
+  if (loading) {
+    return (
+      <Box sx={{ width: "100%" }}>
+        <Box
+          sx={{
+            minHeight: 410,
+            borderRadius: "24px",
+            display: "flex",
+            gap: 4,
+            justifyContent: "space-between",
+            pb: 2,
+          }}
+        >
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={410}
+            sx={{ borderRadius: "24px" }}
+          />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={410}
+            sx={{ borderRadius: "24px" }}
+          />
+        </Box>
+      </Box>
+    );
+  }
+
   return (
-    <>
-      {loading ? (
-        Array.from({ length: 5 }).map((_, index) => (
-          <TableRow key={index}>
-            <TableCell>
-              <Skeleton variant="text" width={120} height={20} />
-            </TableCell>
-            <TableCell>
-              <Skeleton variant="rectangular" width={220} height={36} />
-            </TableCell>
-          </TableRow>
-        ))
-      ) : (
-        <Box>
-          <Typography
-            sx={{
-              color: "#0F172A",
-              fontSize: "19px",
-              fontWeight: 600,
-              lineHeight: "23px",
-              letterSpacing: "-2%",
-            }}
-          >
-            Form Filling Agent Rate
-          </Typography>
+    <Box>
+      <Typography
+        sx={{
+          color: "#0F172A",
+          fontSize: "19px",
+          fontWeight: 600,
+          lineHeight: "23px",
+          letterSpacing: "-2%",
+        }}
+      >
+        Form Filling Agent Rate
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          mt: 1,
+        }}
+      >
+        {agentRates.length > 0 ? (
+          agentRates.map((groupData, index) => (
+            <FormFillingAgentRateTable
+              key={index}
+              data={groupData}
+              page={pages[index] || 1}
+              setPage={(value) => handlePageChange(index, value)}
+              headerColor={index % 2 === 0 ? "#DC2626" : "#FF732C"}
+              progressColor={index % 2 === 0 ? "#DC2626" : "#FF732C"}
+            />
+          ))
+        ) : (
           <Box
             sx={{
               display: "flex",
-              flexWrap: "wrap",
-              gap: 8.5,
-              mt: 1,
+              flexDirection: "column",
+              alignItems: "center",
+              py: 2,
+              justifyContent: "center",
+              width: "100%",
+              height: "300px",
             }}
           >
-            {agentRates.length > 0 ? (
-              agentRates.map((groupData, index) => (
-                <FormFillingAgentRateTable
-                  key={groupData.groupName}
-                  data={groupData}
-                  page={pages[index] || 1}
-                  setPage={(value) => handlePageChange(index, value)}
-                  headerColor={index % 2 === 0 ? "#DC2626" : "#FF732C"}
-                  progressColor={index % 2 === 0 ? "#DC2626" : "#FF732C"}
-                />
-              ))
-            ) : (
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  py: 2,
-                  justifyContent: "center",
-                  width: "100%",
-                  height: "300px",
-                }}
-              >
-                <InboxIcon sx={{ fontSize: 60, color: "#999999" }} />
-                <Typography
-                  sx={{
-                    color: "#000000",
-                    fontWeight: 600,
-                    fontSize: "23px",
-                    lineHeight: "28px",
-                    letterSpacing: "-2%",
-                    mt: 1,
-                  }}
-                >
-                  There is no form filling agent rates.
-                </Typography>
-              </Box>
-            )}
-          </Box>
-          <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={6000}
-            onClose={() => setSnackbarOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          >
-            <Alert
-              onClose={() => setSnackbarOpen(false)}
-              severity="error"
-              sx={{ width: "100%" }}
+            <InboxIcon sx={{ fontSize: 60, color: "#999999" }} />
+            <Typography
+              sx={{
+                color: "#000000",
+                fontWeight: 600,
+                fontSize: "22px",
+                lineHeight: "28px",
+                letterSpacing: "-2%",
+                mt: 1,
+              }}
             >
-              {error}
-            </Alert>
-          </Snackbar>
-        </Box>
-      )}
-    </>
+              There is no form filling agent rates.
+            </Typography>
+          </Box>
+        )}
+      </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSnackbarOpen(false)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 }

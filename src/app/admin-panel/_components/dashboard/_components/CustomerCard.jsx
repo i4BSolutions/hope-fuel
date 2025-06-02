@@ -1,19 +1,23 @@
 import { Box, Typography } from "@mui/material";
 
-export default function CustomerCard({ stats }) {
+export default function CustomerCard({ stats, onClick }) {
   const bgRed = stats.title === "Total Customers";
+  const isInteractive = stats.key === "followUpCustomers";
 
   return (
     <Box
       sx={{
         p: 2,
         borderRadius: 5,
-        backgroundColor: bgRed ? "#DC2626" : "ffffff",
+        backgroundColor: bgRed ? "#DC2626" : "#ffffff",
         border: bgRed ? "none" : "2px solid #CBD5E1",
         width: "250px",
         height: "206px",
         color: bgRed ? "white" : "black",
+        cursor: isInteractive ? "pointer" : "default",
+        "&:hover": isInteractive ? { boxShadow: 4 } : {},
       }}
+      onClick={isInteractive ? onClick : undefined}
     >
       <Box
         sx={{
@@ -54,7 +58,7 @@ export default function CustomerCard({ stats }) {
             mt: 3,
           }}
         >
-          Previous Month:
+          Previous Month:{" "}
           {stats.prevCount === 0
             ? stats.prevCount
             : stats.prevCount.toLocaleString()}

@@ -1,5 +1,6 @@
 "use client";
 
+import getSignedUrl from "@/app/utilites/getSignedUrl";
 import { Box, CircularProgress, Container, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import WalletSelect from "../../UI/Components/GroupWallet";
@@ -28,8 +29,6 @@ export default function SearchBarForm({ onItemClick }) {
         page: currentPage,
       });
 
-      console.log("Query Params:", queryParams.toString());
-
       const response = await fetch(`/api/searchDB?${queryParams}`);
       if (!response.ok) throw new Error("No item found");
 
@@ -37,20 +36,19 @@ export default function SearchBarForm({ onItemClick }) {
 
       if (Array.isArray(data.items)) {
         if (data.items.length > 0) {
-          // const updatedData = await Promise.all(
-          //   data.items.map(async (item) => {
-          //     if (Array.isArray(item.ScreenShotLinks)) {
-          //       const updatedLinks = await Promise.all(
-          //         item.ScreenShotLinks.map(
-          //           async (link) => (await getScreenShotUrl(link)).href
-          //         )
-          //       );
-          //       return { ...item, ScreenShotLinks: updatedLinks };
-          //     }
-          //     return item;
-          //   })
-          // );
-          const updatedData = data.items;
+          const updatedData = await Promise.all(
+            data.items.map(async (item) => {
+              if (Array.isArray(item.ScreenShotLinks)) {
+                const updatedLinks = await Promise.all(
+                  item.ScreenShotLinks.map(
+                    async (link) => await getSignedUrl(link)
+                  )
+                );
+                return { ...item, ScreenShotLinks: updatedLinks };
+              }
+              return item;
+            })
+          );
           setItems((prev) =>
             currentPage === 1 ? updatedData : [...prev, ...updatedData]
           );

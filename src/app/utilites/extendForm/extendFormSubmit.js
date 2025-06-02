@@ -152,7 +152,7 @@ export default async function extendFormSubmit(
       month: month,
       note: note,
       walletId: walletId,
-      screenShot: files.map((file) => ({ url: file.url.href })),
+      screenShot: files.map((file) => ({ key: file.key })),
       expireDate: expireDate,
       cardId: cardId,
     });
@@ -169,8 +169,6 @@ export default async function extendFormSubmit(
         "/api/submitPaymentolduser/",
         requestOptions
       );
-      console.log(response);
-
       const data = await response.json();
 
       if (data.status == 400) {

@@ -1,15 +1,5 @@
-import {
-  Box,
-  LinearProgress,
-  Pagination,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
-import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import InboxIcon from "@mui/icons-material/Inbox";
-import React from "react";
+import { Box, LinearProgress, Typography } from "@mui/material";
 
 const itemsPerPage = 8;
 
@@ -34,24 +24,15 @@ const FormFillingAgentRateTable = ({
   const currentAgents = data.AssignedAgents;
 
   return (
-    <Box sx={{ width: "100%", maxWidth: 620, minHeight: 392 }}>
-      <Paper
-        elevation={3}
+    <Box sx={{ width: "49%" }}>
+      <Box
         sx={{
           overflow: "hidden",
-          borderRadius: 4,
-          maxWidth: 620,
-          minHeight: 410,
-          borderRight: 2,
-          borderLeft: 2,
-          borderBottom: 2,
-          borderRightColor: "#CBD5E1",
-          borderLeftColor: "#CBD5E1",
-          borderBottomColor: "#CBD5E1",
+          minHeight: currentAgents.length > 0 ? "auto" : "410px",
+          borderRadius: "24px",
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          pb: 2,
         }}
       >
         <Box>
@@ -60,7 +41,7 @@ const FormFillingAgentRateTable = ({
               backgroundColor: headerColor,
               color: "white",
               py: 2,
-              px: 4,
+              px: "20px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
@@ -95,7 +76,18 @@ const FormFillingAgentRateTable = ({
             </Typography>
           </Box>
 
-          <Box sx={{ px: 2 }}>
+          <Box
+            sx={{
+              px: 4,
+              pb: 2,
+              borderRight: 2,
+              borderLeft: 2,
+              borderBottom: 2,
+              borderBottomRightRadius: 24,
+              borderBottomLeftRadius: 24,
+              borderColor: "#CBD5E1",
+            }}
+          >
             {currentAgents.length > 0 ? (
               currentAgents.map((agent, index) => (
                 <Box
@@ -179,7 +171,7 @@ const FormFillingAgentRateTable = ({
                   sx={{
                     color: "#000000",
                     fontWeight: 600,
-                    fontSize: "23px",
+                    fontSize: "22px",
                     lineHeight: "28px",
                     letterSpacing: "-2%",
                     mt: 1,
@@ -225,7 +217,7 @@ const FormFillingAgentRateTable = ({
             </Stack>
           </Box>
         )} */}
-      </Paper>
+      </Box>
     </Box>
   );
 };

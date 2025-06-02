@@ -63,6 +63,7 @@ model Customer {
   ManyChat          ManyChat[]
   Transactions      Transactions[]
   Subscriptions     Subscription[]
+  FollowUpStatus    CustomerFollowUpStatus[]
 
   BaseCountry BaseCountry? @relation(fields: [UserCountry], references: [BaseCountryID], map: "BaseCountryID")
 
@@ -290,6 +291,8 @@ model CSVExportTransactionLogs {
   AgentId                      Int?
   CSVExportTransactionDateTime DateTime? @db.Timestamp(0)
   CSVExportTransactionFileName String?   @db.VarChar(255)
+  FromDate                     DateTime? @db.Date
+  ToDate                       DateTime? @db.Date
 
   Agent Agent? @relation(fields: [AgentId], references: [AgentId])
 
@@ -324,6 +327,24 @@ model AssignedWallet {
   @@unique([AgentId, WalletId], map: "AgentId_WalletId")
   @@index([AgentId], map: "AgentId")
   @@index([WalletId], map: "WalletId")
+}
+
+model FollowUpStatus {
+  FollowUpStatusID Int      @id @default(autoincrement())
+  StatusName       String   @unique @db.VarChar(255)
+  FollowUpStatus   CustomerFollowUpStatus[]
+}
+
+model CustomerFollowUpStatus {
+  CustomerFollowUpStatusID Int              @id @default(autoincrement())
+  CustomerID               Int
+  FollowUpStatusID         Int
+  FollowUpDate             DateTime         @default(now()) @db.Timestamp(0)
+  Customer                 Customer         @relation(fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "customerfollowupstatus_ibfk_1")
+  FollowUpStatus           FollowUpStatus   @relation(fields: [FollowUpStatusID], references: [FollowUpStatusID], onDelete: Cascade, onUpdate: Restrict, map: "customerfollowupstatus_ibfk_2")
+
+  @@index([CustomerID], map: "CustomerID")
+  @@index([FollowUpStatusID], map: "FollowUpStatusID")
 }
 
 enum CustomerAuditLogs_FieldChanged {

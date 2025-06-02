@@ -11,11 +11,12 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import DetailModal from "../UI/Components/Modal";
-import HopeFuelIDListDetails from "./components/HopeFuelIDListDetails";
-import HopeFuelIDListItem from "./components/HopeFuelIDListItem";
-import ImageCarouselModal from "./components/ImageCarousel";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import theme from "../UI/theme";
+import getSignedUrl from "../utilites/getSignedUrl";
+import HopeFuelIDListDetails from "./_components/HopeFuelIDListDetails";
+import HopeFuelIDListItem from "./_components/HopeFuelIDListItem";
+import ImageCarouselModal from "./_components/ImageCarousel";
 
 const PAGE_SIZE = 10;
 
@@ -33,7 +34,6 @@ const HopeFuelIdListPage = () => {
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
-  console.log(data);
   const [debouncedSearch] = useDebounce(searchText, 100);
 
   useEffect(() => {
@@ -62,11 +62,10 @@ const HopeFuelIdListPage = () => {
         }
 
         const newData = await response.json();
-
         if (isNewSearch) {
           setData(newData.data || []);
         } else {
-          setData((prev) => [...prev, ...(newData.data || [])]);
+          setData((prev) => [...prev, ...(realData.data || [])]);
         }
 
         setHasMore((newData.data || []).length === PAGE_SIZE);
@@ -91,6 +90,7 @@ const HopeFuelIdListPage = () => {
         throw new Error("Failed to fetch details");
       }
       const result = await response.json();
+
       setDetails(result.data);
     } catch (error) {
       console.error(error);
@@ -122,11 +122,18 @@ const HopeFuelIdListPage = () => {
     }
   };
 
-  const handleOpenScreenshots = (screenshots) => {
+  const handleOpenScreenshots = async (screenshots) => {
     if (!Array.isArray(screenshots)) {
       screenshots = [screenshots];
     }
-    setScreenshotsLists(screenshots);
+    const signedUrls = await Promise.all(
+      screenshots.map(async (screenshot) => {
+        if (typeof screenshot === "string") {
+          return await getSignedUrl(screenshot);
+        }
+      })
+    );
+    setScreenshotsLists(signedUrls);
     setOpenScreenshotModal((prev) => !prev);
   };
 

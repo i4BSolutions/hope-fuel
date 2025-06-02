@@ -246,6 +246,11 @@ const ExportCSVPage = () => {
         AgentId: agent.id,
         CSVExportTransactionDateTime: new Date(),
         CSVExportTransactionFileName: uploadedUrl,
+        StartDate: startDate,
+        EndDate: endDate,
+        TransactionIDs: allTransactions.map(
+          (transaction) => transaction.TransactionID
+        ),
       };
 
       const logResponse = await fetch("/api/v1/csv-logs", {
@@ -264,6 +269,7 @@ const ExportCSVPage = () => {
       setError(error.message || "Failed to export CSV");
       setOpenSnackbar(true);
     } finally {
+      setAllTransactions([]);
       setLoading(false);
     }
   }, [allTransactions, date, handleCloseCSVExportModal]);

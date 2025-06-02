@@ -8,13 +8,29 @@ export async function POST(request) {
       AgentId,
       CSVExportTransactionDateTime,
       CSVExportTransactionFileName,
+      StartDate,
+      EndDate,
+      TransactionIDs,
     } = requestBody;
+
+    await prisma.FormStatus.updateMany({
+      where: {
+        TransactionID: {
+          in: TransactionIDs,
+        },
+      },
+      data: {
+        TransactionStatusID: 3,
+      },
+    });
 
     const data = await prisma.CSVExportTransactionLogs.create({
       data: {
         AgentId,
         CSVExportTransactionDateTime: new Date(CSVExportTransactionDateTime),
         CSVExportTransactionFileName,
+        FromDate: new Date(StartDate),
+        ToDate: new Date(EndDate),
       },
     });
 

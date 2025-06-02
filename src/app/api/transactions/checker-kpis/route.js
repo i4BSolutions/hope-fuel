@@ -18,7 +18,7 @@ export async function GET(request) {
       select: { AgentId: true, AwsId: true, Username: true },
     });
 
-    const checkerMap = new Map(checkers.map((c) => [c.AgentId, c.AwsId]));
+    const checkerMap = new Map(checkers.map((c) => [c.AgentId, c.Username]));
 
     // Get assigned wallets (wallets assigned to agents)
     const assignedWallets = await prisma.assignedWallet.findMany();

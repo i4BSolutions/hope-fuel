@@ -1,5 +1,5 @@
-import { Card, CardContent, Typography, Box } from "@mui/material";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 
 export default function PaymentStatsCard({ checked, pending }) {
   return (
@@ -8,9 +8,9 @@ export default function PaymentStatsCard({ checked, pending }) {
         bgcolor: "#00B074",
         color: "white",
         borderRadius: 6,
-        height: "100%",
-        minWidth: 250,
-        width: "100%",
+        height: 280,
+        minWidth: 320,
+        flex: 0,
       }}
     >
       <CardContent
@@ -19,6 +19,8 @@ export default function PaymentStatsCard({ checked, pending }) {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          pt: 3,
+          px: 3,
         }}
       >
         <Box>
@@ -28,10 +30,9 @@ export default function PaymentStatsCard({ checked, pending }) {
             </Typography>
             <AttachMoneyIcon
               sx={{
-                fontSize: 60,
+                fontSize: 44,
                 color: "white",
                 borderRadius: 2,
-                padding: 1,
               }}
             />
           </Box>
@@ -47,15 +48,17 @@ export default function PaymentStatsCard({ checked, pending }) {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            p: 1,
           }}
           backgroundColor="#047857"
-          borderRadius={2}
-          padding={1}
+          borderRadius="12px"
         >
-          <Typography variant="body2" sx={{ opacity: 0.8, width: "50%" }}>
+          <Typography variant="body2" sx={{ opacity: 0.8, width: "45%" }}>
             Total Payment Check Pending
           </Typography>
-          <Typography variant="h3" fontWeight="medium">
+          <Typography
+            sx={{ fontWeight: 600, fontSize: "34px", lineHeight: "40px" }}
+          >
             {pending}
           </Typography>
         </Box>

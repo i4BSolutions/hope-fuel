@@ -79,13 +79,15 @@ async function InsertCustomer(
 }
 
 async function InsertSubscription(customerId, month) {
-  const currentDate = new Date();
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1 + month, 0);
   try {
     const subscription = await prisma.subscription.create({
       data: {
         CustomerID: customerId,
-        StartDate: currentDate,
-        EndDate: calculateExpireDate(currentDate, month, true),
+        StartDate: startDate,
+        EndDate: endDate,
       },
     });
     return subscription.SubscriptionID;
@@ -115,14 +117,12 @@ async function createScreenShot(screenShot, transactionsID) {
 
   let screenShotLink = await screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
-
-    const path = String(item.url).substring(0, String(item.url).indexOf("?"));
-    const values = [transactionsID, path];
+    const key = item.key;
+    const values = [transactionsID, key];
 
     try {
       const result = await db(query, values);
       console.log("result " + result);
-      // console.log("Result: ", result);
       return result.insertId;
     } catch (error) {
       console.error("Error inserting ScreenShot:", error);
@@ -130,8 +130,8 @@ async function createScreenShot(screenShot, transactionsID) {
     }
   });
   return screenShotLink;
-  // return screenShotLink;
 }
+
 export async function POST(req) {
   try {
     let json = await req.json();
@@ -197,8 +197,8 @@ export async function POST(req) {
      INSERT INTO Transactions   
     (CustomerID, Amount, SupportRegionID, WalletID, TransactionDate, NoteID, Month, PaymentCheck, HopeFuelID) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-
     `;
+
     const values = [
       customerId,
       amount,

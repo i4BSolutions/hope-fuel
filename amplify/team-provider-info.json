@@ -1,41 +1,15 @@
 {
-  "staging": {
+  "jere": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-hopefuel-staging-babc6-authRole",
-      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-staging-babc6-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-staging-babc6-authRole",
+      "AuthRoleName": "amplify-hopefuel-jere-62c38-authRole",
+      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-jere-62c38-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-jere-62c38-authRole",
       "Region": "ap-southeast-1",
-      "DeploymentBucketName": "amplify-hopefuel-staging-babc6-deployment",
-      "UnauthRoleName": "amplify-hopefuel-staging-babc6-unauthRole",
-      "StackName": "amplify-hopefuel-staging-babc6",
-      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-staging-babc6/a492b880-380b-11f0-9ee6-0278665b80c9",
+      "DeploymentBucketName": "amplify-hopefuel-jere-62c38-deployment",
+      "UnauthRoleName": "amplify-hopefuel-jere-62c38-unauthRole",
+      "StackName": "amplify-hopefuel-jere-62c38",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-jere-62c38/f73ad480-3812-11f0-b657-02c11a008af1",
       "AmplifyAppId": "d21tc40zhkpcd1"
-    },
-    "categories": {
-      "auth": {
-        "hopefuel": {}
-      },
-      "storage": {
-        "s3hopefuelstaging9055d67b": {}
-      }
-    }
-  },
-  "arleyne": {
-    "awscloudformation": {
-      "AuthRoleName": "amplify-hopefuel-arleyne-92ec0-authRole",
-      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-arleyne-92ec0-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-arleyne-92ec0-authRole",
-      "Region": "ap-southeast-1",
-      "DeploymentBucketName": "amplify-hopefuel-arleyne-92ec0-deployment",
-      "UnauthRoleName": "amplify-hopefuel-arleyne-92ec0-unauthRole",
-      "StackName": "amplify-hopefuel-arleyne-92ec0",
-      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-arleyne-92ec0/b61e5f10-3715-11f0-89bd-0abaa37ccdd3",
-      "AmplifyAppId": "d21tc40zhkpcd1"
-    },
-    "categories": {
-      "auth": {
-        "hopefuel": {}
-      }
     }
   }
 }

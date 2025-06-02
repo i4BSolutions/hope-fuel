@@ -1,5 +1,6 @@
+import getSignedUrl from "@/app/utilites/getSignedUrl";
 import { Avatar, Box, Input, Typography } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import fileHandler from "../../utilites/createForm/fileHandler";
 
 export const LogoUpload = ({ logoFile, setLogoFile, errors, clearErrors }) => {
@@ -7,11 +8,19 @@ export const LogoUpload = ({ logoFile, setLogoFile, errors, clearErrors }) => {
   const [uploadProgress, setUploadProgress] = useState("");
 
   useEffect(() => {
-    if (!logoFile) {
-      setLogoPreview(null);
-    } else {
-      setLogoPreview(logoFile);
-    }
+    const fetchLogoUrl = async () => {
+      if (!logoFile) {
+        setLogoPreview(null);
+      } else {
+        const url = await getSignedUrl(logoFile);
+        if (url) {
+          setLogoPreview(url);
+        } else {
+          setLogoPreview(null);
+        }
+      }
+    };
+    fetchLogoUrl();
   }, [logoFile]);
 
   const handleFileChange = async (e) => {
@@ -22,7 +31,7 @@ export const LogoUpload = ({ logoFile, setLogoFile, errors, clearErrors }) => {
     setUploadProgress("Uploading...");
 
     //upload to s3
-    const uploadedUrl = await fileHandler(
+    const uploadedObject = await fileHandler(
       [file],
       setLogoFile,
       [],
@@ -30,11 +39,10 @@ export const LogoUpload = ({ logoFile, setLogoFile, errors, clearErrors }) => {
     );
 
     //preview the image
-    if (uploadedUrl?.length > 0) {
-      const url = `${uploadedUrl[0].url.origin}${uploadedUrl[0].url.pathname}`;
-
-      setLogoPreview(uploadedUrl[0].href);
-      setLogoFile(url);
+    if (uploadedObject?.length > 0) {
+      const url = await getSignedUrl(uploadedObject[0].key);
+      setLogoPreview(url);
+      setLogoFile(uploadedObject[0].key);
       setUploadProgress("");
       clearErrors("FundraiserLogo");
     } else {
