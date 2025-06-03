@@ -11,7 +11,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "s3hopefuelstaging9055d67b": {
+    "s3hopefuelstorage85ce1c8f": {
       "BucketName": "string",
       "Region": "string"
     }
