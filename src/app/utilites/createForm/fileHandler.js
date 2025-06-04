@@ -1,5 +1,6 @@
 //Update the setFile to a bunch of file
 //input is setfile functions and files
+import { fetchAuthSession } from "@aws-amplify/core";
 import { getUrl, uploadData } from "aws-amplify/storage";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,10 +13,9 @@ export default async function filehandler(
   let arrayFiles = [];
   let url = [];
 
-  // const session = await fetchAuthSession();
-  // const identityId = session.identityId;
+  const session = await fetchAuthSession();
+  const identityId = session.identityId;
 
-  // get the submitted files
   for (let i = 0; i < files.length; i++) {
     try {
       const file = files[i];
@@ -24,8 +24,7 @@ export default async function filehandler(
       );
 
       const result = await uploadData({
-        // key: `${identityId}/${uuidv4()}/${file.name}`,
-        key: `shared/${uuidv4()}/${file.name}`,
+        key: `${identityId}_${uuidv4()}-${file.name}`,
         data: file,
         options: {
           accessLevel: "protected",
