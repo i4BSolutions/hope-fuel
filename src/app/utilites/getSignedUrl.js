@@ -6,6 +6,7 @@ export default async function getSignedUrl(key) {
       key,
       options: {
         accessLevel: "protected",
+        // targetIdentityId: identityId,
       },
     });
 
