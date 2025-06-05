@@ -84,14 +84,12 @@ const RoleManagementPage = () => {
       );
 
       const res = await fetch("/api/agent/roles", {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const allowed = res.headers.get("Allow");
-        console.error(`Method not allowed. Allowed methods: ${allowed}`);
         throw new Error(result.message || "Update failed");
       }
 
