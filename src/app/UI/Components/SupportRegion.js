@@ -1,24 +1,18 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-const SupportRegion = ({region}) => {
-    if (!region) return <p>No data available in AmountDetails</p>;
+import { Chip, Stack, Typography } from "@mui/material";
+const SupportRegion = ({ region }) => {
+  if (!region) return <p>No data available in AmountDetails</p>;
 
-    return (
-  <Stack direction="row" alignItems="center" spacing={2}>
-    <Typography>Support Region:</Typography>
-    <Chip label={region.Region} color="error" />
-  </Stack>)
+  return (
+    <Stack direction="column" spacing={1} pt={1}>
+      <Typography sx={{ fontSize: 20, fontWeight: 600, color: "#000000" }}>
+        Support Region
+      </Typography>
+      <Chip
+        label={region.Region}
+        color="error"
+        sx={{ alignSelf: "flex-start" }}
+      />
+    </Stack>
+  );
 };
 export default SupportRegion;

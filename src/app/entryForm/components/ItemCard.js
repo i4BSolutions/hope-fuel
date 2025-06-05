@@ -1,5 +1,4 @@
-import React from "react";
-import { Box, Chip, Typography } from "@mui/material";
+import { Box, Chip, Stack, Typography } from "@mui/material";
 
 function ItemCard({ item, onClick }) {
   // Safely access properties using optional chaining (?.)
@@ -31,8 +30,8 @@ function ItemCard({ item, onClick }) {
             src={item.ScreenShotLinks[0]}
             alt="Payment Screenshot"
             sx={{
-              width: 50,
-              height: 50,
+              width: 80,
+              height: 80,
               marginRight: 2,
               borderRadius: 2,
               objectFit: "cover",
@@ -41,8 +40,8 @@ function ItemCard({ item, onClick }) {
         ) : (
           <Box
             sx={{
-              width: 50,
-              height: 50,
+              width: 80,
+              height: 80,
               bgcolor: "#f0f0f0",
               marginRight: 2,
               borderRadius: 2,
@@ -50,25 +49,30 @@ function ItemCard({ item, onClick }) {
           />
         )}
         {/* Display HopeFuelID and Customer Name if available */}
-        <Box sx={{ width: 100 }}>
-          <Typography variant="body1" sx={{ fontWeight: "bold", width: 100 }}>
+        <Stack direction={"column"} sx={{ textAlign: "left" }} spacing={0.2}>
+          <Typography
+            sx={{
+              fontWeight: "bold",
+            }}
+          >
             HOPEID-{item?.HopeFuelID || "N/A"}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography sx={{ fontSize: 16, fontWeight: 400 }}>
             {item?.CustomerName || "No Name"}
           </Typography>
-        </Box>
+          {item?.CurrencyCode && (
+            <Chip
+              label={item.CurrencyCode}
+              size="small"
+              sx={{
+                fontWeight: "600",
+                alignSelf: "start",
+                background: "#FECACA",
+              }}
+            />
+          )}
+        </Stack>
       </Box>
-
-      {/* Right Section with Currency Code */}
-      {item?.CurrencyCode && (
-        <Chip
-          label={item.CurrencyCode}
-          color="primary"
-          size="small"
-          sx={{ fontWeight: "bold" }}
-        />
-      )}
     </Box>
   );
 }

@@ -36,8 +36,10 @@ const CardsIssuedList = ({ data }) => {
     });
   };
   return (
-    <Box sx={{ marginTop: 4 }}>
-      <Typography variant="h6">List of Cards Issued</Typography>
+    <Box>
+      <Typography sx={{ fontSize: 24, fontWeight: 700 }}>
+        List of Cards Issued
+      </Typography>
 
       <Box
         sx={{
@@ -47,13 +49,13 @@ const CardsIssuedList = ({ data }) => {
           paddingBottom: 1,
         }}
       >
-        <Stack direction="row" spacing={2} sx={{ display: "inline-flex" }}>
+        <Stack direction="row" spacing={2}>
           {cards.length > 0 ? (
             cards.map((card, index) => (
               <CardItem
                 key={index}
                 date={formatDate(card.TransactionDate)}
-                amount={card.Amount.toLocaleString()}
+                amount={card.Amount.toFixed(2).toLocaleString()}
                 currency={card.CurrencyCode}
               />
             ))

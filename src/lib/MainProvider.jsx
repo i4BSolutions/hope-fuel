@@ -19,7 +19,7 @@ export default function MainProvider({ children }) {
           <Sidebar />
           <Box
             component="main"
-            sx={{ flexGrow: 1, marginLeft: "80px", padding: 3 }}
+            sx={{ flexGrow: 1, marginLeft: "80px", padding: 2.5 }}
           >
             {children}
           </Box>

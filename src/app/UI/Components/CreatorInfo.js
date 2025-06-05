@@ -1,27 +1,40 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
+import { Stack, Typography } from "@mui/material";
+
 const CreatorInfo = ({ creator }) => {
   if (!creator) return <p>No data available in Amount Details</p>;
 
   return (
-    <Stack spacing={1}>
-      <Typography>Created by {creator ["LoggedAwsIds"] [0]}</Typography>
-      <Typography>Mg Mg </Typography>
-      <Typography>HOPEID: {creator.HopeFuelID}</Typography>
-      <Typography>Manychat ID: {creator.ManyChatId}</Typography>
+    <Stack
+      spacing={3}
+      py={1}
+      px={3}
+      sx={{ width: "100%" }}
+      justifyContent={"space-between"}
+    >
+      <Stack direction={"column"} spacing={0.5}>
+        <Typography sx={{ fontSize: 20, fontWeight: 600 }}>
+          Created by
+        </Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+          {creator.Name}
+        </Typography>
+      </Stack>
+      <Stack direction={"column"} spacing={1}>
+        <Typography sx={{ fontSize: 20, fontWeight: 600 }}>HOPEID</Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+          {creator.HopeFuelID}
+        </Typography>
+      </Stack>
+      <Stack direction={"column"} spacing={0.5}>
+        <Typography sx={{ fontSize: 20, fontWeight: 600 }}>
+          Manychat ID
+        </Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+          {creator.ManyChatId}
+        </Typography>
+      </Stack>
     </Stack>
   );
 };
+
 export default CreatorInfo;

@@ -25,18 +25,6 @@ export default function EntryForm() {
           `/api/paymentDetails?HopeFuelID=${hopeFuelID}`
         );
         const result = await response.json();
-        // if (result.hasOwnProperty("ScreenShotLinks")) {
-        //   console.log("Screenshot has been found");
-        //   let screenShots = result["ScreenShotLinks"];
-
-        //   if (Array.isArray(screenShots)) {
-        //     for (let i = 0; i < screenShots.length; i++) {
-        //       screenShots[i] = await getScreenShotUrl(screenShots[i]);
-        //     }
-        //   }
-
-        //   result["ScreenShotLinks"] = screenShots;
-        // }
         setData(result);
         setNote(result.Note || "");
         setStatus(result.Status || 1);
@@ -86,10 +74,10 @@ export default function EntryForm() {
     );
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", height: "calc(100vh - 40px)" }}>
       <Box
         sx={{
-          width: 300,
+          width: 400,
           borderRight: "1px solid #e0e0e0",
         }}
       >
@@ -105,13 +93,14 @@ export default function EntryForm() {
 
       <Box
         sx={{
-          flexGrow: 1,
           padding: 2,
-          maxWidth: "calc(100% - 300px)",
+          width: "100%",
         }}
       >
         <PaymentDetails
           data={data}
+          note={note}
+          setNote={setNote}
           clearHopeFuelID={() => {
             setHopeFuelID(null);
             router.replace(`/entryForm?walletId=${walletId}`);
