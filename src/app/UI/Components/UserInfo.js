@@ -1,40 +1,37 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Stack,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-} from "@mui/material";
-  // Format the TransactionDate
-  function formatDate(dateString) {
-    const date = new Date(dateString);
+import { Stack, Typography } from "@mui/material";
+// Format the TransactionDate
+function formatDate(dateString) {
+  const date = new Date(dateString);
 
-    const options = {
-      month: "long", // Full month name
-      day: "numeric", // Day of the month
-      year: "numeric", // Full year
-      hour: "2-digit", // Hour in 24-hour format
-      minute: "2-digit", // Minute
-      hour12: false, // Use 24-hour format
-    };
+  const options = {
+    month: "long", // Full month name
+    day: "numeric", // Day of the month
+    year: "numeric", // Full year
+    hour: "2-digit", // Hour in 24-hour format
+    minute: "2-digit", // Minute
+    hour12: false, // Use 24-hour format
+  };
 
-    return new Intl.DateTimeFormat("en-US", options).format(date);
-  }
-const UserInfo = ({user}) => (
-  
+  return new Intl.DateTimeFormat("en-US", options).format(date);
+}
+const UserInfo = ({ user }) => (
   <Stack spacing={1}>
-    <Typography variant="h6">{user.Name}</Typography>
-    <Typography>Email: {user.Email}</Typography>
-    <Stack direction="row" spacing={2}>
-      <Typography>Expire Date: {formatDate(user.ExpireDate)}</Typography>
-      <Typography>Card No: {user.CardID}</Typography>
+    <Typography sx={{ fontSize: 16, fontWeight: 700, lineHeight: "20px" }}>
+      {user.Name}
+    </Typography>
+    <Stack direction="row" spacing={4}>
+      <Stack direction={"column"} spacing={0.5}>
+        <Typography>Email</Typography>
+        <Typography>{user.Email}</Typography>
+      </Stack>
+      <Stack direction={"column"} spacing={0.5}>
+        <Typography>Expire Date</Typography>
+        <Typography>{formatDate(user.ExpireDate)}</Typography>
+      </Stack>{" "}
+      <Stack direction={"column"} spacing={0.5}>
+        <Typography>Card No</Typography>
+        <Typography>{user.CardID ? user.CardID : "N/A"}</Typography>
+      </Stack>
     </Stack>
   </Stack>
 );

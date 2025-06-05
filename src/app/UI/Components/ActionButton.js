@@ -56,20 +56,22 @@ const ActionButtons = ({ data, onActionComplete }) => {
   };
 
   return (
-    <Stack direction="row" spacing={2} sx={{ marginTop: 2 }}>
+    <Stack direction="row" spacing={2} sx={{ marginTop: 2 }} fullWidth>
       <Button
         variant="contained"
+        fullWidth
+        sx={{ borderRadius: 6, py: 1 }}
         color="error"
-        sx={{ width: "150px" }}
         onClick={handleConfirm}
         disabled={loading}
       >
         Confirm
       </Button>
       <Button
+        sx={{ borderRadius: 6, py: 1 }}
         variant="outlined"
+        fullWidth
         color="error"
-        sx={{ width: "150px" }}
         onClick={handleDenied}
         disabled={loading}
       >

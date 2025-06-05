@@ -86,7 +86,7 @@ export default function EntryForm() {
     );
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <Box
         sx={{
           width: 300,
@@ -105,9 +105,8 @@ export default function EntryForm() {
 
       <Box
         sx={{
-          flexGrow: 1,
           padding: 2,
-          maxWidth: "calc(100% - 300px)",
+          width: "100%",
         }}
       >
         <PaymentDetails
