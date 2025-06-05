@@ -89,11 +89,13 @@ const RoleManagementPage = () => {
         body: JSON.stringify(payload),
       });
 
-      const result = await res.json();
-
       if (!res.ok) {
+        const allowed = res.headers.get("Allow");
+        console.error(`Method not allowed. Allowed methods: ${allowed}`);
         throw new Error(result.message || "Update failed");
       }
+
+      const result = await res.json();
 
       setIsEditing(false);
       setEditedRoles({});
