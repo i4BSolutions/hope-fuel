@@ -24,14 +24,9 @@ export async function GET() {
   }
 }
 
-export async function PUT(req) {
+export async function POST(req) {
   try {
     const updates = await req.json();
-
-    if (req.method !== "PUT") {
-      res.setHeader("Allow", ["PUT"]);
-      return res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
 
     if (!Array.isArray(updates)) {
       return NextResponse.json(
