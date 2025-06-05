@@ -55,8 +55,13 @@ const RoleManagementPage = () => {
   };
 
   useEffect(() => {
-    fetchAgents();
     fetchRoles();
+  }, []);
+
+  useEffect(() => {
+    if (!isEditing) {
+      fetchAgents();
+    }
   }, [isEditing]);
 
   const handleEdit = useCallback(() => {
@@ -158,11 +163,7 @@ const RoleManagementPage = () => {
                           const selectedRole = roles.find(
                             (r) => r.UserRoleID === Number(selected)
                           );
-                          return selectedRole?.UserRoleID == 1
-                            ? "Support Agent"
-                            : selectedRole?.UserRoleID == 2
-                            ? "Admin"
-                            : "Payment Checker" || <em>Unassigned</em>;
+                          return selectedRole?.UserRole ?? <em>Unassigned</em>;
                         }}
                         sx={{
                           borderRadius: 2,
@@ -175,11 +176,7 @@ const RoleManagementPage = () => {
                             key={role.UserRoleID}
                             value={role.UserRoleID}
                           >
-                            {role.UserRoleID == 1
-                              ? "Support Agent"
-                              : role.UserRoleID == 2
-                              ? "Admin"
-                              : "Payment Checker"}
+                            {role.UserRole}
                           </MenuItem>
                         ))}
                       </Select>
