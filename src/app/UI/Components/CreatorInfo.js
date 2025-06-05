@@ -2,7 +2,7 @@ import { Stack, Typography } from "@mui/material";
 
 const CreatorInfo = ({ creator }) => {
   if (!creator) return <p>No data available in Amount Details</p>;
-  console.log("Creator Info:", creator);
+
   return (
     <Stack
       spacing={3}

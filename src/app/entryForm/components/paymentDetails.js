@@ -25,9 +25,13 @@ import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
 import SupportRegion from "../../UI/Components/SupportRegion";
 import UserInfo from "../../UI/Components/UserInfo";
 
-export default function PaymentDetails({ data, clearHopeFuelID }) {
+export default function PaymentDetails({
+  data,
+  note,
+  setNote,
+  clearHopeFuelID,
+}) {
   const [status, setStatus] = useState(1);
-  const [note, setNote] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { agent } = useAgentStore();
@@ -152,6 +156,7 @@ export default function PaymentDetails({ data, clearHopeFuelID }) {
                         <Button
                           variant="contained"
                           sx={{ borderRadius: 8, py: 1 }}
+                          disabled={!data.NoteID}
                           onClick={
                             isEditing
                               ? handleNoteSave

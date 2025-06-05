@@ -23,7 +23,7 @@ function ItemList({ items, onItemClick, onLoadMore, hasInput, hasMore }) {
             />
           ))
         ) : (
-          <Typography variant="h6" align="center">
+          <Typography variant="h6" align="center" sx={{ p: 2 }}>
             No items found
           </Typography>
         )}
