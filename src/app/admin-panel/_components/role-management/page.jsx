@@ -105,6 +105,7 @@ const RoleManagementPage = () => {
 
       setIsEditing(false);
       setEditedRoles({});
+      await fetchAgents();
     } catch (err) {
       console.error("PUT error:", err);
       alert("Error saving roles");
