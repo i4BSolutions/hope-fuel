@@ -55,13 +55,8 @@ const RoleManagementPage = () => {
   };
 
   useEffect(() => {
+    fetchAgents();
     fetchRoles();
-  }, []);
-
-  useEffect(() => {
-    if (!isEditing) {
-      fetchAgents();
-    }
   }, [isEditing]);
 
   const handleEdit = useCallback(() => {
@@ -94,11 +89,11 @@ const RoleManagementPage = () => {
         body: JSON.stringify(payload),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
         throw new Error(result.message || "Update failed");
       }
-
-      const result = await res.json();
 
       setIsEditing(false);
       setEditedRoles({});
@@ -195,6 +190,7 @@ const RoleManagementPage = () => {
                 variant="outlined"
                 color="error"
                 onClick={handleCancel}
+                disabled={loading}
                 sx={{
                   borderRadius: 5,
                   px: 3,
