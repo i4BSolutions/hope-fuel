@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { Select, MenuItem, Typography, Box } from "@mui/material";
+import { Box, MenuItem, Select, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const WalletSelect = ({ onWalletSelected }) => {
   const [currentWallet, setCurrentWallet] = useState("");
@@ -54,7 +54,7 @@ const WalletSelect = ({ onWalletSelected }) => {
   }, []);
 
   return (
-    <Box display="flex" alignItems="center" gap={1}>
+    <Box display="flex" alignItems="center" gap={1} sx={{ width: "100%" }}>
       <Typography fontWeight="bold">Wallet:</Typography>
       <Select
         value={currentWallet}
@@ -85,6 +85,9 @@ const WalletSelect = ({ onWalletSelected }) => {
           },
           "& .MuiSvgIcon-root": {
             color: "black", // Customize the dropdown arrow
+          },
+          "& .MuiSelect-select": {
+            py: "10px", // Customize the padding
           },
         }}
       >

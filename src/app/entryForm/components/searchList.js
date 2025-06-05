@@ -1,7 +1,7 @@
 "use client";
 
 import getSignedUrl from "@/app/utilites/getSignedUrl";
-import { Box, CircularProgress, Container, Divider } from "@mui/material";
+import { Box, CircularProgress, Divider } from "@mui/material";
 import { useEffect, useState } from "react";
 import WalletSelect from "../../UI/Components/GroupWallet";
 import SearchBar from "../../UI/Components/SearchBar";
@@ -102,14 +102,15 @@ export default function SearchBarForm({ onItemClick }) {
   }, [wallet]);
 
   return (
-    <Container
+    <Box
       maxWidth="md"
       sx={{
-        minHeight: "100vh",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         paddingTop: { xs: "8%", md: "5%" },
+        pr: 2.5,
         textAlign: "center",
       }}
     >
@@ -124,7 +125,7 @@ export default function SearchBarForm({ onItemClick }) {
       <Box
         component="section"
         sx={{
-          width: 270,
+          width: "100%",
           px: 2,
           border: "1px solid #e0e0e0",
           borderRadius: "30px",
@@ -145,6 +146,6 @@ export default function SearchBarForm({ onItemClick }) {
           hasMore={hasMore}
         />
       )}
-    </Container>
+    </Box>
   );
 }

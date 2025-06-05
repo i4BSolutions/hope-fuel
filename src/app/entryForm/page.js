@@ -86,10 +86,10 @@ export default function EntryForm() {
     );
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box sx={{ display: "flex", height: "calc(100vh - 40px)" }}>
       <Box
         sx={{
-          width: 300,
+          width: 400,
           borderRight: "1px solid #e0e0e0",
         }}
       >

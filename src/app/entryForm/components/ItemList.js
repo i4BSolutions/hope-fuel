@@ -1,20 +1,19 @@
-import React from "react";
-import { Stack, Box, Button, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import ItemCard from "./ItemCard";
 
 function ItemList({ items, onItemClick, onLoadMore, hasInput, hasMore }) {
   return (
     <Box
       sx={{
-        maxHeight: "80vh", // Set the maximum height for scrolling
-        overflowY: "auto", // Enable vertical scrolling
-        padding: 2,
+        maxHeight: "80vh",
+        overflowY: "auto",
         border: "1px solid #e0e0e0",
         borderRadius: 3,
+        width: "100%",
       }}
     >
       {/* List of Items */}
-      <Stack spacing={2}>
+      <Stack>
         {items.length > 0 ? (
           items.map((item, index) => (
             <ItemCard
@@ -43,7 +42,7 @@ function ItemList({ items, onItemClick, onLoadMore, hasInput, hasMore }) {
             Load More...
           </Button>
         ) : (
-          <Typography variant="body2" sx={{ marginTop: 2, color: "gray" }}>
+          <Typography variant="body2" sx={{ py: 2, color: "gray" }}>
             No more items
           </Typography>
         ))}
