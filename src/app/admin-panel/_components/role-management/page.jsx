@@ -105,8 +105,6 @@ const RoleManagementPage = () => {
 
       setIsEditing(false);
       setEditedRoles({});
-
-      await fetchAgents();
     } catch (err) {
       console.error("PUT error:", err);
       alert("Error saving roles");
@@ -159,7 +157,7 @@ const RoleManagementPage = () => {
                         onChange={(e) =>
                           setEditedRoles((prev) => ({
                             ...prev,
-                            [agent.AgentId]: e.target.value,
+                            [agent.AgentId]: Number(e.target.value),
                           }))
                         }
                         displayEmpty

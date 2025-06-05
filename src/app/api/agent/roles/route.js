@@ -48,16 +48,18 @@ export async function POST(req) {
     console.log("Valid updates:", JSON.stringify(validUpdates, null, 2));
 
     const updatePromises = validUpdates.map(async ({ agentId, userRoleId }) => {
+      const parsedRoleId =
+        userRoleId === null || userRoleId === "" ? null : Number(userRoleId);
       console.log(`Updating agent ${agentId} with role ${userRoleId}`);
 
-      // Make sure the field name matches your database schema
+      if (parsedRoleId !== null && isNaN(parsedRoleId)) {
+        throw new Error(`Invalid userRoleId value: ${userRoleId}`);
+      }
+
       const result = await prisma.agent.update({
         where: { AgentId: agentId },
         data: {
-          UserRoleId:
-            userRoleId === null || userRoleId === ""
-              ? null
-              : Number(userRoleId),
+          UserRoleId: parsedRoleId,
         },
       });
 
