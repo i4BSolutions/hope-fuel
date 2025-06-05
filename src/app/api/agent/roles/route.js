@@ -28,8 +28,6 @@ export async function POST(req) {
   try {
     const updates = await req.json();
 
-    console.log("Received updates:", JSON.stringify(updates, null, 2));
-
     if (!Array.isArray(updates)) {
       return NextResponse.json(
         { error: "Invalid payload format" },
@@ -38,42 +36,42 @@ export async function POST(req) {
     }
 
     const validUpdates = updates.filter((update) => {
-      const isValid = update.agentId && typeof update.agentId === "number";
-      if (!isValid) {
-        console.log("Invalid update:", update);
-      }
-      return isValid;
+      return update.agentId && typeof update.agentId === "number";
     });
-
-    console.log("Valid updates:", JSON.stringify(validUpdates, null, 2));
 
     const updatePromises = validUpdates.map(async ({ agentId, userRoleId }) => {
       const parsedRoleId =
         userRoleId === null || userRoleId === "" ? null : Number(userRoleId);
-      console.log(`Updating agent ${agentId} with role ${userRoleId}`);
 
-      if (parsedRoleId !== null && isNaN(parsedRoleId)) {
-        throw new Error(`Invalid userRoleId value: ${userRoleId}`);
+      if (parsedRoleId !== null) {
+        const role = await prisma.userRole.findUnique({
+          where: { UserRoleID: parsedRoleId },
+        });
+
+        if (!role) {
+          console.warn(
+            `Skipping update for agent ${agentId}: role ${parsedRoleId} not found`
+          );
+          return null;
+        }
       }
 
-      const result = await prisma.agent.update({
+      const updated = await prisma.agent.update({
         where: { AgentId: agentId },
         data: {
           UserRoleId: parsedRoleId,
         },
       });
 
-      console.log(`Updated agent ${agentId}:`, result);
-      return result;
+      return updated;
     });
 
     const results = await Promise.all(updatePromises);
-    console.log("All updates completed:", results);
 
     return NextResponse.json({
       success: true,
       message: "Roles updated successfully.",
-      updatedCount: results.length,
+      updatedCount: results.filter(Boolean).length,
     });
   } catch (error) {
     console.error("Error updating agent roles:", error);
