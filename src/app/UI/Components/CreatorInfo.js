@@ -2,7 +2,7 @@ import { Stack, Typography } from "@mui/material";
 
 const CreatorInfo = ({ creator }) => {
   if (!creator) return <p>No data available in Amount Details</p>;
-
+  console.log("Creator Info:", creator);
   return (
     <Stack
       spacing={3}
@@ -15,7 +15,9 @@ const CreatorInfo = ({ creator }) => {
         <Typography sx={{ fontSize: 20, fontWeight: 600 }}>
           Created by
         </Typography>
-        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>Mg Mg</Typography>
+        <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
+          {creator.Name}
+        </Typography>
       </Stack>
       <Stack direction={"column"} spacing={1}>
         <Typography sx={{ fontSize: 20, fontWeight: 600 }}>HOPEID</Typography>

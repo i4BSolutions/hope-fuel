@@ -164,7 +164,6 @@ export default function PaymentDetails({ data, clearHopeFuelID }) {
                     </>
                   )}
                 </Stack>
-
                 <CreatorInfo creator={data} />
               </Stack>
             </Stack>
