@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const RoleManagementPage = () => {
   const [agents, setAgents] = useState([]);
@@ -165,7 +165,7 @@ const RoleManagementPage = () => {
                         renderValue={(selected) => {
                           if (!selected) return <em>Unassigned</em>;
                           const selectedRole = roles.find(
-                            (r) => r.UserRoleID === Number(selected)
+                            (r) => r.UserRoleID === selected
                           );
                           return selectedRole?.UserRole ?? <em>Unassigned</em>;
                         }}
