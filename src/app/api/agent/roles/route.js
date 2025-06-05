@@ -28,6 +28,8 @@ export async function POST(req) {
   try {
     const updates = await req.json();
 
+    console.log("Received updates:", JSON.stringify(updates, null, 2));
+
     if (!Array.isArray(updates)) {
       return NextResponse.json(
         { error: "Invalid payload format" },
@@ -35,18 +37,41 @@ export async function POST(req) {
       );
     }
 
-    const updatePromises = updates.map(({ agentId, userRoleId }) =>
-      prisma.agent.update({
-        where: { AgentId: agentId },
-        data: { UserRoleId: userRoleId ?? null },
-      })
-    );
+    const validUpdates = updates.filter((update) => {
+      const isValid = update.agentId && typeof update.agentId === "number";
+      if (!isValid) {
+        console.log("Invalid update:", update);
+      }
+      return isValid;
+    });
 
-    await Promise.all(updatePromises);
+    console.log("Valid updates:", JSON.stringify(validUpdates, null, 2));
+
+    const updatePromises = validUpdates.map(async ({ agentId, userRoleId }) => {
+      console.log(`Updating agent ${agentId} with role ${userRoleId}`);
+
+      // Make sure the field name matches your database schema
+      const result = await prisma.agent.update({
+        where: { AgentId: agentId },
+        data: {
+          UserRoleId:
+            userRoleId === null || userRoleId === ""
+              ? null
+              : Number(userRoleId),
+        },
+      });
+
+      console.log(`Updated agent ${agentId}:`, result);
+      return result;
+    });
+
+    const results = await Promise.all(updatePromises);
+    console.log("All updates completed:", results);
 
     return NextResponse.json({
       success: true,
       message: "Roles updated successfully.",
+      updatedCount: results.length,
     });
   } catch (error) {
     console.error("Error updating agent roles:", error);
