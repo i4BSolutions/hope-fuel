@@ -158,7 +158,7 @@ const RoleManagementPage = () => {
                         onChange={(e) =>
                           setEditedRoles((prev) => ({
                             ...prev,
-                            [agent.AgentId]: Number(e.target.value),
+                            [agent.AgentId]: e.target.value,
                           }))
                         }
                         displayEmpty
