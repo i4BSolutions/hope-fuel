@@ -34,11 +34,12 @@ export default function HopeFuelIdStatus({ data }) {
           borderBottom: "1px solid #e0e0e0",
           paddingBottom: "8px",
           marginBottom: "16px",
+          width: "100%",
         }}
       >
         <Stack spacing={1}>
           <h1 style={{ margin: 0 }}>HOPEID - {data.HopeFuelID}</h1>
-          <h2 style={{ margin: 0, fontSize: "16px", color: "#757575" }}>
+          <h2 style={{ m: 0, fontSize: "20px" }}>
             {formatDate(data.TransactionDate)}
           </h2>
         </Stack>

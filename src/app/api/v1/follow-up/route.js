@@ -6,21 +6,17 @@ export async function GET(req) {
   const statusId = parseInt(searchParams.get("statusId") || "0", 10);
   const now = new Date();
 
-  const currentYear = parseInt(
-    searchParams.get("year") || now.getFullYear(),
-    10
+  const currentYear = parseInt(searchParams.get("year"), 10);
+  const currentMonth = parseInt(searchParams.get("month"), 10);
+
+  const monthStart = new Date(Date.UTC(currentYear, currentMonth, 1));
+  const monthEnd = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
+  const twoMonthsAgoStart = new Date(
+    Date.UTC(currentYear, currentMonth - 2, 1)
   );
+  const oneMonthAgoEnd = new Date(Date.UTC(currentYear, currentMonth, 0));
 
-  const currentMonth = parseInt(
-    searchParams.get("month") || now.getMonth() + 1,
-    10
-  );
-
-  const monthStart = new Date(currentYear, currentMonth - 1, 1);
-  const monthEnd = new Date(currentYear, currentMonth, 0);
-  const twoMonthsAgoStart = new Date(currentYear, currentMonth - 3, 1);
-  const oneMonthAgoEnd = new Date(currentYear, currentMonth - 1, 0);
-
+  // Fetch all subscriptions
   const allSubscriptions = await prisma.subscription.findMany({
     select: {
       CustomerID: true,
@@ -30,6 +26,7 @@ export async function GET(req) {
     orderBy: { StartDate: "asc" },
   });
 
+  // Group subscriptions by customer
   const customerSubs = new Map();
   for (const { CustomerID, StartDate, EndDate } of allSubscriptions) {
     if (!customerSubs.has(CustomerID)) customerSubs.set(CustomerID, []);
@@ -42,21 +39,27 @@ export async function GET(req) {
   const followUpCustomerIDs = [];
 
   for (const [customerID, subs] of customerSubs.entries()) {
-    const activeInTarget = subs.some(
-      ({ startDate, endDate }) => startDate <= monthEnd && endDate >= monthStart
+    const parsedSubs = subs.map(({ startDate, endDate }) => ({
+      start: new Date(startDate),
+      end: new Date(endDate),
+    }));
+
+    const isActiveInJune = parsedSubs.some(
+      ({ end }) => end.getTime() >= monthStart.getTime()
     );
 
-    const activeInRecentPast = subs.some(
-      ({ startDate, endDate }) =>
-        startDate <= oneMonthAgoEnd && endDate >= twoMonthsAgoStart
+    const endedInAprOrMay = parsedSubs.some(
+      ({ end }) =>
+        end.getTime() >= twoMonthsAgoStart.getTime() &&
+        end.getTime() <= oneMonthAgoEnd.getTime()
     );
 
-    if (subs.length >= 1 && !activeInTarget && activeInRecentPast) {
+    if (!isActiveInJune && endedInAprOrMay) {
       followUpCustomerIDs.push(customerID);
     }
   }
 
-  // Fetch follow-up customer details, including latest follow-up status
+  // Fetch customer details
   const followUpCustomers = await prisma.customer.findMany({
     where: {
       CustomerId: { in: followUpCustomerIDs },
@@ -99,14 +102,14 @@ export async function GET(req) {
     },
   });
 
-  // Shape response
+  // Format response
   const result = followUpCustomers
     .map((customer) => {
       const transaction = customer.Transactions[0];
       const agent = transaction?.TransactionAgent?.[0]?.Agent;
       const followUp = customer.FollowUpStatus?.[0];
 
-      const statusId = followUp?.FollowUpStatusID ?? 1;
+      const status = followUp?.FollowUpStatusID ?? 1;
 
       return {
         customerId: customer.CustomerId,
@@ -117,7 +120,7 @@ export async function GET(req) {
         lastFormAgent: agent ? agent.Username : null,
         note: transaction?.Note?.Note || null,
         followUpStatus: {
-          statusId,
+          statusId: status,
           followUpDate: followUp?.FollowUpDate ?? null,
         },
       };
