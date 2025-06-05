@@ -48,7 +48,7 @@ export default function CheckUser({ onUserCheck }) {
       try {
         const response = await fetch("/api/formOpenClose");
         const { data } = await response.json();
-        setIsFormOpen(data[0]?.IsFormOpen);
+        setIsFormOpen(Boolean(data[0]?.IsFormOpen));
       } catch (err) {
         console.error("Error fetching form status:", err);
       } finally {
@@ -117,7 +117,7 @@ export default function CheckUser({ onUserCheck }) {
     );
   }
 
-  if (isFormOpen || agent.roleId !== 2) {
+  if (!isFormOpen && agent.roleId !== AGENT_ROLE.ADMIN) {
     return <ServiceUnavailable />;
   }
 

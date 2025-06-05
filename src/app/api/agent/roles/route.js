@@ -28,6 +28,11 @@ export async function PUT(req) {
   try {
     const updates = await req.json();
 
+    if (req.method !== "PUT") {
+      res.setHeader("Allow", ["PUT"]);
+      return res.status(405).end(`Method ${req.method} Not Allowed`);
+    }
+
     if (!Array.isArray(updates)) {
       return NextResponse.json(
         { error: "Invalid payload format" },
