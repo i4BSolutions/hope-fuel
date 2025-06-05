@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
 import { endOfMonth, startOfMonth } from "date-fns";
