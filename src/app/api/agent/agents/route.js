@@ -11,13 +11,6 @@ export async function GET() {
       },
     });
 
-    const rawDbInfo = await prisma.$queryRawUnsafe(`
-  SELECT DATABASE() as db, VERSION() as version
-`);
-
-    console.log("Connected to DB:", rawDbInfo);
-    console.log("DATABASE_URL at runtime:", process.env.DATABASE_URL);
-
     return NextResponse.json({
       status: 200,
       message: "Agents retrieve successfully.",
