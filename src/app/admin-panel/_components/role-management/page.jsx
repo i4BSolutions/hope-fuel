@@ -29,8 +29,10 @@ const RoleManagementPage = () => {
     setLoading(true);
     try {
       const res = await fetch("/api/agent/agents");
+      if (!res.ok) throw new Error("Failed to fetch agents");
+
       const data = await res.json();
-      setAgents(data.data);
+      setAgents(data.data || []);
 
       const initial = {};
       data.data.forEach((agent) => {
@@ -47,17 +49,22 @@ const RoleManagementPage = () => {
   const fetchRoles = async () => {
     try {
       const res = await fetch("/api/agent/roles");
+      if (!res.ok) throw new Error("Failed to fetch roles");
+
       const data = await res.json();
-      setRoles(data.data);
+      setRoles(data.data || []);
     } catch (err) {
       console.error("Failed to fetch roles", err);
     }
   };
 
   useEffect(() => {
-    fetchRoles();
     fetchAgents();
   }, [isEditing]);
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
 
   const handleEdit = useCallback(() => {
     const initial = {};
