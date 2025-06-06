@@ -72,6 +72,7 @@ export async function POST(req) {
       success: true,
       message: "Roles updated successfully.",
       updatedCount: results.filter(Boolean).length,
+      data: results,
     });
   } catch (error) {
     console.error("Error updating agent roles:", error);
