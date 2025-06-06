@@ -25,14 +25,23 @@ const RoleManagementPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const fetchRoles = async () => {
+    try {
+      const res = await fetch("/api/agent/roles");
+      const data = await res.json();
+      setRoles(data.data);
+    } catch (err) {
+      console.error("Failed to fetch roles", err);
+    }
+  };
+
   const fetchAgents = async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/agent/agents");
-      if (!res.ok) throw new Error("Failed to fetch agents");
 
       const data = await res.json();
-      setAgents(data.data || []);
+      setAgents(data.data);
 
       const initial = {};
       data.data.forEach((agent) => {
@@ -46,25 +55,10 @@ const RoleManagementPage = () => {
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const res = await fetch("/api/agent/roles");
-      if (!res.ok) throw new Error("Failed to fetch roles");
-
-      const data = await res.json();
-      setRoles(data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch roles", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchAgents();
-  }, [isEditing]);
-
   useEffect(() => {
     fetchRoles();
-  }, []);
+    fetchAgents();
+  }, [isEditing]);
 
   const handleEdit = useCallback(() => {
     const initial = {};
@@ -98,7 +92,7 @@ const RoleManagementPage = () => {
 
       const result = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !result.success) {
         throw new Error(result.message || "Update failed");
       }
 
@@ -165,14 +159,14 @@ const RoleManagementPage = () => {
                           }))
                         }
                         displayEmpty
-                        renderValue={(selected) => {
-                          if (!selected) return <em>Unassigned</em>;
+                        // renderValue={(selected) => {
+                        //   if (!selected) return <em>Unassigned</em>;
 
-                          const role = roles.find(
-                            (r) => r.UserRoleID === Number(selected)
-                          );
-                          return role?.UserRole ?? <em>Unassigned</em>;
-                        }}
+                        //   const role = roles.find(
+                        //     (r) => r.UserRoleID === Number(selected)
+                        //   );
+                        //   return role?.UserRole ?? <em>Unassigned</em>;
+                        // }}
                         sx={{
                           borderRadius: 2,
                           fontWeight: "medium",
