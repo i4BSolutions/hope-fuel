@@ -167,10 +167,11 @@ const RoleManagementPage = () => {
                         displayEmpty
                         renderValue={(selected) => {
                           if (!selected) return <em>Unassigned</em>;
-                          const selectedRole = roles.find(
-                            (r) => r.UserRoleID === selected
+
+                          const role = roles.find(
+                            (r) => r.UserRoleID === Number(selected)
                           );
-                          return selectedRole?.UserRole ?? <em>Unassigned</em>;
+                          return role?.UserRole ?? <em>Unassigned</em>;
                         }}
                         sx={{
                           borderRadius: 2,

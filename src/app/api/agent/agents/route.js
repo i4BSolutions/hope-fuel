@@ -1,9 +1,20 @@
 import { NextResponse } from "next/server";
-import db from "../../../utilites/db";
+import prisma from "../../../utilites/prisma";
 
 export async function GET() {
   try {
-    const agents = await db("SELECT AgentId, Username, UserRoleId FROM Agent");
+    const agents = await prisma.agent.findMany({
+      select: {
+        AgentId: true,
+        Username: true,
+        UserRoleId: true,
+        UserRole: {
+          select: {
+            UserRole: true,
+          },
+        },
+      },
+    });
 
     return NextResponse.json({
       status: 200,
