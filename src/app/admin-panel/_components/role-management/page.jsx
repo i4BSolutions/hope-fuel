@@ -82,8 +82,6 @@ const RoleManagementPage = () => {
           userRoleId: userRoleId === "" ? null : Number(userRoleId),
         })
       );
-      console.log("Payload being sent:", JSON.stringify(payload, null, 2));
-      console.log("editedRoles state:", editedRoles);
 
       const res = await fetch("/api/agent/roles", {
         method: "POST",
@@ -92,7 +90,6 @@ const RoleManagementPage = () => {
       });
 
       const result = await res.json();
-      console.log("Response:", result);
 
       if (!res.ok) {
         throw new Error(result.message || "Update failed");
@@ -101,9 +98,11 @@ const RoleManagementPage = () => {
       setIsEditing(false);
       setEditedRoles({});
     } catch (err) {
-      console.error("PUT error:", err);
-      alert("Error saving roles");
+      console.error("POST error:", err);
     } finally {
+      setTimeout(() => {
+        fetchAgents();
+      }, 500);
       setLoading(false);
     }
   };
