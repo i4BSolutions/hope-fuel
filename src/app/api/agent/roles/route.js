@@ -39,23 +39,32 @@ export async function POST(req) {
       return update.agentId && typeof update.agentId === "number";
     });
 
-    const updatePromises = validUpdates.map(async ({ agentId, userRoleId }) => {
-      const updated = await prisma.agent.update({
+    const updatePromises = validUpdates.map(({ agentId, userRoleId }) =>
+      prisma.agent.update({
         where: { AgentId: agentId },
         data: {
           UserRoleId: userRoleId,
         },
-      });
+      })
+    );
 
-      return updated;
+    await Promise.all(updatePromises);
+
+    const results = await prisma.agent.findMany({
+      select: {
+        AgentId: true,
+        Username: true,
+        UserRoleId: true,
+        UserRole: {
+          select: { UserRole: true },
+        },
+      },
     });
-
-    const results = await Promise.all(updatePromises);
 
     return NextResponse.json({
       success: true,
       message: "Roles updated successfully.",
-      updatedCount: results.filter(Boolean).length,
+      updatedCount: results.length,
       data: results,
     });
   } catch (error) {
