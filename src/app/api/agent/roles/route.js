@@ -40,26 +40,10 @@ export async function POST(req) {
     });
 
     const updatePromises = validUpdates.map(async ({ agentId, userRoleId }) => {
-      const parsedRoleId =
-        userRoleId === null || userRoleId === "" ? null : Number(userRoleId);
-
-      if (parsedRoleId !== null) {
-        const role = await prisma.userRole.findUnique({
-          where: { UserRoleID: parsedRoleId },
-        });
-
-        if (!role) {
-          console.warn(
-            `Skipping update for agent ${agentId}: role ${parsedRoleId} not found`
-          );
-          return null;
-        }
-      }
-
       const updated = await prisma.agent.update({
         where: { AgentId: agentId },
         data: {
-          UserRoleId: parsedRoleId,
+          UserRoleId: userRoleId,
         },
       });
 
