@@ -77,7 +77,7 @@ export default function CustomerStats({ currentMonth }) {
 
     fetchData();
   }, [currentMonth]);
-  
+
   const handleCardClick = (stats) => {
     if (stats.key === "followUpCustomers") {
       setSelectedCard(stats);
@@ -201,9 +201,9 @@ export default function CustomerStats({ currentMonth }) {
               {
                 disableLine: true,
                 disableTicks: true,
-                valueFormatter: (value) => {
-                  return value;
-                },
+                min: 0,
+                max: 1000,
+                valueFormatter: (value) => value.toFixed(0),
               },
             ]}
             series={[

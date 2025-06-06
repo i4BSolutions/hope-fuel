@@ -37,7 +37,6 @@ export async function GET(req) {
     const monthEnd = new Date(year, month + 1, 0);
     const lastMonthEnd = new Date(year, month, 0);
     const twoMonthsAgoStart = new Date(year, month - 2, 1);
-    const now = new Date();
 
     let active = new Set();
     let newActive = new Set();
@@ -47,7 +46,7 @@ export async function GET(req) {
     for (const [customerId, subs] of subscriptionMap.entries()) {
       const sorted = subs.sort((a, b) => a.startDate - b.startDate);
 
-      const hasCurrentSub = subs.some(
+      const isActiveInMonth = subs.some(
         ({ startDate, endDate }) =>
           startDate <= monthEnd && endDate >= monthStart
       );
@@ -57,21 +56,18 @@ export async function GET(req) {
           startDate <= lastMonthEnd && endDate >= twoMonthsAgoStart
       );
 
-      const isActiveNow = subs.some(({ endDate }) => endDate >= now);
-
       const firstSub = sorted[0];
-      const lastSub = sorted[sorted.length - 1];
       const isNew =
         firstSub.startDate >= monthStart && firstSub.startDate <= monthEnd;
 
-      if (isActiveNow) {
+      if (isActiveInMonth) {
         active.add(customerId);
         if (isNew) {
           newActive.add(customerId);
         } else {
           oldActive.add(customerId);
         }
-      } else if (!hasCurrentSub && hadSub1to2MonthsAgo) {
+      } else if (hadSub1to2MonthsAgo) {
         followUp.add(customerId);
       }
     }
@@ -94,8 +90,8 @@ export async function GET(req) {
 
   const trend = [];
   for (let i = 6; i > 0; i--) {
-    const date = new Date(currentYear, currentMonth - i - 1, 1);
-    const stats = computeStats(date.getFullYear(), date.getMonth() + 1);
+    const date = new Date(currentYear, currentMonth - i, 1);
+    const stats = computeStats(date.getFullYear(), date.getMonth());
     trend.push({
       month: date.toLocaleString("default", { month: "long" }),
       stats,
