@@ -17,14 +17,12 @@ const pool = mysql.createPool({
 export default async function db(query, params) {
   try {
     const [rows] = await pool.query(query, params);
-//  console.log("Rows form db:", rows);
-    return rows; 
+    //  console.log("Rows form db:", rows);
+    return rows;
   } catch (error) {
     console.error("Error connecting to db", error);
     throw new Error("Failed to connect to db");
-    
-  }finally{
-   pool.end;
+  } finally {
+    pool.end;
   }
- 
 }
