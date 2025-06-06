@@ -40,7 +40,14 @@ const RoleManagementPage = () => {
     try {
       const res = await fetch("/api/agent/agents");
 
+      if (!res.ok) {
+        throw new Error("Failed to fetch agents");
+      }
+
       const data = await res.json();
+      if (!data.data) {
+        throw new Error("Invalid response format");
+      }
       setAgents(data.data);
 
       const initial = {};
@@ -77,12 +84,22 @@ const RoleManagementPage = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const payload = Object.entries(editedRoles).map(
-        ([agentId, userRoleId]) => ({
-          agentId: Number(agentId),
-          userRoleId: userRoleId === "" ? null : Number(userRoleId),
-        })
+      const changedRoles = Object.entries(editedRoles).filter(
+        ([agentId, roleId]) => {
+          const agent = agents.find((a) => a.AgentId === Number(agentId));
+          return agent && agent.UserRoleId !== roleId;
+        }
       );
+
+      const payload = changedRoles.map(([agentId, userRoleId]) => ({
+        agentId: Number(agentId),
+        userRoleId: userRoleId === "" ? null : Number(userRoleId),
+      }));
+
+      if (payload.length === 0) {
+        setIsEditing(false);
+        return;
+      }
 
       const res = await fetch("/api/agent/roles", {
         method: "POST",
@@ -96,19 +113,20 @@ const RoleManagementPage = () => {
         throw new Error(result.message || "Update failed");
       }
 
-      setAgents(result.data || []);
-
-      const updated = {};
-      result.data.forEach((agent) => {
-        updated[agent.AgentId] = agent.UserRoleId ?? "";
-      });
-      setEditedRoles(updated);
+      await fetchAgents();
+      setEditedRoles({});
       setIsEditing(false);
     } catch (err) {
       console.error("POST error:", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderRoleValue = (selected) => {
+    if (!selected) return <em>Unassigned</em>;
+    const role = roles.find((r) => r.UserRoleID === Number(selected));
+    return role?.UserRole ?? <em>Unassigned</em>;
   };
 
   return (
@@ -159,14 +177,7 @@ const RoleManagementPage = () => {
                           }))
                         }
                         displayEmpty
-                        // renderValue={(selected) => {
-                        //   if (!selected) return <em>Unassigned</em>;
-
-                        //   const role = roles.find(
-                        //     (r) => r.UserRoleID === Number(selected)
-                        //   );
-                        //   return role?.UserRole ?? <em>Unassigned</em>;
-                        // }}
+                        renderValue={renderRoleValue}
                         sx={{
                           borderRadius: 2,
                           fontWeight: "medium",

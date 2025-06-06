@@ -30,7 +30,7 @@ export async function POST(req) {
 
     if (!Array.isArray(updates)) {
       return NextResponse.json(
-        { error: "Invalid payload format" },
+        { error: "Invalid payload format", success: false },
         { status: 400 }
       );
     }
@@ -39,27 +39,37 @@ export async function POST(req) {
       return update.agentId && typeof update.agentId === "number";
     });
 
-    const updatePromises = validUpdates.map(({ agentId, userRoleId }) =>
-      prisma.agent.update({
-        where: { AgentId: agentId },
-        data: {
-          UserRoleId: userRoleId,
-        },
+    const updateResults = await Promise.all(
+      validUpdates.map(async ({ agentId, userRoleId }) => {
+        try {
+          return await prisma.agent.update({
+            where: { AgentId: agentId },
+            data: { UserRoleId: userRoleId },
+            select: {
+              AgentId: true,
+              Username: true,
+              UserRoleId: true,
+              UserRole: {
+                select: { UserRole: true },
+              },
+            },
+          });
+        } catch (error) {
+          console.error(`Failed to update agent ${agentId}:`, error);
+          return null;
+        }
       })
     );
 
-    await Promise.all(updatePromises);
+    const results = updateResults.filter((result) => result !== null);
 
-    const results = await prisma.agent.findMany({
-      select: {
-        AgentId: true,
-        Username: true,
-        UserRoleId: true,
-        UserRole: {
-          select: { UserRole: true },
-        },
-      },
-    });
+    if (results.length === 0) {
+      return NextResponse.json({
+        success: false,
+        message: "No agents were updated successfully",
+        data: [],
+      });
+    }
 
     return NextResponse.json({
       success: true,
