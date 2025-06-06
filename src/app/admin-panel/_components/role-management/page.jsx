@@ -55,8 +55,8 @@ const RoleManagementPage = () => {
   };
 
   useEffect(() => {
-    fetchAgents();
     fetchRoles();
+    fetchAgents();
   }, [isEditing]);
 
   const handleEdit = useCallback(() => {
@@ -95,14 +95,17 @@ const RoleManagementPage = () => {
         throw new Error(result.message || "Update failed");
       }
 
+      setAgents(result.data || []);
+
+      const updated = {};
+      result.data.forEach((agent) => {
+        updated[agent.AgentId] = agent.UserRoleId ?? "";
+      });
+      setEditedRoles(updated);
       setIsEditing(false);
-      setEditedRoles({});
     } catch (err) {
       console.error("POST error:", err);
     } finally {
-      setTimeout(() => {
-        fetchAgents();
-      }, 500);
       setLoading(false);
     }
   };
