@@ -48,7 +48,7 @@ const ExtendUserPage = () => {
     );
   }
 
-  if (isFormOpen || agent.roleId !== AGENT_ROLE.ADMIN) {
+  if (!isFormOpen && agent.roleId !== AGENT_ROLE.ADMIN) {
     return <ServiceUnavailable />;
   }
 
