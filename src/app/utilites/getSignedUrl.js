@@ -2,11 +2,12 @@ import { getUrl } from "@aws-amplify/storage";
 
 export default async function getSignedUrl(key) {
   try {
+    const identityId = key.split("_")[0];
     const { url, expiresAt } = await getUrl({
       key,
       options: {
         accessLevel: "protected",
-        // targetIdentityId: identityId,
+        targetIdentityId: identityId,
       },
     });
 

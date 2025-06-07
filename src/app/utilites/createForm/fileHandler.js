@@ -12,8 +12,8 @@ export default async function filehandler(
   let arrayFiles = [];
   let url = [];
 
-  // const session = await fetchAuthSession();
-  // const identityId = session.identityId;
+  const session = await fetchAuthSession();
+  const identityId = session.identityId;
 
   // get the submitted files
   for (let i = 0; i < files.length; i++) {
@@ -24,8 +24,7 @@ export default async function filehandler(
       );
 
       const result = await uploadData({
-        // key: `${identityId}/${uuidv4()}/${file.name}`,
-        key: `shared/${uuidv4()}/${file.name}`,
+        key: `${identityId}_${uuidv4()}-${file.name}`,
         data: file,
         options: {
           accessLevel: "protected",
