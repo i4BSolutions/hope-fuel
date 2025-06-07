@@ -9,7 +9,15 @@
       "UnauthRoleName": "amplify-hopefuel-jere-62c38-unauthRole",
       "StackName": "amplify-hopefuel-jere-62c38",
       "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-jere-62c38/f73ad480-3812-11f0-b657-02c11a008af1",
-      "AmplifyAppId": "d21tc40zhkpcd1"
+      "AmplifyAppId": "d4ripigqsy2vl"
+    },
+    "categories": {
+      "auth": {
+        "hopefuel": {}
+      },
+      "storage": {
+        "s3hopefuelstorage85ce1c8f": {}
+      }
     }
   }
 }
