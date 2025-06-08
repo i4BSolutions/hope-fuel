@@ -1,0 +1,15 @@
+{
+  "kaile": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-hopefuel-kaile-58b3f-authRole",
+      "UnauthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-kaile-58b3f-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::160784268736:role/amplify-hopefuel-kaile-58b3f-authRole",
+      "Region": "ap-southeast-1",
+      "DeploymentBucketName": "amplify-hopefuel-kaile-58b3f-deployment",
+      "UnauthRoleName": "amplify-hopefuel-kaile-58b3f-unauthRole",
+      "StackName": "amplify-hopefuel-kaile-58b3f",
+      "StackId": "arn:aws:cloudformation:ap-southeast-1:160784268736:stack/amplify-hopefuel-kaile-58b3f/f848ef90-438b-11f0-a0ae-027299b11133",
+      "AmplifyAppId": "d5hz5bmbvl9kx"
+    }
+  }
+}
