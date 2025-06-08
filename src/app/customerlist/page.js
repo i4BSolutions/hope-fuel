@@ -252,8 +252,8 @@ const CustomerListPage = () => {
         const subscriptions = customer?.HopeFuelID
           ? await fetchSubscriptionByHopeFuelID(customer.HopeFuelID)
           : [];
-        const cardIssued = customer?.HopeFuelID
-          ? await fetchCardIssuedByID(customer?.HopeFuelID)
+        const cardIssued = customer?.CustomerId
+          ? await fetchCardIssuedByID(customer?.CustomerId)
           : [];
         setProfileDetailData({ ...customer, subscriptions, cardIssued });
 
