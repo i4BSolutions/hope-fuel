@@ -33,12 +33,17 @@ const DateContainer = styled(Box)(({ theme }) => ({
 const ScrollContainer = styled(Box)({
   display: "flex",
   overflowX: "auto",
-  scrollbarWidth: "none",
-  "&::-webkit-scrollbar": {
-    display: "none",
-  },
-  "-ms-overflow-style": "none",
   paddingBottom: 8,
+  "&::-webkit-scrollbar": {
+    height: 6,
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#ccc",
+    borderRadius: 4,
+  },
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: "#f0f0f0",
+  },
 });
 
 const SubscriptionCard = ({ cards }) => {
@@ -52,84 +57,91 @@ const SubscriptionCard = ({ cards }) => {
         {cards.length !== 0 && "List of Cards Issued"}
       </Typography>
 
-      <ScrollContainer>
-        {cards.map((card, index) => (
-          <Card
-            key={index}
-            sx={{
-              minWidth: 155,
-              mr: 2,
-              mb: 1,
-              borderRadius: 3,
-              "&:last-child": { mr: 0 },
-              border: 0.5,
-              borderColor: "#E2E8F0",
-            }}
-          >
-            <CardContent sx={{ p: 2 }}>
-              <Stack alignItems="center" spacing={2}>
-                <DateContainer>
-                  <Typography
-                    variant="h6"
-                    color="#000"
-                    sx={{
-                      mb: 2,
-                      zIndex: 2,
-                      backgroundColor: "white",
-                      px: 1,
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      lineHeight: "20px",
-                    }}
-                  >
-                    {moment(card.ValidFromDate).format("MMMM D,YYYY")}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="#000"
-                    sx={{
-                      mt: 2,
-                      zIndex: 2,
-                      backgroundColor: "white",
-                      px: 1,
-                      fontSize: "14px",
-                      fontWeight: 600,
-                      lineHeight: "20px",
-                    }}
-                  >
-                    {moment(card.ValidThroughDate).format("MMMM D,YYYY")}
-                  </Typography>
-                </DateContainer>
+      <Box
+        sx={{
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <ScrollContainer>
+          {cards.map((card, index) => (
+            <Card
+              key={index}
+              sx={{
+                minWidth: 155,
+                mr: 2,
+                mb: 1,
+                borderRadius: 3,
+                "&:last-child": { mr: 0 },
+                border: 0.5,
+                borderColor: "#E2E8F0",
+              }}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Stack alignItems="center" spacing={2}>
+                  <DateContainer>
+                    <Typography
+                      variant="h6"
+                      color="#000"
+                      sx={{
+                        mb: 2,
+                        zIndex: 2,
+                        backgroundColor: "white",
+                        px: 1,
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        lineHeight: "20px",
+                      }}
+                    >
+                      {moment(card.ValidFromDate).format("MMMM D,YYYY")}
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      color="#000"
+                      sx={{
+                        mt: 2,
+                        zIndex: 2,
+                        backgroundColor: "white",
+                        px: 1,
+                        fontSize: "14px",
+                        fontWeight: 600,
+                        lineHeight: "20px",
+                      }}
+                    >
+                      {moment(card.ValidThroughDate).format("MMMM D,YYYY")}
+                    </Typography>
+                  </DateContainer>
 
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography
-                    variant="h6"
-                    color="#000"
-                    sx={{
-                      fontWeight: 400,
-                      fontSize: "14px",
-                      lineHeight: "17px",
-                    }}
-                  >
-                    {formatAmount(card.MonthlyAmount)}
-                  </Typography>
-                  <Chip
-                    label={card.CurrencyCode}
-                    sx={{
-                      backgroundColor: "#FECACA",
-                      color: "#000",
-                      fontWeight: 600,
-                      height: 24,
-                      fontSize: "12px",
-                      lineHeight: "18px",
-                    }}
-                  />
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography
+                      variant="h6"
+                      color="#000"
+                      sx={{
+                        fontWeight: 400,
+                        fontSize: "14px",
+                        lineHeight: "17px",
+                      }}
+                    >
+                      {formatAmount(card.MonthlyAmount)}
+                    </Typography>
+                    <Chip
+                      label={card.CurrencyCode}
+                      sx={{
+                        backgroundColor: "#FECACA",
+                        color: "#000",
+                        fontWeight: 600,
+                        height: 24,
+                        fontSize: "12px",
+                        lineHeight: "18px",
+                      }}
+                    />
+                  </Stack>
                 </Stack>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
-      </ScrollContainer>
+              </CardContent>
+            </Card>
+          ))}
+        </ScrollContainer>
+      </Box>
     </Container>
   );
 };

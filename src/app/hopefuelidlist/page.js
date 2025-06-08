@@ -65,7 +65,7 @@ const HopeFuelIdListPage = () => {
         if (isNewSearch) {
           setData(newData.data || []);
         } else {
-          setData((prev) => [...prev, ...(realData.data || [])]);
+          setData((prev) => [...prev, ...(newData.data || [])]);
         }
 
         setHasMore((newData.data || []).length === PAGE_SIZE);
