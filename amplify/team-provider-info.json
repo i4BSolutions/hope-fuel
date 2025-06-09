@@ -1,0 +1,15 @@
+{
+  "eliza": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-hopefuel-eliza-bc7e4-authRole",
+      "UnauthRoleArn": "arn:aws:iam::340673541632:role/amplify-hopefuel-eliza-bc7e4-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::340673541632:role/amplify-hopefuel-eliza-bc7e4-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-hopefuel-eliza-bc7e4-deployment",
+      "UnauthRoleName": "amplify-hopefuel-eliza-bc7e4-unauthRole",
+      "StackName": "amplify-hopefuel-eliza-bc7e4",
+      "StackId": "arn:aws:cloudformation:us-east-1:340673541632:stack/amplify-hopefuel-eliza-bc7e4/cee45410-44f2-11f0-9e17-126fc2b9dba7",
+      "AmplifyAppId": "dxqfmllnvn6xz"
+    }
+  }
+}
