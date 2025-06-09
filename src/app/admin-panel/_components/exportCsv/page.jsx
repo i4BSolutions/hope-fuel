@@ -183,10 +183,10 @@ const ExportCSVPage = () => {
       }
 
       const headers = [
-        "Card ID",
-        "User Country",
         "Name",
         "Email",
+        "User Country",
+        "Card ID",
         "Amount",
         "Currency",
         "Month",
@@ -200,10 +200,10 @@ const ExportCSVPage = () => {
 
       allTransactions.forEach((transaction) => {
         const row = [
-          transaction.CardID || "",
-          transaction.UserCountry || "",
           transaction.Name || "",
           transaction.Email || "",
+          transaction.UserCountry || "",
+          transaction.CardID || "",
           transaction.Amount || "",
           transaction.CurrencyCode || "",
           transaction.Month + " " + "Month" || "",
