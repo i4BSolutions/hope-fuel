@@ -1,33 +1,42 @@
-import { NextResponse } from "next/server";
-import db from "../../utilites/db";
-import calculateExpireDate from "../../utilites/calculateExpireDate";
-import { max } from "date-fns";
 import moment from "moment-timezone";
+import { NextResponse } from "next/server";
+import calculateExpireDate from "../../utilites/calculateExpireDate";
+import db from "../../utilites/db";
+import prisma from "../../utilites/prisma";
+
+const minimumAmounts = [
+  { currencyCode: "USD", amount: 20 },
+  { currencyCode: "MMK", amount: 30000 },
+  { currencyCode: "THB", amount: 300 },
+];
+
 //Insert Into Customer Table
 async function InsertCustomer(
   customerName,
   customerEmail,
   agentId,
   manyChatId,
+  countryId,
   contactLink,
   month
 ) {
   let currentDay = new Date();
   let nextExpireDate = calculateExpireDate(currentDay, month, true);
   const query = `
-    INSERT INTO Customer (Name, Email, AgentID, ManyChatID, ContactLink, ExpireDate ) VALUES (?, ?, ?, ?, ?, ?)
+    INSERT INTO Customer (Name, Email, AgentID, ManyChatID, UserCountry, ContactLink, ExpireDate ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
   const values = [
     customerName,
     customerEmail,
     agentId,
     manyChatId,
+    countryId,
     contactLink,
     nextExpireDate,
   ];
+
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId; // Retrieve the inserted customer ID
   } catch (error) {
     console.error("Error inserting customer:", error);
@@ -44,10 +53,9 @@ async function createNote(note, agentID) {
   const values = [note, new Date(), agentID];
   try {
     const result = await db(query, values);
-    // console.log("Result: ", result);
     return result.insertId;
   } catch (error) {
-    console.error("Error inserting customer:", error);
+    console.error("Error inserting note:", error);
     return NextResponse.json(
       { error: "Failed to insert customer" },
       { status: 500 }
@@ -71,12 +79,11 @@ async function createScreenShot(screenShot, transactionsID) {
   let screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
 
-    const path = String(item.url).substring(0, String(item.url).indexOf("?"));
-    const values = [transactionsID, path];
+    const key = item.key;
+    const values = [transactionsID, key];
 
     try {
       const result = await db(query, values);
-
       return result.insertId;
     } catch (error) {
       console.error("Error inserting screenshot:", error);
@@ -105,6 +112,7 @@ async function InsertTransactionLog(transactionId, agentId) {
     return;
   }
 }
+
 async function InsertFormStatus(transactionId) {
   const query = `INSERT INTO FormStatus (TransactionID, TransactionStatusID) VALUES (?, ?)`;
   const values = [transactionId, 1];
@@ -126,6 +134,113 @@ async function maxHopeFuelID() {
   return result[0]["maxHopeFuelID"];
 }
 
+// get currency by wallet ID
+async function getCurrencyByWalletId(walletId) {
+  console.log("Wallet ID: ", walletId);
+  const query = `
+    SELECT 
+      C.CurrencyId, C.CurrencyCode
+    FROM 
+      Wallet AS W
+    JOIN 
+      Currency AS C 
+    ON
+      W.CurrencyId = C.CurrencyId
+    WHERE
+      W.WalletId = ?;
+  `;
+
+  const values = [walletId];
+
+  try {
+    const result = await db(query, values);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    throw new Error("[DB] Error getting currency by wallet ID");
+  }
+}
+
+// get exchange rate by currency ID
+async function getExchangeRateByCurrencyId(currencyId) {
+  console.log("Currency ID: ", currencyId);
+  const query = `
+    SELECT
+      *
+    FROM
+      ExchangeRates
+    WHERE
+      CurrencyId = ?;
+  `;
+
+  const values = [currencyId];
+
+  try {
+    const result = await db(query, values);
+    return result.length > 0 ? result[0] : null;
+  } catch (error) {
+    throw new Error("[DB] Error getting exchange rate by currency ID");
+  }
+}
+
+function getMinimumAmountByCurrencyCode(currencyCode) {
+  const minimumAmount = minimumAmounts.find(
+    (item) => item.currencyCode === currencyCode
+  );
+
+  return minimumAmount ? minimumAmount.amount : 20;
+}
+
+function convertCurrency(amount, exchangeRate) {
+  return amount / exchangeRate;
+}
+
+async function checkMinimumAmount(amount, month, currencyId, currencyCode) {
+  let minimumAmountData = getMinimumAmountByCurrencyCode(currencyCode);
+
+  const minimumAmountByMonth = minimumAmountData * month;
+
+  console.log("Minimum amount by month: ", minimumAmountByMonth);
+
+  // If currency is NOT MMK, THB, or USD, convert amount to USD before comparison
+  if (
+    currencyCode !== "MMK" &&
+    currencyCode !== "THB" &&
+    currencyCode !== "USD"
+  ) {
+    const exchangeRateData = await getExchangeRateByCurrencyId(currencyId);
+
+    if (!exchangeRateData) {
+      throw new Error("Exchange rate data not found");
+    }
+
+    const convertedAmount = convertCurrency(
+      amount,
+      exchangeRateData.ExchangeRate
+    );
+    return convertedAmount >= minimumAmountByMonth;
+  }
+
+  return amount >= minimumAmountByMonth;
+}
+
+async function InsertSubscription(customerId, month) {
+  const now = new Date();
+  const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endDate = new Date(now.getFullYear(), now.getMonth() + 1 + month, 0);
+  try {
+    const subscription = await prisma.subscription.create({
+      data: {
+        CustomerID: customerId,
+        StartDate: startDate,
+        EndDate: endDate,
+      },
+    });
+    return subscription.SubscriptionID;
+  } catch (error) {
+    console.error("Error inserting subscription:", error);
+  }
+}
+
 export async function POST(req) {
   try {
     if (!req.body) {
@@ -134,8 +249,8 @@ export async function POST(req) {
         { status: 400 }
       );
     }
+
     let json = await req.json();
-    console.log(json);
 
     let {
       customerName,
@@ -143,6 +258,7 @@ export async function POST(req) {
       agentId,
       supportRegionId,
       manyChatId,
+      countryId,
       contactLink,
       amount,
       month,
@@ -150,6 +266,33 @@ export async function POST(req) {
       walletId,
       screenShot,
     } = json;
+
+    // Fetch currency by wallet ID
+    const currency = await getCurrencyByWalletId(walletId);
+
+    if (!currency) {
+      return NextResponse.json(
+        { error: "Currency not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if the amount is above the minimum requirement
+    const isAmountValid = await checkMinimumAmount(
+      amount,
+      month,
+      currency.CurrencyId,
+      currency.CurrencyCode
+    );
+
+    if (!isAmountValid) {
+      return NextResponse.json(
+        {
+          error: `Amount is less than the required minimum ${currency.CurrencyCode} for ${month} month(s).`,
+        },
+        { status: 400 }
+      );
+    }
 
     month = parseInt(month);
 
@@ -175,6 +318,7 @@ export async function POST(req) {
       customerEmail,
       agentId,
       manyChatId,
+      countryId,
       contactLink,
       month
     );
@@ -197,8 +341,8 @@ export async function POST(req) {
      INSERT INTO Transactions   
     (CustomerID, Amount,  SupportRegionID, WalletID, TransactionDate, NoteID, Month,HopeFuelID) 
       VALUES (?, ?, ?, ?,  ? , ?, ?, ?)
-
     `;
+
     const values = [
       customerId,
       amount,
@@ -211,22 +355,20 @@ export async function POST(req) {
     ];
     const result = await db(query, values);
 
+    const subscriptionId = await InsertSubscription(customerId, month);
     const transactionId = result.insertId;
-    //console.log("Transaction ID " + transactionId);
     const formStatusId = await InsertFormStatus(transactionId);
-
     const screenShotIds = await createScreenShot(screenShot, transactionId);
     const logId = await InsertTransactionLog(transactionId, agentId);
-    // console.log("Screenshot ids are: " + screenShotIds)
-    console.log("Transaction Result: ", result);
+
     return NextResponse.json({
       status: "success",
       transactionId,
       screenShotIds,
       formStatusId,
+      subscriptionId,
     });
   } catch (error) {
-    console.log(error);
     return NextResponse.json(
       { error: error.message || "Something went wrong" },
       { status: 500 }

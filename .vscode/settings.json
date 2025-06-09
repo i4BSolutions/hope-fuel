@@ -7,5 +7,12 @@
     "amplify/#current-cloud-backend": true,
     "amplify/backend/amplify-meta.json": true,
     "amplify/backend/awscloudformation": true
-  }
+  },
+  "cSpell.words": [
+    "awsconfig",
+    "customerlist",
+    "HOPEFUEL"
+  ],
+  "git.ignoreLimitWarning": true,
+  "postman.settings.dotenv-detection-notification-visibility": false
 }

@@ -172,4 +172,102 @@ CREATE TABLE FormStatus (
 );
 
 
+CREATE TABLE FormVisibilityStatus (
+    VisibilityStatusId INT AUTO_INCREMENT PRIMARY KEY,
+    AgentId INT NOT NULL,
+    IsFormOpen BOOLEAN NOT NULL,
+    FormTimeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (AgentId) REFERENCES Agent(AgentId) ON DELETE CASCADE
+);
 
+CREATE TABLE CustomerAuditLogs (
+    LogId INT AUTO_INCREMENT PRIMARY KEY,
+    AgentId INT NOT NULL,
+    FieldChanged ENUM('Name', 'Email', 'UserCountry') NOT NULL,
+    OldValue VARCHAR(255),
+    NewValue VARCHAR(255),
+    CustomerId INT NOT NULL,
+    ChangeDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    -- Foreign Key Constraints
+    CONSTRAINT fk_agent FOREIGN KEY (AgentId) REFERENCES Agent(AgentId) ON DELETE CASCADE,
+    CONSTRAINT fk_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
+);
+
+CREATE TABLE ManyChat (
+    ManyChatId INT AUTO_INCREMENT PRIMARY KEY,  
+    ConversationId VARCHAR(255) NOT NULL,       
+    CustomerId INT NOT NULL,                   
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    UpdateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+    
+    -- Define Foreign Key Constraint
+    CONSTRAINT fk_manychat_customer FOREIGN KEY (CustomerId) REFERENCES Customer(CustomerId) ON DELETE CASCADE
+);
+
+CREATE TABLE Platform (
+    PlatformID INT PRIMARY KEY AUTO_INCREMENT,
+    PlatformName VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Insert data into Platform table
+INSERT INTO Platform(PlatformName)
+VALUES ('Facebook'), ('Telegram'), ('Others');
+
+
+CREATE TABLE BaseCountry (
+    BaseCountryID INT PRIMARY KEY AUTO_INCREMENT,
+    BaseCountryName VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE Fundraiser (
+    FundraiserID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserName VARCHAR(255) NOT NULL,
+    FundraiserEmail VARCHAR(255) UNIQUE NOT NULL,
+    FundraiserLogo VARCHAR(255),
+	BaseCountryID INT, -- Fundraiser's base country
+    FundraiserCentralID INT, -- Fundraiser's central id from central database
+    FOREIGN KEY (BaseCountryID) REFERENCES BaseCountry(BaseCountryID) ON DELETE SET NULL
+);
+
+CREATE TABLE Fundraiser_AcceptedCurrencies (
+    FundraiserAcceptedCurrencyID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserID INT,
+    CurrencyID INT,
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE,
+    FOREIGN KEY (CurrencyID) REFERENCES Currency(CurrencyID) ON DELETE CASCADE
+);
+
+CREATE TABLE Fundraiser_ContactLinks (
+    ContactID INT PRIMARY KEY AUTO_INCREMENT,
+    FundraiserID INT,
+    PlatformID INT,
+    ContactURL VARCHAR(255) NOT NULL,
+    FOREIGN KEY (FundraiserID) REFERENCES Fundraiser(FundraiserID) ON DELETE CASCADE,
+    FOREIGN KEY (PlatformID) REFERENCES Platform(PlatformID) ON DELETE CASCADE
+);
+
+-- Create Exchange Rate table
+CREATE TABLE ExchangeRates (
+    ExchangeRateId INT AUTO_INCREMENT PRIMARY KEY,
+    BaseCountryId INT NOT NULL,
+    CurrencyId INT NOT NULL,
+    ExchangeRate DECIMAL(12,5) NOT NULL,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    -- Define Foreign Key Constraint
+    CONSTRAINT fk_currency FOREIGN KEY (CurrencyId) REFERENCES Currency(CurrencyId) ON DELETE CASCADE,
+    CONSTRAINT fk_basecountry FOREIGN KEY (BaseCountryId) REFERENCES BaseCountry(BaseCountryID) ON DELETE CASCADE
+);
+
+-- Create Table for Minimum Amount
+CREATE TABLE MinimumAmount (
+    MinimumAmountId INT AUTO_INCREMENT PRIMARY KEY,
+    CurrencyId INT NOT NULL,
+    Amount DECIMAL(12,2) NOT NULL,
+    CreateAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    UpdatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (CurrencyId) REFERENCES Currency(CurrencyId) ON DELETE CASCADE
+);

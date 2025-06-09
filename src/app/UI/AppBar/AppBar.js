@@ -1,24 +1,24 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Tooltip from "@mui/material/Tooltip";
-import MenuItem from "@mui/material/MenuItem";
+import { AGENT_ROLE, COOKIE_KEY } from "@/lib/constants";
+import { useAgentStore } from "@/stores/agentStore";
 import AdbIcon from "@mui/icons-material/Adb";
+import LogoutIcon from "@mui/icons-material/Logout";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import SignalCellularAltIcon from "@mui/icons-material/SignalCellularAlt";
-import LogoutIcon from "@mui/icons-material/Logout";
-import Divider from "@mui/material/Divider";
-import { useRouter } from "next/navigation";
+import AppBar from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Toolbar from "@mui/material/Toolbar";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
 import { signOut } from "aws-amplify/auth";
-import { useUser } from "../../context/UserContext";
-import { set } from "date-fns";
+import { deleteCookie } from "cookies-next";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 const settings = [
   { icon: <PersonOutlineIcon />, label: "Account" },
@@ -29,30 +29,34 @@ const settings = [
 export default function ResponsiveAppBar() {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const router = useRouter();
-  const { setUser, currentUser } = useUser();
+  const { agent } = useAgentStore();
 
   // Define navigation items
   let navItems = [];
 
-  if (currentUser == undefined) {
+  if (!agent) {
     navItems = [{ label: "Still loading", path: "/createForm" }];
-  } else if (currentUser["UserRole"] === "Admin") {
+  } else if (agent.roleId === AGENT_ROLE.ADMIN) {
     navItems = [
       { label: "အသစ်သွင်းခြင်း", path: "/createForm" },
       { label: "သက်တမ်းတိုးခြင်း", path: "/extendUser" },
-      // { label: "ဖောင်အဖွင့်အပိတ်", path: "/formToggle" },
+      { label: "ဖောင်အဖွင့်အပိတ်", path: "/formopenclose" },
       { label: "ငွေစစ်ဆေးခြင်း", path: "/entryForm" },
       // { label: "ရှာဖွေခြင်း", path: "/search" },
       // { label: "HopeFuelDetail", path: "/details" },
     ];
-  } else if (currentUser["UserRole"] === "Support Agent") {
+  } else if (agent.roleId === AGENT_ROLE.SUPPORT_AGENT) {
     navItems = [
       { label: "အသစ်သွင်းခြင်း", path: "/createForm" },
       { label: "သက်တမ်းတိုးခြင်း", path: "/extendUser" },
+      // { label: "ဖောင်အဖွင့်အပိတ်", path: "/formopenclose" },
+      { label: "HopeFuelID List", path: "/hopefuelidlist" },
+      { label: "Customers List", path: "/customerlist" },
+
       // { label: "ရှာဖွေခြင်း", path: "/search" },
       // { label: "HopeFuelDetail", path: "/details" },
     ];
-  } else if (currentUser["UserRole"] === "Payment Processor") {
+  } else if (agent.roleId === AGENT_ROLE.PAYMENT_PROCESSOR) {
     navItems = [
       { label: "အသစ်သွင်းခြင်း", path: "/createForm" },
       { label: "သက်တမ်းတိုးခြင်း", path: "/extendUser" },
@@ -81,7 +85,7 @@ export default function ResponsiveAppBar() {
         break;
       case "Logout":
         await signOut({ global: true });
-        setUser(null);
+        deleteCookie(COOKIE_KEY);
         router.push("/");
         break;
       default:

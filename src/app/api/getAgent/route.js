@@ -4,6 +4,8 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
+export const dynamic = "force-dynamic";
+
 async function getAgent(awsId) {
   const query = `SELECT 
     Agent.AgentId,

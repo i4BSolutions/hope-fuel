@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
+export const dynamic = "force-dynamic";
+
 async function loadWallet(currencyCode) {
   const query = `
   SELECT Wallet.WalletID, Wallet.WalletName 

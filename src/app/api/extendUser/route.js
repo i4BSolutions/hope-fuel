@@ -1,9 +1,11 @@
 export const dynamic = "force-dynamic"; // defaults to force-static
-import db from "../../utilites/db";
-import calculateExpireDate from "../../utilites/calculateExpireDate";
-import recentExpireDate from "../../utilites/recentExpireDate.js";
-import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import moment from "moment-timezone";
+import { NextResponse } from "next/server";
+import calculateExpireDate from "../../utilites/calculateExpireDate";
+import db from "../../utilites/db";
+import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
+import prisma from "../../utilites/prisma";
+
 async function createScreenShot(screenShot, transactionsID) {
   console.log(transactionsID + "  " + screenShot);
 
@@ -16,7 +18,6 @@ async function createScreenShot(screenShot, transactionsID) {
     try {
       const result = await db(query, values);
       console.log("result " + result);
-      // console.log("Result: ", result);
       return result.insertId;
     } catch (error) {
       console.error("Error inserting ScreenShot:", error);
@@ -24,7 +25,22 @@ async function createScreenShot(screenShot, transactionsID) {
     }
   });
   return screenShotLink;
-  // return screenShotLink;
+}
+
+async function InsertSubscription(customerId, month) {
+  const currentDate = new Date();
+  try {
+    const subscription = await prisma.subscription.create({
+      data: {
+        CustomerID: customerId,
+        StartDate: currentDate,
+        EndDate: calculateExpireDate(currentDate, month, true),
+      },
+    });
+    return subscription.SubscriptionID;
+  } catch (error) {
+    console.error("Error inserting subscription:", error);
+  }
 }
 
 export async function POST(request) {
@@ -88,7 +104,7 @@ export async function POST(request) {
       obj["customerId"],
       obj["supportRegionId"],
       obj["walletId"],
-      parseInt(obj["amount"]),
+      obj["amount"],
       false,
       null,
       obj["noteId"],
@@ -114,11 +130,18 @@ export async function POST(request) {
   }
 
   // //update the expire date
-  const value = [nextExpireDate, obj["customerId"]];
+  const value = [
+    nextExpireDate,
+    obj["manyChatId"],
+    obj["agentId"],
+    obj["customerId"],
+  ];
   console.log("nextExpireDate is ");
   console.log(nextExpireDate);
 
-  const sql = `UPDATE Customer SET ExpireDate = ? WHERE CustomerID = ? LIMIT 1`;
+  const sql = `UPDATE Customer 
+                SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?
+                WHERE CustomerID = ?`;
   try {
     let result = await db(sql, value);
     // console.log("Result: ", result);
@@ -134,13 +157,14 @@ export async function POST(request) {
       ) VALUES (?, ?, ?)`,
       [transactionId, obj["agentId"], transactionDateWithThailandTimeZone]
     );
-    // add the transaction id and agentid in the same one
+
+    await InsertSubscription(obj["customerId"], obj["month"]);
 
     const screenShotIds = await createScreenShot(
       obj["screenShot"],
       transactionId
     );
-    return Response.json(result);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Error inserting customer:", error);
     return NextResponse.json(

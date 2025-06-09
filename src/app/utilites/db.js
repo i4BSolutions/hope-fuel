@@ -15,7 +15,14 @@ const pool = mysql.createPool({
 });
 
 export default async function db(query, params) {
-  const [rows] = await pool.execute(query, params);
-  console.log("Rows form db:", rows); 
-  return rows; // Return only the rows
+  try {
+    const [rows] = await pool.query(query, params);
+    //  console.log("Rows form db:", rows);
+    return rows;
+  } catch (error) {
+    console.error("Error connecting to db", error);
+    throw new Error("Failed to connect to db");
+  } finally {
+    pool.end;
+  }
 }

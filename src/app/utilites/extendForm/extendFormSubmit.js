@@ -1,32 +1,49 @@
 export default async function extendFormSubmit(
-  event,
-  currency,
-  supportRegion,
+  formData,
   files,
   userInfo,
-  setloading,
-  formFillingPerson,
-  setAmountValidate,
-  setmonthValidate,
-  setmanyChatValidate,
-  fileExist,
-  setfileExist,
-  agentID
+  setLoading,
+  agentId,
+  customerId,
+  onSuccess
 ) {
-  event.preventDefault();
-  setAmountValidate(false);
-  setmonthValidate(false);
-  setmanyChatValidate(false);
-  // setloading(true)
-  const data = new FormData(event.currentTarget);
-  const amount = data.get("amount");
-  const month = data.get("month");
-  const manychat = data.get("manyChat");
-  const wallet = JSON.parse(data.get("wallets"));
-  const notes = data.get("notes");
-  const contactLink = data.get("contactLink");
+  const {
+    currency,
+    amount,
+    walletId,
+    month,
+    supportRegion,
+    donorCountry,
+    manyChatId,
+    contactLink,
+    note,
+  } = formData;
+
+  setLoading(true);
+
+  const transactionDate = new Date();
+
+  const payload = {
+    customerName: userInfo.name,
+    customerEmail: userInfo.email,
+    agentId,
+    customerId,
+    supportRegionId: supportRegion,
+    countryId: donorCountry,
+    manyChatId,
+    contactLink,
+    amount,
+    month,
+    note,
+    walletId,
+    transactionDate,
+    screenShot: files.map((f) => ({
+      url: f.url.href,
+    })),
+  };
+
   let cardId = userInfo["prf_no"];
-  console.log(cardId);
+
   //if cardID exist for the extend user
   if (cardId) {
     console.log("Inside cardId ");
@@ -37,50 +54,10 @@ export default async function extendFormSubmit(
   }
 
   const supportRegionID = supportRegion.SupportRegionID;
+
   let expireDate = userInfo["expire_date"];
   if (expireDate) {
     expireDate = new Date(userInfo["expire_date"]);
-  }
-  // console.log("First URL of Image: " + files[0].href)
-
-  let tmp = {
-    amount,
-    month,
-    manychat,
-    wallet,
-    notes,
-    contactLink,
-    supportRegionID,
-    files,
-    agentID,
-    expireDate: expireDate,
-    cardID: cardId,
-  };
-  console.log(tmp);
-
-  // validate month and amount
-  if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
-    console.log("Amount validation failed:", amount);
-    setAmountValidate(true);
-    setloading(false);
-    return;
-  }
-  if (!/^\d+$/g.test(month)) {
-    setmonthValidate(true);
-    setloading(false);
-    return;
-  }
-  if (!/^\d+$/g.test(manychat)) {
-    setmanyChatValidate(true);
-    setloading(false);
-    return;
-  }
-
-  // //check if file exist
-  if (files.length == 0) {
-    setfileExist(false);
-    setloading(false);
-    return;
   }
 
   // check if the user exist in mysql
@@ -106,8 +83,8 @@ export default async function extendFormSubmit(
   if (Object.hasOwn(ans, "Name")) {
     // create a note
     raw = JSON.stringify({
-      note: notes,
-      agentID: agentID,
+      note: note,
+      agentID: agentId,
     });
     requestOptions = {
       method: "POST",
@@ -116,26 +93,13 @@ export default async function extendFormSubmit(
       redirect: "follow",
     };
 
-    let note = await fetch("/api/insertNote/", requestOptions);
-    note = await note.json();
+    let noteResponse = await fetch("/api/insertNote/", requestOptions);
+    noteResponse = await noteResponse.json();
 
     myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    console.log(ans);
-    raw = JSON.stringify({
-      customerId: ans["CustomerId"],
-      supportRegionId: supportRegionID,
-      walletId: wallet,
-      amount: amount,
-      agentId: agentID,
-      noteId: note["id"],
-      transactionDate: new Date(),
-      month: month,
-      screenShot: files.map((url) => {
-        return { url: url.href };
-      }),
-      cardId: cardId,
-    });
+    //console.log(ans);
+    raw = JSON.stringify(payload);
 
     requestOptions = {
       method: "POST",
@@ -144,54 +108,87 @@ export default async function extendFormSubmit(
       redirect: "follow",
     };
 
-    let response = await fetch(`/api/extendUser`, requestOptions);
-    location.reload();
+    try {
+      const response = await fetch("/api/extendUser", requestOptions);
+      console.log(response);
+
+      const data = await response.json();
+
+      if (response.status == 400) {
+        return {
+          success: false,
+          status: 400,
+          errorMsg: data.error,
+        };
+      }
+
+      setLoading(false);
+
+      return {
+        success: true,
+        status: 200,
+      };
+    } catch (error) {
+      console.error("Error submitting payment", error);
+
+      return {
+        success: false,
+        status: 500,
+      };
+    }
   } // treat this as new customer but get the requried user information from airtable
   else {
-    // // get customer information from airtable using name and email
-    // raw = JSON.stringify({
-    //   "name": userInfo.name,
-    //   "email": userInfo.email
-    // })
-    // requestOptions = {
-    //   method: 'POST',
-    //   headers: myHeaders,
-    //   body: raw,
-    //   redirect: 'follow'
-    // };
-
-    // let response = await fetch('/api/checkuser' , requestOptions)
-    // response = response.json()
-
+    // get customer information from airtable using name and email
     // submitpaymentinformation
 
     let raw = JSON.stringify({
       customerName: userInfo.name,
       customerEmail: userInfo.email,
-      agentId: agentID,
+      agentId: agentId,
       supportRegionId: supportRegionID,
-      manyChatId: manychat,
+      manyChatId: manyChatId,
       contactLink: contactLink,
       amount: amount,
       month: month,
-      note: notes,
-      walletId: wallet,
-      screenShot: files.map((url) => {
-        return { url: url.href };
-      }),
+      note: note,
+      walletId: walletId,
+      screenShot: files.map((file) => ({ key: file.key })),
       expireDate: expireDate,
       cardId: cardId,
     });
-    console.log(JSON.parse(raw));
+    //console.log(JSON.parse(raw));
     requestOptions = {
       method: "POST",
       headers: myHeaders,
       body: raw,
       redirect: "follow",
     };
-    let answ = await fetch("/api/submitPaymentolduser/", requestOptions);
-    let { status } = await answ.json();
-    console.log(status);
-    location.reload();
+
+    try {
+      const response = await fetch(
+        "/api/submitPaymentolduser/",
+        requestOptions
+      );
+      const data = await response.json();
+
+      if (data.status == 400) {
+        return {
+          success: false,
+          status: 400,
+          errorMsg: data.error,
+        };
+      }
+
+      setLoading(false);
+
+      onSuccess?.();
+    } catch (error) {
+      console.error("Error submitting payment", error);
+
+      return {
+        success: false,
+        status: 500,
+      };
+    }
   }
 }

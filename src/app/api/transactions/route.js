@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
+export const dynamic = "force-dynamic";
+
 // Function to fetch PaymentCheck data
 async function PaymentCheckQuery(status) {
   const query = `

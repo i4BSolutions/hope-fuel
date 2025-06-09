@@ -1,114 +1,241 @@
 "use client";
 
-import {
-  Box,
-  Button,
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@mui/material";
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { Box, Typography, CircularProgress, Modal } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { AGENT_ROLE } from "../../lib/constants";
+import { useAgentStore } from "../../stores/agentStore";
 import checkUserSubmit from "../utilites/checkUserSubmit";
-import { getCurrentUser } from "aws-amplify/auth";
-import { useUser } from "../context/UserContext";
+import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
+import CustomButton from "../components/Button";
+import CustomInput from "../components/Input";
 
-export default function CheckUser({ onUserCheck, userRole }) {
+// Zod Schema
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+});
+
+export default function CheckUser({ onUserCheck }) {
+  const { agent } = useAgentStore();
+
   const [loading, setLoading] = useState(false);
-  const [hasPermissionThisMonth, sethasPermissionThisMonth] = useState(true);
-  const { currentUser } = useUser();
+  const [isFormOpen, setIsFormOpen] = useState(null);
+  const [hasPermissionThisMonth, setHasPermissionThisMonth] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setLoading(true);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
 
-    const formData = new FormData(event.currentTarget);
-    console.log(currentUser);
-    const userRole = currentUser["UserRole"];
-
-    // const { username, userId, signInDetails } = await getCurrentUser();
-    const name = formData.get("name").trim();
-    const email = formData.get("email").trim();
-
-    const user = await checkUserSubmit(name, email, userRole);
-
-    // // check if the user has permission
-    var myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
-
-    var raw = JSON.stringify({
-      name: name,
-      email: email,
-    });
-
-    var requestOptions = {
-      method: "POST",
-      headers: myHeaders,
-      body: raw,
-      redirect: "follow",
+  useEffect(() => {
+    const fetchFormStatus = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch("/api/formOpenClose");
+        const { data } = await response.json();
+        setIsFormOpen(Boolean(data[0]?.IsFormOpen));
+      } catch (err) {
+        console.error("Error fetching form status:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    // console.log("This is my agent role");
-    // let agentRole = await fetch(`/api/getAgent?awsId=${userId}`);
-    // agentRole = await agentRole.json();
-    // console.log(agentRole);
+    fetchFormStatus();
+  }, []);
 
-    let bool = true;
+  const checkUserPermission = async (name, email) => {
+    const headers = { "Content-Type": "application/json" };
+    const body = JSON.stringify({ name, email });
 
-    // if user is an admin
-    if (userRole !== "Admin") {
-      let response = await fetch(
-        "/api/checkolduserpermission/",
-        requestOptions
-      );
-      bool = await response.json();
+    const response = await fetch("/api/checkolduserpermission/", {
+      method: "POST",
+      headers,
+      body,
+    });
+
+    const result = await response.json();
+    return result;
+  };
+
+  const onSubmit = async ({ name, email }) => {
+    setLoading(true);
+
+    const user = await checkUserSubmit(name.trim(), email.trim());
+
+    let hasPermission = true;
+
+    if (agent.roleId !== AGENT_ROLE.ADMIN) {
+      hasPermission = await checkUserPermission(name, email);
     }
 
-    if (!bool) {
-      sethasPermissionThisMonth(bool);
-      setLoading(bool);
+    setHasPermissionThisMonth(hasPermission);
+
+    if (!hasPermission) {
+      setOpenModal(true);
+      setLoading(false);
       return;
-    } else if (bool && user) {
-      onUserCheck(user, true); // User exists, show ExtendForm
-    } else if (!user) {
-      // if user don't exist
-      onUserCheck({ name, email }, false); // New user, show CreateForm
+    }
+
+    if (user) {
+      setOpenModal(true);
+      onUserCheck(user, true);
+    } else {
+      onUserCheck({ name, email }, false);
     }
 
     setLoading(false);
   };
 
-  return loading ? (
-    <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-      <CircularProgress />
-    </Box>
-  ) : (
-    <>
-      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-        <TextField
-          autoFocus
-          margin="normal"
-          required
-          fullWidth
-          name="name"
-          label="Name"
-          type="text"
-          id="name"
-        />
-        <TextField
-          margin="normal"
-          required
-          fullWidth
-          name="email"
-          label="Email Address"
-          type="email"
-          id="email"
-        />
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3 }}>
-          Check User
-        </Button>
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "50vh",
+        }}
+      >
+        <CircularProgress />
       </Box>
-      {hasPermissionThisMonth == false && (
-        <h1>This user don't have permission this month anymore</h1>
+    );
+  }
+
+  if (!isFormOpen && agent.roleId !== AGENT_ROLE.ADMIN) {
+    return <ServiceUnavailable />;
+  }
+
+  return (
+    <>
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        align="center"
+        sx={{ fontSize: 23, mt: 8 }}
+      >
+        Customer Membership Registration
+      </Typography>
+
+      <Box
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        sx={{ width: 360, mx: "auto", mt: 4 }}
+      >
+        <Box mb={2}>
+          <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
+            Name <span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <CustomInput
+                label="Name"
+                placeholder="Mg Mg"
+                fullWidth={true}
+                type="text"
+                {...field}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+            )}
+          />
+        </Box>
+
+        <Box mb={2}>
+          <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
+            Email <span style={{ color: "red" }}>*</span>
+          </Typography>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <CustomInput
+                label="Email"
+                placeholder="mgmg@gmail.com"
+                type="email"
+                fullWidth={true}
+                {...field}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            )}
+          />
+        </Box>
+
+        <CustomButton width variant="contained" type="submit" text="Check" />
+      </Box>
+
+      {!hasPermissionThisMonth && (
+        <Modal open={openModal} onClose={() => setOpenModal(false)}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: 500,
+              bgcolor: "white",
+              borderRadius: 3,
+              boxShadow: 24,
+              p: 4,
+              textAlign: "center",
+            }}
+          >
+            <Typography sx={{ fontSize: 18, fontWeight: "bold" }}>
+              Customer already existed.
+            </Typography>
+            <Typography sx={{ fontSize: 16, mb: 3, fontWeight: "bold" }}>
+              Do you wish to extend his/her membership instead?
+            </Typography>
+
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+              <CustomButton
+                variant="outlined"
+                onClick={() => setOpenModal(false)}
+                text="Back"
+                icon={<ArrowBackIcon />}
+                sx={{
+                  borderColor: "#b71c1c",
+                  color: "#b71c1c",
+                  borderRadius: "25px",
+                  px: 3,
+                  "&:hover": { backgroundColor: "#fce8e6" },
+                  fontSize: "12px",
+                }}
+              />
+              <CustomButton
+                variant="contained"
+                text="Proceed to Membership Extension"
+                icon={<ArrowForwardIcon />}
+                sx={{
+                  backgroundColor: "#b71c1c",
+                  color: "white",
+                  borderRadius: "25px",
+                  px: 3,
+                  "&:hover": { backgroundColor: "#9a0007" },
+                  fontSize: "12px",
+                }}
+              />
+            </Box>
+          </Box>
+        </Modal>
       )}
     </>
   );

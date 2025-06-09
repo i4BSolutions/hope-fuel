@@ -1,64 +1,69 @@
 import { NextResponse } from "next/server";
-import db from "../../utilites/db";
-import getScreenShotUrl from "../../utilites/getScreenShotUrl";
+import prisma from "../../utilites/prisma";
+
 // Function to fetch paginated data
 async function getPaginatedData(page, selectedWallet) {
-  console.log("Selected Wallet from api: ", selectedWallet);
   const itemsPerPage = 10;
   const offset = (parseInt(page, 10) - 1) * itemsPerPage;
 
-  // Ensure offset and itemsPerPage are integers
-  console.log("Is Offset an integer?", Number.isInteger(offset));
-  console.log("Is ItemsPerPage an integer?", Number.isInteger(itemsPerPage));
+  const now = new Date();
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstDayOfNextMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    1
+  );
 
-  if (isNaN(offset) || isNaN(itemsPerPage)) {
-    console.error("Invalid pagination parameters");
-    throw new Error("Invalid pagination parameters");
+  const baseWhere = {
+    FormStatus: {
+      some: {
+        TransactionStatusID: 1,
+      },
+    },
+    TransactionDate: {
+      gte: firstDayOfMonth,
+      lt: firstDayOfNextMonth,
+    },
+  };
+
+  if (selectedWallet !== "All Wallets") {
+    baseWhere["Wallet"] = {
+      WalletName: selectedWallet,
+    };
   }
 
-  console.log("Fetching paginated data for page:", page);
-  console.log("Offset:", offset, "Items Per Page:", itemsPerPage);
-
-  //get current Month
-  let currentMonth = new Date().getMonth() + 1;
-
-  const query = `
-  SELECT 
-    C.CurrencyCode,
-    Cu.Name AS CustomerName,
-    T.HopeFuelID,
-    JSON_ARRAYAGG(S.ScreenShotLink) AS ScreenShotLinks
-FROM 
-    Transactions T
-JOIN 
-    Customer Cu ON T.CustomerID = Cu.CustomerId
-JOIN 
-    Wallet W ON T.WalletID = W.WalletId
-JOIN 
-
-  FormStatus FS ON FS.TransactionID = T.TransactionID
-JOIN 
-    Currency C ON W.CurrencyId = C.CurrencyId
-LEFT JOIN 
-    ScreenShot S ON S.TransactionID = T.TransactionID
-WHERE 
-    FS.TransactionStatusID = ?
-    AND MONTH(T.TransactionDate) = MONTH(CURDATE())
-    AND YEAR(T.TransactionDate) = YEAR(CURDATE())
-    AND W.WalletName = "${selectedWallet}"
-GROUP BY 
-    T.TransactionID, C.CurrencyCode, Cu.Name, T.HopeFuelID
-ORDER BY 
-    T.TransactionDate DESC
-LIMIT ${offset},${itemsPerPage} ;
-  `;
-
-  console.log("Query:", query);
-
   try {
-    const rows = await db(query, [1]);
-    console.log("Fetched paginated data:", rows);
-    return rows;
+    const [rows, totalCount] = await Promise.all([
+      prisma.Transactions.findMany({
+        where: baseWhere,
+        include: {
+          Customer: { select: { Name: true } },
+          Wallet: { select: { Currency: { select: { CurrencyCode: true } } } },
+          Screenshot: { select: { ScreenShotLink: true } },
+        },
+        orderBy: { TransactionDate: "desc" },
+        skip: offset,
+        take: itemsPerPage,
+      }),
+      prisma.Transactions.count({
+        where: baseWhere,
+      }),
+    ]);
+
+    const formattedRows = rows.map((row) => ({
+      CurrencyCode: row.Wallet?.Currency?.CurrencyCode || null,
+      CustomerName: row.Customer?.Name || null,
+      HopeFuelID: row.HopeFuelID || null,
+      ScreenShotLinks: row.Screenshot?.map((s) => s.ScreenShotLink) || [],
+    }));
+
+    return {
+      items: formattedRows,
+      totalItems: totalCount,
+      itemsPerPage,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / itemsPerPage),
+    };
   } catch (error) {
     console.error("Error fetching paginated data:", error);
     throw new Error("Error fetching paginated data");
@@ -67,33 +72,46 @@ LIMIT ${offset},${itemsPerPage} ;
 
 // Function to search by HopeFuelID
 async function searchByHopeFuelID(HopeFuelID) {
-  console.log("Searching for HopeFuelID from api:", HopeFuelID);
-  const query = `
-    SELECT 
-      C.CurrencyCode,
-      Cu.Name AS CustomerName,
-      T.HopeFuelID,
-      JSON_ARRAYAGG(S.ScreenShotLink) AS ScreenShotLinks
-    FROM 
-      Transactions T
-    JOIN 
-      Customer Cu ON T.CustomerID = Cu.CustomerId
-    JOIN 
-      Wallet W ON T.WalletID = W.WalletId
-    JOIN 
-      Currency C ON W.CurrencyId = C.CurrencyId
-    LEFT JOIN 
-      ScreenShot S ON S.TransactionID = T.TransactionID
-    WHERE 
-      T.HopeFuelID = ?
-      GROUP BY T.TransactionID
-      ;
-  `;
-
   try {
-    const [rows] = await db(query, [HopeFuelID]);
+    const row = await prisma.Transactions.findFirst({
+      where: {
+        HopeFuelID: HopeFuelID,
+      },
+      include: {
+        Customer: {
+          select: {
+            Name: true,
+          },
+        },
+        Wallet: {
+          select: {
+            Currency: {
+              select: {
+                CurrencyCode: true,
+              },
+            },
+          },
+        },
+        Screenshot: {
+          select: {
+            ScreenShotLink: true,
+          },
+        },
+      },
+    });
 
-    return rows ? [rows] : [];
+    if (!row) {
+      return [];
+    }
+
+    const formattedRow = {
+      CurrencyCode: row.Wallet.Currency.CurrencyCode,
+      CustomerName: row.Customer.Name,
+      HopeFuelID: row.HopeFuelID,
+      ScreenShotLinks: row.Screenshot.map((s) => s.ScreenShotLink),
+    };
+
+    return [formattedRow];
   } catch (error) {
     console.error("Error fetching search data:", error);
     throw new Error("Error fetching search data");
@@ -107,22 +125,32 @@ export async function GET(req) {
   const selectedWallet = searchParams.get("wallet") || " ";
 
   try {
-    let data;
     if (HopeFuelID) {
-      console.log(`Searching for HopeFuelID: ${HopeFuelID}`);
-      data = await searchByHopeFuelID(HopeFuelID);
+      const id = parseInt(HopeFuelID, 10);
+      const found = await searchByHopeFuelID(id);
+
+      if (found.length === 0) {
+        return NextResponse.json({
+          items: [],
+          totalItems: 0,
+          itemsPerPage: 10,
+          currentPage: 1,
+          totalPages: 1,
+        });
+      }
+
+      return NextResponse.json({
+        items: found,
+        totalItems: 1,
+        itemsPerPage: 10,
+        currentPage: 1,
+        totalPages: 1,
+      });
     } else {
-      console.log(`Fetching paginated data for page: ${page}`);
-      data = await getPaginatedData(page, selectedWallet);
+      const data = await getPaginatedData(page, selectedWallet);
+      return NextResponse.json(data);
     }
-
-    if (!data || data.length === 0) {
-      return NextResponse.json({ message: "No data found" }, { status: 404 });
-    }
-
-    return NextResponse.json(data);
   } catch (error) {
-    console.error("API Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

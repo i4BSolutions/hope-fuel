@@ -1,16 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Box, Button, Modal, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
 import CheckUser from "./checkUser";
 import CreateForm from "./createForm";
 import ExtendForm from "./extendForm";
 import ExtendOrNot from "./extendOrNot";
-import { UserProvider } from "../context/UserContext";
-import { AgentProvider } from "../context/AgentContext";
-import { Avatar, Typography, Box } from "@mui/material";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
-import { withAuthenticator } from "@aws-amplify/ui-react";
 
 function CreateOrExtendPage() {
   const [userInfo, setUserInfo] = useState(null);
@@ -18,16 +17,22 @@ function CreateOrExtendPage() {
   const [showExtendOrNot, setShowExtendOrNot] = useState(false);
   const [showExtendForm, setShowExtendForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const router = useRouter();
 
   // Fetch the current authenticated user and their role
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
+    setLoading(true);
+
     const fetchUser = async () => {
       const user = await getAuthCurrentUser();
       setCurrentUser(user);
     };
+
     fetchUser();
+    setLoading(false);
   }, []);
 
   const userRole = currentUser?.role || "user";
@@ -49,37 +54,91 @@ function CreateOrExtendPage() {
     }
   };
 
+  const handleExtendDecline = () => {
+    setShowExtendOrNot(false);
+    setShowCreateForm(false);
+    setShowExtendForm(false);
+  };
+
+  if (loading)
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", height: "100vh" }}>
+        <CircularProgress />
+      </Box>
+    );
+
   return (
-    <AgentProvider>
-      <UserProvider user={currentUser}>
+    <>
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        {showExtendOrNot ? (
+          <ExtendOrNot
+            userInfo={userInfo}
+            onConfirm={handleExtendOrNot}
+            onDecline={handleExtendDecline}
+          />
+        ) : !showCreateForm && !showExtendForm ? (
+          <CheckUser onUserCheck={handleUserCheck} userRole={userRole} />
+        ) : showCreateForm ? (
+          <CreateForm
+            userInfo={userInfo}
+            setloading={setLoading}
+            onSuccess={() => setIsSuccessModalOpen(true)}
+          />
+        ) : (
+          <ExtendForm
+            userInfo={userInfo}
+            setLoading={setLoading}
+            onSuccess={() => setIsSuccessModalOpen(true)}
+          />
+        )}
+      </Box>
+
+      <Modal
+        open={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        aria-labelledby="success-modal"
+      >
         <Box
           sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 300,
+            bgcolor: "white",
+            borderRadius: "12px",
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Hope Member Registration Form
+          <LockOutlinedIcon sx={{ fontSize: "50px", color: "green" }} />
+          <Typography
+            sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}
+          >
+            Membership Registration Successful.
           </Typography>
-          {loading ? (
-            <Typography variant="body1">Loading...</Typography>
-          ) : showExtendOrNot ? (
-            <ExtendOrNot userInfo={userInfo} onConfirm={handleExtendOrNot} />
-          ) : !showCreateForm && !showExtendForm ? (
-            <CheckUser onUserCheck={handleUserCheck} userRole={userRole} />
-          ) : showCreateForm ? (
-            <CreateForm userInfo={userInfo} setloading={setLoading} />
-          ) : (
-            <ExtendForm userInfo={userInfo} setloading={setLoading} />
-          )}
+
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => {
+              setIsSuccessModalOpen(false);
+              location.reload();
+            }}
+          >
+            OK
+          </Button>
         </Box>
-      </UserProvider>
-    </AgentProvider>
+      </Modal>
+    </>
   );
 }
 
