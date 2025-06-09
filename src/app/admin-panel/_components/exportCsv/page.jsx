@@ -233,8 +233,12 @@ const ExportCSVPage = () => {
       link.click();
 
       // Upload the CSV file to the s3 bucket
-      const uploadedUrl = await csvHandler(blob, allTransactions);
-      console.log("Uploaded URL:", uploadedUrl);
+      const fileName = `ConfirmedPayment_Export_${startDate}_to_${endDate}.csv`;
+      const file = new File([csvContent], fileName, {
+        type: "text/csv;charset=utf-8;",
+      });
+      const { key } = await csvHandler(file);
+      console.log("Uploaded Key:", key);
       document.body.removeChild(link);
 
       setTimeout(() => {
@@ -245,7 +249,7 @@ const ExportCSVPage = () => {
       const requestBody = {
         AgentId: agent.id,
         CSVExportTransactionDateTime: new Date(),
-        CSVExportTransactionFileName: uploadedUrl,
+        CSVExportTransactionFileName: key,
         StartDate: startDate,
         EndDate: endDate,
         TransactionIDs: allTransactions.map(
