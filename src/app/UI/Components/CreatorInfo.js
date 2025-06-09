@@ -16,7 +16,7 @@ const CreatorInfo = ({ creator }) => {
           Created by
         </Typography>
         <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
-          {creator.Name}
+          {creator.AgentName}
         </Typography>
       </Stack>
       <Stack direction={"column"} spacing={1}>

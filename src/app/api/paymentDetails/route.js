@@ -30,6 +30,7 @@ export async function GET(request) {
               select: {
                 AwsId: true,
                 AgentId: true,
+                Username: true,
               },
             },
           },
@@ -102,6 +103,7 @@ export async function GET(request) {
       ExpireDate: transaction.Customer?.ExpireDate,
       CardID: transaction.Customer?.CardID,
       AwsId: transaction.Customer?.Agent?.AwsId,
+      AgentName: transaction.Customer?.Agent?.Username,
       PrimaryAwsId: transaction.Customer?.Agent?.AgentId,
       LoggedAwsIds:
         transaction.TransactionAgent?.map((agent) => agent.Agent?.AwsId) || [],
