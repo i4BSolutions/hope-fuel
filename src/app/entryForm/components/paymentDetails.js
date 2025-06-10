@@ -7,6 +7,8 @@ import {
   Button,
   Card,
   FormControl,
+  styled,
+  Tooltip,
   ImageList,
   ImageListItem,
   Modal,
@@ -24,6 +26,37 @@ import CreatorInfo from "../../UI/Components/CreatorInfo";
 import HopeFuelIdStatus from "../../UI/Components/HopeIdStatus";
 import SupportRegion from "../../UI/Components/SupportRegion";
 import UserInfo from "../../UI/Components/UserInfo";
+import ImageCarousel from "./ImageCarousel";
+
+const ScrollableImageContainer = styled(Box)({
+  width: "40%",
+  display: "flex",
+  overflowX: "auto",
+  gap: "24px",
+  padding: "4px",
+  "&::-webkit-scrollbar": {
+    height: "6px",
+  },
+  "&::-webkit-scrollbar-track": {
+    background: "#f1f1f1",
+    borderRadius: "3px",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    background: "#888",
+    borderRadius: "3px",
+  },
+  "&::-webkit-scrollbar-thumb:hover": {
+    background: "#555",
+  },
+});
+
+const ImageItem = styled("img")({
+  width: "60%",
+  height: "620px",
+  objectFit: "cover",
+  borderRadius: "8px",
+  flexShrink: 0,
+});
 
 export default function PaymentDetails({
   data,
@@ -36,6 +69,8 @@ export default function PaymentDetails({
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const { agent } = useAgentStore();
   const [screenShots, setScreenShots] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     if (data.ScreenShotLinks && data.ScreenShotLinks.length > 0) {
@@ -82,33 +117,54 @@ export default function PaymentDetails({
           <HopeFuelIdStatus data={data} />
           <Stack direction="row" spacing={4}>
             {data.ScreenShotLinks && data.ScreenShotLinks.length > 0 ? (
-              <ImageList
-                sx={{ width: "40%", height: 620, borderRadius: "12px" }}
-                rowHeight={620}
-                cols={1}
-              >
-                {screenShots.map((link, index) => (
-                  <ImageListItem
-                    key={index}
-                    sx={{
-                      width: "100%",
-                      borderRadius: "12px",
-                      boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
-                      objectFit: "contain",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => window.open(link, "_blank")}
-                  >
-                    <img
-                      src={link}
-                      style={{ borderRadius: "12px" }}
-                      alt={`Screenshot ${index + 1}`}
+              <Tooltip title="Hold Shift and scroll" arrow>
+                <ScrollableImageContainer>
+                  {screenShots.map((image, index) => (
+                    <ImageItem
+                      onClick={() => {
+                        setShowImageModal((prev) => !prev);
+                        setActiveImage(index);
+                      }}
+                      key={index}
+                      src={image}
                       loading="lazy"
+                      sx={{
+                        "&:hover": {
+                          transform: "scale(1.02)",
+                          cursor: "pointer",
+                        },
+                      }}
                     />
-                  </ImageListItem>
-                ))}
-              </ImageList>
+                  ))}
+                </ScrollableImageContainer>
+              </Tooltip>
             ) : (
+              // <ImageList
+              //   sx={{ width: "40%", height: 620, borderRadius: "12px" }}
+              //   rowHeight={620}
+              //   cols={1}
+              // >
+              //   {screenShots.map((link, index) => (
+              //     <ImageListItem
+              //       key={index}
+              //       sx={{
+              //         width: "100%",
+              //         borderRadius: "12px",
+              //         boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
+              //         objectFit: "contain",
+              //         cursor: "pointer",
+              //       }}
+              //       onClick={() => window.open(link, "_blank")}
+              //     >
+              //       <img
+              //         src={link}
+              //         style={{ borderRadius: "12px" }}
+              //         alt={`Screenshot ${index + 1}`}
+              //         loading="lazy"
+              //       />
+              //     </ImageListItem>
+              //   ))}
+              // </ImageList>
               <Typography>No screenshots available</Typography>
             )}
             <Stack spacing={2} sx={{ flex: 1 }}>
@@ -188,6 +244,15 @@ export default function PaymentDetails({
         </FormControl>
         <CardsIssuedList data={data} />
       </Box>
+
+      <ImageCarousel
+        open={showImageModal}
+        onClose={() => setShowImageModal((prev) => !prev)}
+        screenshots={screenShots}
+        activeImage={activeImage}
+        activeImageHandler={setActiveImage}
+      />
+
       <Modal
         open={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
