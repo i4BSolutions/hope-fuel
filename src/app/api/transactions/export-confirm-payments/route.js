@@ -56,7 +56,15 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
   }
 
   const transactions = await prisma.Transactions.findMany({
-    where,
+    where: {
+      FormStatus: {
+        some: {
+          TransactionStatus: {
+            TransactionStatusID: 2,
+          },
+        },
+      },
+    },
     orderBy: {
       HopeFuelID: "desc",
     },
@@ -89,6 +97,7 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
       },
     },
   });
+  console.log("transactions", JSON.stringify(transactions, null, 2));
 
   return transactions.map((t) => ({
     HopeFuelID: t.HopeFuelID,
@@ -127,12 +136,14 @@ export async function GET(req) {
     endDate = moment(endDateParam).isValid() ? endDateParam : null;
   }
   const transactionStatus = params.get("transactionStatus") || null;
+  console.log(transactionStatus);
   try {
     const result = await retrieveHopeFuelList(
       startDate,
       endDate,
       transactionStatus
     );
+    console.log("Result:", JSON.stringify(result, null, 2));
     return NextResponse.json({
       status: 200,
       message: "Hopefuel list retrieve successfully.",
