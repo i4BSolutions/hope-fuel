@@ -37,6 +37,7 @@ const ExtendUserForm = () => {
   const handleOtpComplete = async (value) => {
     setCheckInputComplete(true);
     setIsChecking(true);
+    
     await checkPrfSubmit(
       value,
       setUserExist,
