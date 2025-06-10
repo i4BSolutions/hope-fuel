@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 
 const ExtendOrNot = ({ userInfo, onConfirm, onDecline }) => {
-  console.log("userInfo from ExtendOrNot: ", userInfo);
   return (
     <>
       <Typography
@@ -59,7 +58,9 @@ const ExtendOrNot = ({ userInfo, onConfirm, onDecline }) => {
                 <TableCell>{userInfo.name}</TableCell>
                 <TableCell>{userInfo.email || "N/A"}</TableCell>
                 <TableCell>{userInfo.prf_no || "N/A"}</TableCell>
-                <TableCell>{userInfo.expire_date || "N/A"}</TableCell>
+                <TableCell>
+                  {new Date(userInfo.expire_date).toLocaleDateString() || "N/A"}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -10,8 +10,8 @@ export default async function checkPrfSubmit(
   setHasPermissonThisMonth,
   userRole
 ) {
-  console.log(prfno);
   setisChecking(true);
+
   // Get the prfNo id (Or customer id)
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
@@ -83,9 +83,8 @@ export default async function checkPrfSubmit(
       setisChecking(false);
       setHasPermissonThisMonth(res1);
       setuserExist(true);
-      console.log("user role from checjprf: ", userRole);
 
-      if (userRole == "Admin") {
+      if (userRole == 2) {
         setUserInfo({
           name: res["Name"],
           email: res["Email"],
@@ -99,14 +98,14 @@ export default async function checkPrfSubmit(
 
     // if user has permission
     setHasPermissonThisMonth(true);
-    console.log(res);
+
     setUserInfo({
       name: res["Name"],
       email: res["Email"],
       prf_no: res["CardID"],
       expire_date: res["ExpireDate"],
     });
-    console.log("user info, res", res["Name"]);
+
     setuserExist(true);
     setisChecking(false);
   } else {
@@ -125,7 +124,7 @@ export default async function checkPrfSubmit(
 
     let response1 = await fetch("api/checkPermission", requestOptions);
     let bool = await response1.json();
-    console.log("bool from checkpermission: ", bool);
+
     if (!bool) {
       setisChecking(false);
       setHasPermissonThisMonth(bool);
@@ -138,7 +137,7 @@ export default async function checkPrfSubmit(
           expire_date: json.expire_date,
         });
       }
-      console.log("result = ", bool);
+
       return;
     }
     setHasPermissonThisMonth(true);
