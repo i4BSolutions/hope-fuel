@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import WalletSelect from "../../UI/Components/GroupWallet";
 import SearchBar from "../../UI/Components/SearchBar";
 import ItemList from "./ItemList";
+import { useAgentStore } from "../../../stores/agentStore";
 
 export default function SearchBarForm({ onItemClick }) {
   const [items, setItems] = useState([]);
@@ -18,6 +19,8 @@ export default function SearchBarForm({ onItemClick }) {
   const [hasMore, setHasMore] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
 
+  const { agent } = useAgentStore();
+
   const fetchItems = async (query, selectedWallet, currentPage) => {
     setLoading(true);
     setError(null);
@@ -27,6 +30,7 @@ export default function SearchBarForm({ onItemClick }) {
         ...(query && { HopeFuelID: query }),
         ...(selectedWallet && { wallet: selectedWallet }),
         page: currentPage,
+        agentId: agent.id,
       });
 
       const response = await fetch(`/api/searchDB?${queryParams}`);
