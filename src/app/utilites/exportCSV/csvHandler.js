@@ -1,5 +1,6 @@
-import { fetchAuthSession } from "aws-amplify/auth";
+import { fetchAuthSession } from "@aws-amplify/core";
 import { uploadData } from "aws-amplify/storage";
+import { v4 as uuidv4 } from "uuid";
 
 export default async function csvHandler(file) {
   try {
@@ -7,7 +8,7 @@ export default async function csvHandler(file) {
     const identityId = session.identityId;
 
     const result = await uploadData({
-      key: `${identityId}/${file.name}`,
+      key: `${identityId}_${uuidv4()}%${file.name}`,
       data: file,
       options: {
         accessLevel: "protected",

@@ -16,19 +16,20 @@ import { getUrl } from "aws-amplify/storage";
 const TransactionsHistoryList = ({ transactionHistoryLists }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  console.log(transactionHistoryLists);
 
   const getPrettyFileName = (rawKey) => {
-    const fileName = rawKey.split("/").pop(); // remove path prefix
-    return fileName.replace(/_/g, " ").replace(/(\d{2})-(\d{2})/g, "$1:$2");
+    const fileName = rawKey.split("%")[1];
+    return fileName;
   };
 
   const handleDownload = async (key) => {
     try {
+      const identityId = key.split("_")[0];
       const { url } = await getUrl({
         key,
         options: {
           accessLevel: "protected",
+          targetIdentityId: identityId,
         },
       });
 
