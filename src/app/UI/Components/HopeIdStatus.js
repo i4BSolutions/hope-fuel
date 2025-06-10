@@ -13,16 +13,18 @@ export default function HopeFuelIdStatus({ data }) {
     const date = new Date(dateString);
 
     const options = {
-      month: "long", // Full month name
-      day: "numeric", // Day of the month
-      year: "numeric", // Full year
-      hour: "2-digit", // Hour in 24-hour format
-      minute: "2-digit", // Minute
-      hour12: false, // Use 24-hour format
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "UTC",
     };
 
-    return new Intl.DateTimeFormat("en-US", options).format(date);
+    return new Intl.DateTimeFormat("en-TH", options).format(date);
   }
+
   return (
     <div>
       <Stack
