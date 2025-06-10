@@ -1,6 +1,7 @@
 import { Box, MenuItem, Select, Typography } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAgentStore } from "../../../stores/agentStore";
 
 const WalletSelect = ({ onWalletSelected }) => {
   const [currentWallet, setCurrentWallet] = useState("");
@@ -8,6 +9,8 @@ const WalletSelect = ({ onWalletSelected }) => {
 
   const searchParams = useSearchParams();
   const walletId = searchParams.get("walletId");
+
+  const { agent } = useAgentStore();
 
   const handleChange = (event) => {
     const wallet = event.target.value;
@@ -18,7 +21,9 @@ const WalletSelect = ({ onWalletSelected }) => {
   useEffect(() => {
     const fetchAllWallets = async () => {
       try {
-        const response = await fetch(`/api/loadWalletByCurrency`);
+        const response = await fetch(
+          `/api/v1/wallets/assigned-wallets/get-by-agent-id?agentId=${agent.id}`
+        );
         const result = await response.json();
 
         setWallets(result);

@@ -97,10 +97,13 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
   return (
     <Box
       sx={{
-        padding: 2,
+        width: "100%",
         maxWidth: 600,
+        maxHeight: "90vh",
         bgcolor: "white",
         borderRadius: 3,
+        overflowY: "auto",
+        p: 3,
       }}
     >
       <Box component="form" onSubmit={handleSubmit(onSubmit)}>
