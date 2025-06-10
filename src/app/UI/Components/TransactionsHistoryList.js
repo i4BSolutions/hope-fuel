@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Box,
   Button,
@@ -12,24 +11,58 @@ import {
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DownloadIcon from "@mui/icons-material/Download";
 import moment from "moment-timezone";
+import { getUrl } from "aws-amplify/storage";
 
 const TransactionsHistoryList = ({ transactionHistoryLists }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const handleDownload = (filename) => {
-    console.log(`Downloading ${filename}`);
-    const link = document.createElement("a");
-    link.href = filename;
-    link.download = filename.split("/").pop();
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const getPrettyFileName = (rawKey) => {
+    const fileName = rawKey.split("%")[1];
+    return fileName;
+  };
+
+  const handleDownload = async (key) => {
+    try {
+      const identityId = key.split("_")[0];
+      const { url } = await getUrl({
+        key,
+        options: {
+          accessLevel: "protected",
+          targetIdentityId: identityId,
+        },
+      });
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = key.split("/").pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error generating download URL", error);
+    }
   };
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ overflow: "hidden", borderRadius: 2 }}>
+      <Paper
+        elevation={0}
+        sx={{
+          overflow: "hidden",
+          borderRadius: 2,
+          maxHeight: 600,
+          overflowY: "auto",
+          scrollbarWidth: "thin",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#cbd5e1",
+            borderRadius: "4px",
+          },
+        }}
+      >
         {transactionHistoryLists.map((history, index) => (
           <Box key={history.CSVExportTransactionLogsId}>
             <Box
@@ -57,7 +90,7 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                   )}
                 </Typography>
                 <Typography variant="body1" fontWeight="medium">
-                  {history.CSVExportTransactionFileName.split("/").pop()}
+                  {getPrettyFileName(history.CSVExportTransactionFileName)}
                 </Typography>
               </Box>
 
@@ -67,7 +100,6 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
                   alignItems: "center",
                   gap: 1,
                   color: "text.secondary",
-                  minWidth: isMobile ? "auto" : "180px",
                 }}
               >
                 <CalendarMonthIcon size={16} />
@@ -80,12 +112,7 @@ const TransactionsHistoryList = ({ transactionHistoryLists }) => {
               <Button
                 variant="outlined"
                 color="error"
-                startIcon={<DownloadIcon size={16} />}
-                sx={{
-                  borderRadius: "full",
-                  textTransform: "none",
-                  px: 3,
-                }}
+                startIcon={<DownloadIcon />}
                 onClick={() =>
                   handleDownload(history.CSVExportTransactionFileName)
                 }

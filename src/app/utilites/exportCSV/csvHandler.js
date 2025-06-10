@@ -1,25 +1,26 @@
-import { uploadData, getUrl } from "aws-amplify/storage";
+import { fetchAuthSession } from "@aws-amplify/core";
+import { uploadData } from "aws-amplify/storage";
+import { v4 as uuidv4 } from "uuid";
 
-export default async function csvHandler(file, allTransactions) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const fileName = `ConfirmedPayment_Export_${timestamp}.csv`;
-
+export default async function csvHandler(file) {
   try {
+    const session = await fetchAuthSession();
+    const identityId = session.identityId;
+
     const result = await uploadData({
-      key: fileName,
+      key: `${identityId}_${uuidv4()}%${file.name}`,
       data: file,
       options: {
+        accessLevel: "protected",
         contentType: "text/csv",
         contentDisposition: "attachment",
       },
     }).result;
 
-    const bucketBaseUrl =
-      "https://hopefuel41d36-dev.s3.us-east-1.amazonaws.com";
-    const publicUrl = `${bucketBaseUrl}/public/${result.key}`;
-
-    console.log("Public File URL:", publicUrl);
-    return publicUrl;
+    return {
+      key: result.key,
+      name: file.name,
+    };
   } catch (error) {
     console.error("Upload error: ", error);
     throw new Error("Error uploading CSV file");

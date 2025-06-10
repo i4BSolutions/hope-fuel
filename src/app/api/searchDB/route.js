@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "../../utilites/prisma";
 
 // Function to fetch paginated data
-async function getPaginatedData(page, selectedWallet) {
+async function getPaginatedData(page, selectedWallet, agentId) {
   const itemsPerPage = 10;
   const offset = (parseInt(page, 10) - 1) * itemsPerPage;
 
@@ -14,19 +14,52 @@ async function getPaginatedData(page, selectedWallet) {
     1
   );
 
+  // Fetch agent role
+  const agent = await prisma.agent.findUnique({
+    where: { AgentId: agentId },
+    select: { UserRoleId: true },
+  });
+
+  if (!agent) {
+    throw new Error("Agent not found");
+  }
+
+  let walletFilter = {};
+
+  // If agent is not admin, get assigned wallets
+  if (agent.UserRoleId !== 2) {
+    const assignedWallets = await prisma.assignedWallet.findMany({
+      where: { AgentId: agentId },
+      select: { WalletId: true },
+    });
+
+    const assignedWalletIds = assignedWallets.map((w) => w.WalletId);
+
+    if (assignedWalletIds.length === 0) {
+      return {
+        items: [],
+        totalItems: 0,
+        itemsPerPage,
+        currentPage: page,
+        totalPages: 1,
+      };
+    }
+
+    walletFilter = { WalletID: { in: assignedWalletIds } };
+  }
+
   const baseWhere = {
     FormStatus: {
-      some: {
-        TransactionStatusID: 1,
-      },
+      some: { TransactionStatusID: 1 },
     },
     TransactionDate: {
       gte: firstDayOfMonth,
       lt: firstDayOfNextMonth,
     },
+    ...walletFilter,
   };
 
-  if (selectedWallet !== "All Wallets") {
+  if (selectedWallet && selectedWallet !== "All Wallets") {
     baseWhere["Wallet"] = {
       WalletName: selectedWallet,
     };
@@ -45,9 +78,7 @@ async function getPaginatedData(page, selectedWallet) {
         skip: offset,
         take: itemsPerPage,
       }),
-      prisma.Transactions.count({
-        where: baseWhere,
-      }),
+      prisma.Transactions.count({ where: baseWhere }),
     ]);
 
     const formattedRows = rows.map((row) => ({
@@ -70,45 +101,50 @@ async function getPaginatedData(page, selectedWallet) {
   }
 }
 
-// Function to search by HopeFuelID
-async function searchByHopeFuelID(HopeFuelID) {
+// Function to search by HopeFuelID, limited to assigned wallets
+async function searchByHopeFuelID(HopeFuelID, agentId) {
   try {
+    // Fetch agent role
+    const agent = await prisma.agent.findUnique({
+      where: { AgentId: agentId },
+      select: { UserRoleId: true },
+    });
+
+    if (!agent) throw new Error("Agent not found");
+
+    let walletFilter = {};
+
+    // If not admin, restrict to assigned wallets
+    if (agent.UserRoleId !== 2) {
+      const assignedWallets = await prisma.assignedWallet.findMany({
+        where: { AgentId: agentId },
+        select: { WalletId: true },
+      });
+      const assignedWalletIds = assignedWallets.map((w) => w.WalletId);
+      if (assignedWalletIds.length === 0) return [];
+
+      walletFilter = { WalletID: { in: assignedWalletIds } };
+    }
+
     const row = await prisma.Transactions.findFirst({
       where: {
         HopeFuelID: HopeFuelID,
+        ...walletFilter,
       },
       include: {
-        Customer: {
-          select: {
-            Name: true,
-          },
-        },
-        Wallet: {
-          select: {
-            Currency: {
-              select: {
-                CurrencyCode: true,
-              },
-            },
-          },
-        },
-        Screenshot: {
-          select: {
-            ScreenShotLink: true,
-          },
-        },
+        Customer: { select: { Name: true } },
+        Wallet: { select: { Currency: { select: { CurrencyCode: true } } } },
+        Screenshot: { select: { ScreenShotLink: true } },
       },
     });
 
-    if (!row) {
-      return [];
-    }
+    if (!row) return [];
 
     const formattedRow = {
-      CurrencyCode: row.Wallet.Currency.CurrencyCode,
-      CustomerName: row.Customer.Name,
-      HopeFuelID: row.HopeFuelID,
-      ScreenShotLinks: row.Screenshot.map((s) => s.ScreenShotLink),
+      CurrencyCode: row.Wallet?.Currency?.CurrencyCode || null,
+      CustomerName: row.Customer?.Name || null,
+      HopeFuelID: row.HopeFuelID || null,
+      ScreenShotLinks: row.Screenshot?.map((s) => s.ScreenShotLink) || [],
     };
 
     return [formattedRow];
@@ -123,11 +159,12 @@ export async function GET(req) {
   const HopeFuelID = searchParams.get("HopeFuelID");
   const page = parseInt(searchParams.get("page"), 10) || 1;
   const selectedWallet = searchParams.get("wallet") || " ";
+  const agentId = parseInt(searchParams.get("agentId"), 10);
 
   try {
     if (HopeFuelID) {
       const id = parseInt(HopeFuelID, 10);
-      const found = await searchByHopeFuelID(id);
+      const found = await searchByHopeFuelID(id, agentId);
 
       if (found.length === 0) {
         return NextResponse.json({
@@ -147,7 +184,7 @@ export async function GET(req) {
         totalPages: 1,
       });
     } else {
-      const data = await getPaginatedData(page, selectedWallet);
+      const data = await getPaginatedData(page, selectedWallet, agentId);
       return NextResponse.json(data);
     }
   } catch (error) {
