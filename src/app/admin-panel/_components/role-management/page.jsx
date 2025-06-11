@@ -38,7 +38,7 @@ const RoleManagementPage = () => {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/agent/agents");
+      const res = await fetch("/api/agent/get-all");
 
       if (!res.ok) {
         throw new Error("Failed to fetch agents");
