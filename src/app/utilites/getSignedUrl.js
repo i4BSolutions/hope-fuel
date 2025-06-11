@@ -2,6 +2,13 @@ import { getUrl } from "@aws-amplify/storage";
 
 export default async function getSignedUrl(key) {
   try {
+    if (key.startsWith("https")) {
+      const fileName = key.split("/");
+      const { url, expiresAt } = await getUrl({
+        key: fileName[fileName.length - 1],
+      });
+      return url.href;
+    }
     const identityId = key.split("_")[0];
     const { url, expiresAt } = await getUrl({
       key,
