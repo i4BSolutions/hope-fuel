@@ -143,6 +143,7 @@ export async function GET(request) {
         AgentId: {
           notIn: assignedAgentIds,
         },
+        UserRoleId: 1, // only include support agents
       },
       select: {
         AgentId: true,
