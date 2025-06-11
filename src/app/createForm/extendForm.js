@@ -143,6 +143,8 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
 
   const onSubmit = async (formData) => {
     setHasSubmitted(true);
+    if (!files.length) return;
+    setLoading(true);
     try {
       await extendFormSubmit(
         formData,

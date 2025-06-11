@@ -38,7 +38,7 @@ export default async function extendFormSubmit(
     walletId,
     transactionDate,
     screenShot: files.map((f) => ({
-      url: f.url.href,
+      key: f.key,
     })),
   };
 
@@ -123,7 +123,7 @@ export default async function extendFormSubmit(
       }
 
       setLoading(false);
-
+      onSuccess?.();
       return {
         success: true,
         status: 200,
