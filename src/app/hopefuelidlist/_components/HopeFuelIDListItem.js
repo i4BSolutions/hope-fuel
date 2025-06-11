@@ -1,6 +1,6 @@
+import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
 import moment from "moment-timezone";
-import stringTruncator from "../../../lib/stringTruncator";
 import CopyableText from "../../UI/Components/CopyableText";
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
@@ -176,11 +176,8 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   ManyChat ID
                 </Typography>
                 <CopyableText
-                  text={
-                    item.ManyChatId
-                      ? stringTruncator(item.ManyChatId, 6)
-                      : "N/A"
-                  }
+                  text={item.ManyChatId ? item.ManyChatId : "N/A"}
+                  truncatorLimit={6}
                   fontSize="14px"
                   fontWeight={500}
                 />
