@@ -5,7 +5,7 @@
 
 */
 -- DropIndex
--- DROP INDEX `Customer_Email_key` ON `Customer`;
+DROP INDEX `Customer_Email_key` ON `Customer`;
 
 -- AlterTable
 ALTER TABLE `Agent` ADD COLUMN `Username` VARCHAR(191) NULL;
