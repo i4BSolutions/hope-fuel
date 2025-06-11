@@ -16,7 +16,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const RoleManagementPage = () => {
   const [agents, setAgents] = useState([]);
@@ -131,7 +131,7 @@ const RoleManagementPage = () => {
 
   return (
     <Box display="flex" flexDirection="column" flex={1}>
-      <Typography variant="h6" fontWeight="bold" mb={2}>
+      <Typography variant="h6" fontWeight="bold" my={2}>
         Role Management
       </Typography>
       <Paper
