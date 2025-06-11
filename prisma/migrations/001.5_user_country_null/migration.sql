@@ -1,0 +1,1 @@
+ALTER TABLE `Customer` MODIFY COLUMN `UserCountry` INT NULL;
