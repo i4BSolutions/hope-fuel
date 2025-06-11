@@ -38,7 +38,7 @@ const RoleManagementPage = () => {
   const fetchAgents = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/agent/agents");
+      const res = await fetch("/api/agent/get-all");
 
       if (!res.ok) {
         throw new Error("Failed to fetch agents");
@@ -131,7 +131,7 @@ const RoleManagementPage = () => {
 
   return (
     <Box display="flex" flexDirection="column" flex={1}>
-      <Typography variant="h6" fontWeight="bold" mb={2}>
+      <Typography variant="h6" fontWeight="bold" my={2}>
         Role Management
       </Typography>
       <Paper
