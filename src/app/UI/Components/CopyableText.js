@@ -1,3 +1,4 @@
+import stringTruncator from "@/lib/stringTruncator";
 import { Check, ContentCopy } from "@mui/icons-material";
 import {
   Alert,
@@ -7,9 +8,14 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 
-const CopyableText = ({ text, fontSize = "18px", fontWeight = 600 }) => {
+const CopyableText = ({
+  text,
+  fontSize = "18px",
+  fontWeight = 600,
+  truncatorLimit,
+}) => {
   const [copied, setCopied] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
 
@@ -47,7 +53,6 @@ const CopyableText = ({ text, fontSize = "18px", fontWeight = 600 }) => {
       >
         <Typography
           component="span"
-          // variant={variant}
           onClick={handleCopy}
           sx={{
             cursor: "pointer",
@@ -57,7 +62,7 @@ const CopyableText = ({ text, fontSize = "18px", fontWeight = 600 }) => {
             fontWeight: fontWeight,
           }}
         >
-          {text}
+          {stringTruncator(text, truncatorLimit)}
         </Typography>
         <Tooltip title="Copy to clipboard">
           <IconButton
