@@ -1,25 +1,25 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { remove } from "aws-amplify/storage";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
+import CustomInput from "../components/CustomInput";
 import CustomDropzone from "../components/Dropzone";
-import CustomInput from "../components/Input";
 import filehandler from "../utilites/createForm/fileHandler";
 import extendFormSubmit from "../utilites/extendForm/extendFormSubmit";
 import ErrorMessage from "./components/errorMessage";
-import { remove } from "aws-amplify/storage";
-import * as z from "zod";
-import { Controller, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
   currency: z.string().min(1, "Currency is required"),
   amount: z.coerce.number().positive("Amount must be positive"),
   walletId: z.coerce.number().min(1, "Wallet is required"),
   supportRegion: z.coerce.number().min(1, "Support region is required"),
-  donorCountry: z.string().optional(),
+  donorCountry: z.coerce.number().optional(),
   month: z.coerce.number().min(1, "Month must be at least 1"),
   manyChatId: z.string().regex(/^\d+$/, "Numeric ID only"),
   contactLink: z.string().optional(),
@@ -28,7 +28,6 @@ const schema = z.object({
 
 const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const { agent } = useAgentStore();
-
   const [customerId, setCustomerId] = useState(null);
   const [currencies, setCurrencies] = useState([]);
   const [wallets, setWallets] = useState([]);
@@ -40,6 +39,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [donorCountry, setDonorCountry] = useState(null);
 
   const {
     control,
@@ -56,7 +56,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
       walletId: "",
       month: 1,
       supportRegion: "",
-      donorCountry: "",
+      donorCountry: 0,
       manyChatId: "",
       contactLink: "",
       note: "",
@@ -77,6 +77,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
       });
       const ans = await res.json();
       setValue("donorCountry", ans.UserCountryName);
+      setDonorCountry(ans.UserCountry);
       setCustomerId(ans.CustomerId);
     };
     fetchUser();
@@ -384,16 +385,34 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
               <Controller
                 name="donorCountry"
                 control={control}
-                render={({ field }) => (
-                  <CustomInput
-                    disabled
-                    label="Country"
-                    type="text"
-                    {...field}
-                    error={!!errors.donorCountry}
-                    helperText={errors.donorCountry?.message}
-                  />
-                )}
+                render={({ field }) => {
+                  if (donorCountry === null) {
+                    return (
+                      <CustomInput
+                        label="Country"
+                        type="select"
+                        options={baseCountryList.map((c) => ({
+                          label: c.BaseCountryName,
+                          value: c.BaseCountryID,
+                        }))}
+                        {...field}
+                        error={!!errors.donorCountry}
+                        helperText={errors.donorCountry?.message}
+                      />
+                    );
+                  } else {
+                    return (
+                      <CustomInput
+                        disabled
+                        label="Country"
+                        type="text"
+                        {...field}
+                        error={!!errors.donorCountry}
+                        helperText={errors.donorCountry?.message}
+                      />
+                    );
+                  }
+                }}
               />
             </Box>
           </Box>
@@ -500,7 +519,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
               width={true}
               variant="contained"
               type="submit"
-              text="Register"
+              text="Extend"
               fontWeight="normal"
             />
           </Box>

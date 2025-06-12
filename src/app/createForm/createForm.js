@@ -1,17 +1,15 @@
-import { Box, Typography, TextField } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
-import createFormSubmit from "../utilites/createForm/createformSubmit";
-import filehandler from "../utilites/createForm/fileHandler";
+import { Box, TextField, Typography } from "@mui/material";
 import { remove } from "aws-amplify/storage";
-
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 import { useAgentStore } from "../../stores/agentStore";
 import CustomButton from "../components/Button";
+import CustomInput from "../components/CustomInput";
 import CustomDropzone from "../components/Dropzone";
-import CustomInput from "../components/Input";
+import createFormSubmit from "../utilites/createForm/createformSubmit";
+import filehandler from "../utilites/createForm/fileHandler";
 import ErrorMessage from "./components/errorMessage";
 
 const schema = z.object({
@@ -28,7 +26,6 @@ const schema = z.object({
 
 const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const { agent } = useAgentStore();
-
   const [currencies, setCurrencies] = useState([]);
   const [wallets, setWallets] = useState([]);
   const [supportRegions, setSupportRegions] = useState([]);
@@ -38,7 +35,6 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
-
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const {

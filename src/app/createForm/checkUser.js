@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Box, Typography, CircularProgress, Modal } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { Box, CircularProgress, Modal, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 
 import { AGENT_ROLE } from "../../lib/constants";
 import { useAgentStore } from "../../stores/agentStore";
-import checkUserSubmit from "../utilites/checkUserSubmit";
 import ServiceUnavailable from "../UI/Components/ServiceUnavailable";
 import CustomButton from "../components/Button";
-import CustomInput from "../components/Input";
+import CustomInput from "../components/CustomInput";
+import checkUserSubmit from "../utilites/checkUserSubmit";
 
 // Zod Schema
 const schema = z.object({
