@@ -80,9 +80,9 @@ export default function CheckUser({ onUserCheck }) {
 
     let hasPermission = true;
 
-    if (agent.roleId !== AGENT_ROLE.ADMIN) {
-      hasPermission = await checkUserPermission(name, email);
-    }
+    // if (agent.roleId !== AGENT_ROLE.ADMIN) {
+    //   hasPermission = await checkUserPermission(name, email);
+    // }
 
     setHasPermissionThisMonth(hasPermission);
 
