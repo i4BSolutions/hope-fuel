@@ -1,15 +1,16 @@
 "use client";
 
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   CircularProgress,
   Divider,
+  IconButton,
   Paper,
   TextField,
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { useDebounce } from "use-debounce";
 import DetailModal from "../UI/Components/Modal";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import theme from "../UI/theme";
@@ -34,7 +35,6 @@ const HopeFuelIdListPage = () => {
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
-  const [debouncedSearch] = useDebounce(searchText, 100);
 
   useEffect(() => {
     setError(null);
@@ -48,8 +48,8 @@ const HopeFuelIdListPage = () => {
       setError(null);
 
       try {
-        const url = debouncedSearch
-          ? `api/hopeFuelList/search?q=${encodeURIComponent(debouncedSearch)}`
+        const url = searchText
+          ? `api/hopeFuelList/search?q=${encodeURIComponent(searchText)}`
           : `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
 
         const response = await fetch(url);
@@ -77,7 +77,7 @@ const HopeFuelIdListPage = () => {
         setLoading(false);
       }
     },
-    [debouncedSearch, page, hasMore, data]
+    [page, hasMore, data]
   );
 
   const fetchDetails = async (hopeId) => {
@@ -100,7 +100,6 @@ const HopeFuelIdListPage = () => {
   };
 
   const fetchSubscriptionByHopeFuelID = async (hopeId) => {
-    console.log(hopeId);
     setLoadingDetails(true);
     setScreenshotsLists([]);
 
@@ -141,11 +140,11 @@ const HopeFuelIdListPage = () => {
     setOpenScreenshotModal((prev) => !prev);
   };
 
-  useEffect(() => {
+  const onSearchHandler = () => {
     setPage(1);
     setHasMore(true);
     fetchData(true);
-  }, [debouncedSearch]);
+  };
 
   const handleScroll = useCallback(() => {
     if (
@@ -186,6 +185,7 @@ const HopeFuelIdListPage = () => {
         sx={{
           display: "flex",
           justifyContent: "center",
+          alignItems: "center",
           width: "100%",
           maxWidth: 445,
           margin: "0 auto",
@@ -196,6 +196,7 @@ const HopeFuelIdListPage = () => {
         }}
       >
         <TextField
+          sx={{ px: 1 }}
           fullWidth
           variant="standard"
           placeholder="Search..."
@@ -205,6 +206,13 @@ const HopeFuelIdListPage = () => {
             disableUnderline: true,
           }}
         />
+        <IconButton
+          aria-label="search"
+          loading={false}
+          onClick={onSearchHandler}
+        >
+          <SearchIcon />
+        </IconButton>
       </Box>
       <Divider
         sx={{
