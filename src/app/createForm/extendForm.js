@@ -39,7 +39,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [minAmountError, setMinAmountError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [donorCountry, setDonorCountry] = useState(null);
+  const [userCountry, setUserCountry] = useState(null);
 
   const {
     control,
@@ -56,7 +56,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
       walletId: "",
       month: 1,
       supportRegion: "",
-      donorCountry: 0,
+      donorCountry: null,
       manyChatId: "",
       contactLink: "",
       note: "",
@@ -76,8 +76,8 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
         body: JSON.stringify({ name: userInfo.name, email: userInfo.email }),
       });
       const ans = await res.json();
-      setValue("donorCountry", ans.UserCountryName);
-      setDonorCountry(ans.UserCountry);
+      setValue("donorCountry", ans.UserCountry);
+      setUserCountry(ans.UserCountry);
       setCustomerId(ans.CustomerId);
     };
     fetchUser();
@@ -377,43 +377,49 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
             </Box>
 
             <Box flex={1}>
-              {/* Donor Country Selection */}
               <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
                 Donor Country
-                {/* <span style={{ color: "red" }}>*</span> */}
               </Typography>
-              <Controller
-                name="donorCountry"
-                control={control}
-                render={({ field }) => {
-                  if (donorCountry === null) {
-                    return (
-                      <CustomInput
-                        label="Country"
-                        type="select"
-                        options={baseCountryList.map((c) => ({
-                          label: c.BaseCountryName,
-                          value: c.BaseCountryID,
-                        }))}
-                        {...field}
-                        error={!!errors.donorCountry}
-                        helperText={errors.donorCountry?.message}
-                      />
+
+              {userCountry === null ? (
+                <Controller
+                  name="donorCountry"
+                  control={control}
+                  render={({ field }) => (
+                    <CustomInput
+                      label="Country"
+                      type="select"
+                      options={baseCountryList.map((c) => ({
+                        label: c.BaseCountryName,
+                        value: c.BaseCountryID,
+                      }))}
+                      {...field}
+                      error={!!errors.donorCountry}
+                      helperText={errors.donorCountry?.message}
+                    />
+                  )}
+                />
+              ) : (
+                <Controller
+                  name="donorCountry"
+                  control={control}
+                  render={({ field }) => {
+                    const selected = baseCountryList.find(
+                      (c) => c.BaseCountryID === field.value
                     );
-                  } else {
                     return (
                       <CustomInput
                         disabled
                         label="Country"
                         type="text"
-                        {...field}
+                        value={selected?.BaseCountryName || "N/A"}
                         error={!!errors.donorCountry}
                         helperText={errors.donorCountry?.message}
                       />
                     );
-                  }
-                }}
-              />
+                  }}
+                />
+              )}
             </Box>
           </Box>
 

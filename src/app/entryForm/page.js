@@ -94,7 +94,7 @@ export default function EntryForm() {
       <Box
         sx={{
           padding: 2,
-          width: "100%",
+          width: "80%",
         }}
       >
         <PaymentDetails
