@@ -43,8 +43,6 @@ async function InsertSubscription(customerId, month) {
 }
 
 export async function POST(request) {
-  //get customer ID based on the PRF no
-
   const obj = await request.json();
   console.log("Obj from extendUserAPI: ", obj);
 
@@ -133,13 +131,14 @@ export async function POST(request) {
     nextExpireDate,
     obj["manyChatId"],
     obj["agentId"],
+    obj["countryId"],
     obj["customerId"],
   ];
   console.log("nextExpireDate is ");
   console.log(nextExpireDate);
 
   const sql = `UPDATE Customer 
-                SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?
+                SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?, UserCountry = ?
                 WHERE CustomerID = ?`;
   try {
     let result = await db(sql, value);
