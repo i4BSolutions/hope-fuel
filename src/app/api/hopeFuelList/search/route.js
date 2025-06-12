@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import db from "../../../utilites/db";
 
 async function searchHopeFuelList(searchText) {
-
   let params = [];
   let query = `
     
@@ -17,7 +16,7 @@ SELECT
     t.Month,
     GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ', ') AS ScreenShot,
     c.ManyChatId,
-    GROUP_CONCAT(DISTINCT a.AwsId SEPARATOR ', ') AS 'FormFilledPerson',
+    GROUP_CONCAT(DISTINCT a.Username SEPARATOR ',') AS 'FormFilledPerson',
     ts.TransactionStatus,
     n.Note AS Note
 FROM Transactions t
@@ -69,15 +68,16 @@ GROUP BY
 
     `;
 
-
-    params = Array(13).fill(`%${searchText}%`);
-
+  params = Array(13).fill(`%${searchText}%`);
 
   try {
     const result = await db(query, params);
     return result.map((row) => ({
       ...row,
-      ScreenShot: typeof(row.ScreenShot )=== 'string' && row.ScreenShot ? row.ScreenShot.split(", ") : [],
+      ScreenShot:
+        typeof row.ScreenShot === "string" && row.ScreenShot
+          ? row.ScreenShot.split(", ")
+          : [],
     }));
   } catch (error) {
     console.error("Error searching in Hope Fuel List", error);
@@ -99,13 +99,13 @@ export async function GET(req) {
   try {
     const result = await searchHopeFuelList(searchText);
 
-      if (!result || result.length === 0) {
+    if (!result || result.length === 0) {
       return NextResponse.json(
         { error: "No matching records found" },
         { status: 404 }
-        );
+      );
     }
-    
+
     return NextResponse.json({
       status: 200,
       message: "Successfully searched in Hope Fuel List",
