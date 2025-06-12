@@ -74,7 +74,7 @@ async function getPaginatedData(page, selectedWallet, agentId) {
           Wallet: { select: { Currency: { select: { CurrencyCode: true } } } },
           Screenshot: { select: { ScreenShotLink: true } },
         },
-        orderBy: { TransactionDate: "desc" },
+        orderBy: { TransactionDate: "asc" },
         skip: offset,
         take: itemsPerPage,
       }),
