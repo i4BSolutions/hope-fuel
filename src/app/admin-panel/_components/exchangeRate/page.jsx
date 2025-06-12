@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import CustomInput from "../../../components/Input";
+import CustomInput from "../../../components/CustomInput";
 
 export default function ExchangeRates() {
   const [rates, setRates] = useState([]);

@@ -35,9 +35,7 @@ const ExtendUserForm = () => {
   const [loading, setLoading] = useState(false);
 
   const handleOtpComplete = async (value) => {
-    setCheckInputComplete(true);
     setIsChecking(true);
-    
     await checkPrfSubmit(
       value,
       setUserExist,
@@ -47,6 +45,7 @@ const ExtendUserForm = () => {
       agent.roleId
     );
     setIsChecking(false);
+    setCheckInputComplete(true);
   };
 
   const handleDecline = () => {
@@ -75,7 +74,7 @@ const ExtendUserForm = () => {
       />
 
       {!userExist && checkInputComplete && !isChecking && (
-        <>
+        <Box sx={{ mt: 5 }}>
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
             ဒီ user မရှိပါဘူး — <strong>အရင်စာရင်းသွင်းပါ</strong>
@@ -103,7 +102,7 @@ const ExtendUserForm = () => {
               အသစ်သွင်းမယ်
             </Button>
           </Stack>
-        </>
+        </Box>
       )}
 
       {isChecking && (
