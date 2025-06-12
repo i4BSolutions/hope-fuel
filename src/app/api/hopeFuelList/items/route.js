@@ -17,7 +17,7 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       t.Month,
       GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
       c.ManyChatId,
-      GROUP_CONCAT(DISTINCT a.Username SEPARATOR ',') AS 'FormFilledPerson',
+      a.Username AS FormFilledPerson,
       ts.TransactionStatus,
       n.Note AS Note
     FROM Transactions t
@@ -26,8 +26,16 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
     LEFT JOIN Currency curr ON w.CurrencyId = curr.CurrencyId
     LEFT JOIN Note n ON t.NoteID = n.NoteID
     LEFT JOIN ScreenShot ss ON t.TransactionID = ss.TransactionID
-    LEFT JOIN TransactionAgent ta ON t.TransactionID = ta.TransactionID
-    LEFT JOIN Agent a ON ta.AgentID = a.AgentId
+    LEFT JOIN (
+      SELECT ta1.TransactionID, ta1.AgentID
+      FROM TransactionAgent ta1
+      INNER JOIN (
+        SELECT TransactionID, MAX(TransactionAgentID) AS MaxTAID
+        FROM TransactionAgent
+        GROUP BY TransactionID
+      ) latest_ta ON ta1.TransactionID = latest_ta.TransactionID AND ta1.TransactionAgentID = latest_ta.MaxTAID
+    ) latest_ta ON t.TransactionID = latest_ta.TransactionID
+    LEFT JOIN Agent a ON latest_ta.AgentID = a.AgentId
     LEFT JOIN (
       SELECT 
         fs.TransactionID,
