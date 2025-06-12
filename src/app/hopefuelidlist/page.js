@@ -179,20 +179,6 @@ const HopeFuelIdListPage = () => {
     setOpenModal((prev) => !prev);
   };
 
-  if (!loading && data.length === 0) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Typography sx={{ textAlign: "center" }}>No Details Found</Typography>
-      </Box>
-    );
-  }
-
   return (
     <>
       <Box
@@ -227,6 +213,18 @@ const HopeFuelIdListPage = () => {
           borderColor: "#CBD5E1",
         }}
       />
+
+      {!loading && data.length === 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Typography sx={{ textAlign: "center" }}>No Details Found</Typography>
+        </Box>
+      )}
 
       <HopeFuelIDListItem
         data={data}
