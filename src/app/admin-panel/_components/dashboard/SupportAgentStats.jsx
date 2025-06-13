@@ -5,7 +5,7 @@ import { Alert, Box, Skeleton, Snackbar, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import FormFillingAgentRateTable from "./_components/FormFillingAgentRateTable";
 
-export default function SupportAgentStats() {
+export default function SupportAgentStats({ currentMonth }) {
   const [pages, setPages] = useState({});
   const [agentRates, setAgentRates] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -17,9 +17,16 @@ export default function SupportAgentStats() {
       setLoading(true);
       setError(null);
       setSnackbarOpen(false);
+
+      const year = currentMonth.year();
+      const month = currentMonth.month() + 1;
+      console.log(year, month);
       try {
-        const response = await fetch("api/agent/agent-group");
+        const response = await fetch(
+          `api/agent/agent-group?year=${year}&month=${month}`
+        );
         const data = await response.json();
+        console.log(data);
         if (data.status === 200) {
           setAgentRates(
             data.data.result.filter((group) => group.AgentGroupID !== null)
@@ -39,7 +46,7 @@ export default function SupportAgentStats() {
       }
     };
     getAgentRates();
-  }, []);
+  }, [currentMonth]);
 
   const handlePageChange = (index, newPage) => {
     setPages((prev) => ({
