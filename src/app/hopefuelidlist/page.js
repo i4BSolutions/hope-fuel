@@ -37,27 +37,25 @@ const HopeFuelIdListPage = () => {
   const searchRef = useRef("");
 
   useEffect(() => {
-    const fetchData = async (page) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const url = `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
-        const response = await fetch(url);
-        const { data } = await response.json();
-        if (page === 1) {
-          setData(data);
-        } else {
-          setData((prev) => [...prev, ...data]);
+    if (searchRef.current === "") {
+      const fetchData = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const url = `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
+          const response = await fetch(url);
+          const { data } = await response.json();
+          setData((prev) => (page === 1 ? data : [...prev, ...data]));
+          setHasMore(data.length === PAGE_SIZE);
+        } catch (error) {
+          setError(error.message);
+          setHasMore(false);
+        } finally {
+          setLoading(false);
         }
-        setHasMore(data.length === PAGE_SIZE);
-      } catch (error) {
-        setError(error.message);
-        setHasMore(false);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData(page);
+      };
+      fetchData();
+    }
   }, [page]);
 
   const handleScroll = useCallback(() => {
@@ -139,6 +137,7 @@ const HopeFuelIdListPage = () => {
   const onSearchHandler = async () => {
     try {
       setLoading(true);
+      setPage(1);
       setHasMore(true);
       if (searchRef.current === "") {
         const response = await fetch(
@@ -146,7 +145,7 @@ const HopeFuelIdListPage = () => {
         );
         const { data } = await response.json();
         setData(data);
-        setHasMore(data.length > PAGE_SIZE);
+        setHasMore(data.length === PAGE_SIZE);
       } else {
         const url = `api/hopeFuelList/search?q=${encodeURIComponent(
           searchRef.current
@@ -154,6 +153,7 @@ const HopeFuelIdListPage = () => {
         const response = await fetch(url);
         const { data } = await response.json();
         setData(data);
+        setHasMore(false);
       }
     } catch (error) {
       setError(error.message);
@@ -183,7 +183,8 @@ const HopeFuelIdListPage = () => {
           width: "100%",
           maxWidth: 445,
           margin: "0 auto",
-          padding: "14px",
+          px: 2,
+          py: 1,
           backgroundColor: "#F1F5F9",
           borderRadius: 20,
           mt: 3,
@@ -243,7 +244,7 @@ const HopeFuelIdListPage = () => {
             justifyContent: "center",
             alignItems: "center",
             mt: 2,
-            height: "70vh",
+            height: "30vh",
           }}
         >
           <CircularProgress />
