@@ -30,12 +30,12 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       SELECT ta1.TransactionID, ta1.AgentID
       FROM TransactionAgent ta1
       INNER JOIN (
-        SELECT TransactionID, MAX(TransactionAgentID) AS MaxTAID
+        SELECT TransactionID, MIN(TransactionAgentID) AS FirstTAID
         FROM TransactionAgent
         GROUP BY TransactionID
-      ) latest_ta ON ta1.TransactionID = latest_ta.TransactionID AND ta1.TransactionAgentID = latest_ta.MaxTAID
-    ) latest_ta ON t.TransactionID = latest_ta.TransactionID
-    LEFT JOIN Agent a ON c.AgentId = a.AgentID
+      ) first_ta ON ta1.TransactionID = first_ta.TransactionID AND ta1.TransactionAgentID = first_ta.FirstTAID
+    ) ta ON t.TransactionID = ta.TransactionID
+    LEFT JOIN Agent a ON ta.AgentID = a.AgentID
     LEFT JOIN (
       SELECT 
         fs.TransactionID,
