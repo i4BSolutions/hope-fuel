@@ -1,6 +1,7 @@
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
 import moment from "moment-timezone";
+import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
@@ -25,7 +26,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
         data.map((item) => (
           <Card
             onClick={() => onClick && onClick(item.HopeFuelID)}
-            key={item.HopeFuelID}
+            key={uuidv4()}
             sx={{
               backgroundColor: "#FFFFFF",
               borderRadius: "8px",

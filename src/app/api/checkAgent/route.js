@@ -23,7 +23,7 @@ export async function POST(req) {
       create: {
         AwsId: awsId,
         UserRoleId: 1,
-        Username: email.split("@")[0],
+        Username: email.split("@")[0] + "@" + email.split("@")[1].split(".")[0],
       },
       include: { UserRole: true },
     });
@@ -31,7 +31,7 @@ export async function POST(req) {
     const payload = {
       id: agent.AgentId,
       roleId: agent.UserRoleId,
-      username: email.split("@")[0],
+      username: email.split("@")[0] + "@" + email.split("@")[1].split(".")[0],
     };
 
     const token = await new SignJWT(payload)
