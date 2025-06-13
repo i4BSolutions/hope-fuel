@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import DetailModal from "../UI/Components/Modal";
 import SubscriptionCard from "../UI/Components/SubscriptionCard";
 import theme from "../UI/theme";
@@ -22,7 +22,6 @@ import ImageCarouselModal from "./_components/ImageCarousel";
 const PAGE_SIZE = 10;
 
 const HopeFuelIdListPage = () => {
-  const [searchText, setSearchText] = useState("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -35,50 +34,47 @@ const HopeFuelIdListPage = () => {
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
+  const searchRef = useRef("");
 
   useEffect(() => {
-    setError(null);
-  }, [searchText]);
-
-  const fetchData = useCallback(
-    async (isNewSearch = false) => {
-      if (!hasMore && !isNewSearch) return;
-
+    const fetchData = async (page) => {
       setLoading(true);
       setError(null);
-
       try {
-        const url = searchText
-          ? `api/hopeFuelList/search?q=${encodeURIComponent(searchText)}`
-          : `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
-
+        const url = `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
         const response = await fetch(url);
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `Failed to fetch data (${response.status})`
-          );
-        }
-
-        const newData = await response.json();
-        if (isNewSearch) {
-          setData(newData.data || []);
+        const { data } = await response.json();
+        if (page === 1) {
+          setData(data);
         } else {
-          setData((prev) => [...prev, ...(newData.data || [])]);
+          setData((prev) => [...prev, ...data]);
         }
-
-        setHasMore((newData.data || []).length === PAGE_SIZE);
+        setHasMore(data.length === PAGE_SIZE);
       } catch (error) {
         setError(error.message);
-        setData(isNewSearch ? [] : data);
         setHasMore(false);
       } finally {
         setLoading(false);
       }
-    },
-    [page, hasMore, data]
-  );
+    };
+    fetchData(page);
+  }, [page]);
+
+  const handleScroll = useCallback(() => {
+    if (
+      window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 100 &&
+      !loading &&
+      hasMore
+    ) {
+      setPage((prev) => prev + 1);
+    }
+  }, [loading, hasMore, error]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   const fetchDetails = async (hopeId) => {
     setLoadingDetails(true);
@@ -140,33 +136,32 @@ const HopeFuelIdListPage = () => {
     setOpenScreenshotModal((prev) => !prev);
   };
 
-  const onSearchHandler = () => {
-    setPage(1);
-    setHasMore(true);
-    fetchData(true);
+  const onSearchHandler = async () => {
+    try {
+      setLoading(true);
+      setHasMore(true);
+      if (searchRef.current === "") {
+        const response = await fetch(
+          `api/hopeFuelList/items?page=1&limit=${PAGE_SIZE}`
+        );
+        const { data } = await response.json();
+        setData(data);
+        setHasMore(data.length > PAGE_SIZE);
+      } else {
+        const url = `api/hopeFuelList/search?q=${encodeURIComponent(
+          searchRef.current
+        )}`;
+        const response = await fetch(url);
+        const { data } = await response.json();
+        setData(data);
+      }
+    } catch (error) {
+      setError(error.message);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const handleScroll = useCallback(() => {
-    if (
-      window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 100 &&
-      !loading &&
-      hasMore
-    ) {
-      setPage((prev) => prev + 1);
-    }
-  }, [loading, hasMore, error]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
-
-  useEffect(() => {
-    if (page > 1) {
-      fetchData();
-    }
-  }, [page]);
 
   const handleOpen = (hopeFuelId) => {
     fetchDetails(hopeFuelId);
@@ -181,7 +176,6 @@ const HopeFuelIdListPage = () => {
   return (
     <>
       <Box
-        component="form"
         sx={{
           display: "flex",
           justifyContent: "center",
@@ -200,17 +194,20 @@ const HopeFuelIdListPage = () => {
           fullWidth
           variant="standard"
           placeholder="Search..."
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
+          onChange={(e) => {
+            searchRef.current = e.target.value;
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              onSearchHandler();
+            }
+          }}
           InputProps={{
             disableUnderline: true,
           }}
         />
-        <IconButton
-          aria-label="search"
-          loading={false}
-          onClick={onSearchHandler}
-        >
+
+        <IconButton aria-label="search" size="large" onClick={onSearchHandler}>
           <SearchIcon />
         </IconButton>
       </Box>
