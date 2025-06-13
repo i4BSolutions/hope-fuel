@@ -30,17 +30,16 @@ export default function GroupAssignTable() {
   const fetchAssignedAgents = async () => {
     setLoading(true);
     try {
-      const response = await fetch("api/agent/agent-group");
+      const response = await fetch("api/agent/agent-group-assignments");
       const json = await response.json();
 
-      const groups = json.data.result;
+      const groups = json.data;
       setGroups(groups.map((group) => group.GroupName));
 
-      const flatAgents = json.data.result.flatMap((group) =>
-        group.AssignedAgents.map((agent) => ({
+      const flatAgents = groups.flatMap((group) =>
+        group.Agents.map((agent) => ({
           AgentId: agent.AgentId,
           Username: agent.Username,
-          TransactionCount: agent.TransactionCount,
           GroupName: group.GroupName,
         }))
       );
@@ -70,13 +69,18 @@ export default function GroupAssignTable() {
   const handleSave = async (event) => {
     event.preventDefault();
     setLoading(true);
+
     try {
       const groupMap = {};
+      const unassigned = [];
 
       assignedAgents.forEach((agent) => {
         const selectedGroup =
           editedAssignAgents[agent.AgentId] ?? agent.GroupName;
-        if (selectedGroup && selectedGroup !== "Not assigned") {
+
+        if (!selectedGroup || selectedGroup === "Not assigned") {
+          unassigned.push(agent.AgentId);
+        } else {
           if (!groupMap[selectedGroup]) groupMap[selectedGroup] = [];
           groupMap[selectedGroup].push(agent.AgentId);
         }
@@ -86,23 +90,23 @@ export default function GroupAssignTable() {
         const agentIds = groupMap[groupName];
         if (agentIds.length === 0) continue;
 
-        const res = await fetch("/api/agent/agent-group", {
+        const res = await fetch("/api/agent/agent-group-assignments", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ groupName, agentIds }),
         });
 
         const result = await res.json();
-
         if (!res.ok) {
           console.error("PUT error:", result);
           throw new Error(`Failed to update ${groupName}: ${result.message}`);
         }
       }
+
       setIsEditing(false);
       setEditedAssignAgents({});
     } catch (err) {
-      console.error("PUT error:", err);
+      console.error("Save error:", err);
     } finally {
       setLoading(false);
     }
