@@ -16,7 +16,7 @@ SELECT
     t.Month,
     GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ', ') AS ScreenShot,
     c.ManyChatId,
-    GROUP_CONCAT(DISTINCT a.Username SEPARATOR ',') AS 'FormFilledPerson',
+    MAX(a.Username) AS FormFilledPerson,
     ts.TransactionStatus,
     n.Note AS Note
 FROM Transactions t
@@ -26,7 +26,7 @@ LEFT JOIN Currency curr ON w.CurrencyId = curr.CurrencyId
 LEFT JOIN Note n ON t.NoteID = n.NoteID
 LEFT JOIN ScreenShot ss ON t.TransactionID = ss.TransactionID
 LEFT JOIN TransactionAgent ta ON t.TransactionID = ta.TransactionID
-LEFT JOIN Agent a ON ta.AgentID = a.AgentId
+LEFT JOIN Agent a ON c.AgentId = a.AgentID
 LEFT JOIN (
     SELECT 
         fs.TransactionID,
