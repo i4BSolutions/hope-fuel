@@ -62,7 +62,7 @@ const HopeFuelIDListDetails = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [imageUrls, setImageUrls] = useState([]);
-  console.log(data.CreateTime);
+
   useEffect(() => {
     (async () => {
       const urls = await Promise.all(
