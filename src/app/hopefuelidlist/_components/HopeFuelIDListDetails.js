@@ -7,7 +7,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import moment from "moment-timezone";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 import ImageCarouselModal from "./ImageCarousel";
@@ -62,7 +62,7 @@ const HopeFuelIDListDetails = ({ data }) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [imageUrls, setImageUrls] = useState([]);
-
+  console.log(data.CreateTime);
   useEffect(() => {
     (async () => {
       const urls = await Promise.all(
@@ -187,7 +187,7 @@ const HopeFuelIDListDetails = ({ data }) => {
                   fontWeight: 600,
                 }}
               >
-                {moment(data.CreateTime).format("DD-MM-YYYY HH:mm:ss")}
+                {dayjs(data.CreateTime).format("DD-MM-YYYY HH:mm A")}
               </Value>
             </InfoRow>
             <InfoRow>
