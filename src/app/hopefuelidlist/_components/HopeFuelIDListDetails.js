@@ -11,7 +11,6 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 import ImageCarouselModal from "./ImageCarousel";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 
 const InfoRow = styled(Box)(({ theme }) => ({
@@ -75,11 +74,9 @@ const HopeFuelIDListDetails = ({ data }) => {
   }, []);
 
   function formatDate(dateString) {
-    dayjs.extend(utc);
     dayjs.extend(timezone);
-    return dayjs
-      .utc(dateString)
-      .tz("Asia/Bangkok")
+    return dayjs(dateString)
+      .tz("Asia/Bangkok", true)
       .format("MMMM D, YYYY HH:mm A");
   }
 
