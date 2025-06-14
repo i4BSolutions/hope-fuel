@@ -1,9 +1,10 @@
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
-import moment from "moment-timezone";
 import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
@@ -16,6 +17,15 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
         return "#FBBF24";
     }
   };
+
+  function formatDate(dateString) {
+    dayjs.extend(utc);
+    dayjs.extend(timezone);
+    return dayjs
+      .utc(dateString)
+      .tz("Asia/Bangkok")
+      .format("MMMM D, YYYY HH:mm A");
+  }
 
   if (!Array.isArray(data)) {
     return null;
@@ -101,7 +111,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                     fontWeight: 500,
                   }}
                 >
-                  {dayjs(item.TransactionDate).format("DD-MM-YYYY HH:mm A")}
+                  {formatDate(item.TransactionDate)}
                 </Typography>
               </Box>
               <Box sx={{ minWidth: "60px" }}>
