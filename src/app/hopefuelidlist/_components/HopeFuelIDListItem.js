@@ -3,6 +3,7 @@ import { Box, Button, Card, Divider, Typography } from "@mui/material";
 import moment from "moment-timezone";
 import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
+import dayjs from "dayjs";
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
@@ -100,7 +101,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                     fontWeight: 500,
                   }}
                 >
-                  {moment(item.TransactionDate).format("DD-MM-YYYY HH:mm:ss")}
+                  {dayjs(item.TransactionDate).format("DD-MM-YYYY HH:mm A")}
                 </Typography>
               </Box>
               <Box sx={{ minWidth: "60px" }}>
