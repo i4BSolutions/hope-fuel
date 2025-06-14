@@ -19,9 +19,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
 
   function formatDate(dateString) {
     dayjs.extend(timezone);
-    return dayjs(dateString)
-      .tz("Asia/Bangkok", true)
-      .format("MMMM D, YYYY HH:mm A");
+    return dayjs(dateString).tz("Asia/Bangkok").format("MMMM D, YYYY HH:mm A");
   }
 
   if (!Array.isArray(data)) {
