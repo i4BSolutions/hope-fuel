@@ -3,15 +3,14 @@ import { Box, Button, Card, Divider, Typography } from "@mui/material";
 import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
     switch (status) {
-      case "ငွေစစ်ဆေးပြီး":
+      case "Payment Checked":
         return "#03fc73";
-      case "ကတ်ထုတ်ပေးပြီး":
+      case "Card Issued":
         return "#6183E4";
       default:
         return "#FBBF24";
@@ -19,11 +18,9 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   };
 
   function formatDate(dateString) {
-    dayjs.extend(utc);
     dayjs.extend(timezone);
-    return dayjs
-      .utc(dateString)
-      .tz("Asia/Bangkok")
+    return dayjs(dateString)
+      .tz("Asia/Bangkok", true)
       .format("MMMM D, YYYY HH:mm A");
   }
 
