@@ -70,10 +70,15 @@ export async function GET(request) {
           },
         },
         TransactionAgent: {
+          orderBy: {
+            TransactionAgentID: "asc",
+          },
+          take: 1,
           select: {
             Agent: {
               select: {
                 AwsId: true,
+                Username: true,
               },
             },
           },
@@ -84,7 +89,8 @@ export async function GET(request) {
     if (!transaction) {
       return NextResponse.json([], { status: 200 });
     }
-    console.log("Transaction data:", transaction.FormStatus?.TransactionStatus);
+
+    const firstAgent = transaction.TransactionAgent?.[0]?.Agent;
 
     const result = {
       TransactionID: transaction.TransactionID,
@@ -103,7 +109,7 @@ export async function GET(request) {
       ExpireDate: transaction.Customer?.ExpireDate,
       CardID: transaction.Customer?.CardID,
       AwsId: transaction.Customer?.Agent?.AwsId,
-      AgentName: transaction.Customer?.Agent?.Username,
+      AgentName: firstAgent?.Username,
       PrimaryAwsId: transaction.Customer?.Agent?.AgentId,
       LoggedAwsIds:
         transaction.TransactionAgent?.map((agent) => agent.Agent?.AwsId) || [],
