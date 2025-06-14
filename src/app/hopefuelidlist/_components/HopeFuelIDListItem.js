@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
@@ -16,11 +20,6 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
         return "#FBBF24";
     }
   };
-
-  function formatDate(dateString) {
-    dayjs.extend(timezone);
-    return dayjs(dateString).tz("Asia/Bangkok").format("MMMM D, YYYY HH:mm A");
-  }
 
   if (!Array.isArray(data)) {
     return null;
@@ -106,7 +105,10 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                     fontWeight: 500,
                   }}
                 >
-                  {formatDate(item.TransactionDate)}
+                  {dayjs
+                    .utc(item.TransactionDate)
+                    .tz("Asia/Bangkok")
+                    .format("MMMM D, YYYY HH:mm A")}
                 </Typography>
               </Box>
               <Box sx={{ minWidth: "60px" }}>
