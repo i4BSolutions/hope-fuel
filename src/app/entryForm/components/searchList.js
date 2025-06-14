@@ -74,9 +74,11 @@ export default function SearchBarForm({ onItemClick }) {
 
           setTotalPages(data.totalPages);
           setHasMore(currentPage < data.totalPages);
-        } else if (currentPage === 1) {
-          setItems([]);
-          setNoResults(true);
+        } else {
+          if (currentPage === 1) {
+            setItems([]);
+            setNoResults(true);
+          }
           setHasMore(false);
         }
       }
@@ -87,7 +89,11 @@ export default function SearchBarForm({ onItemClick }) {
       setNoResults(true);
       setHasMore(false);
     } finally {
-      setLoading(false);
+      if (isLoadMore) {
+        setIsLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -107,10 +113,10 @@ export default function SearchBarForm({ onItemClick }) {
     fetchItems(searchQuery, selectedWallet, 1);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchItems(searchQuery, wallet, nextPage, true);
+    await fetchItems(searchQuery, wallet, nextPage, true);
   };
 
   useEffect(() => {
