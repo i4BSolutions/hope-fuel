@@ -18,11 +18,21 @@ export default function SearchBarForm({ onItemClick }) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { agent } = useAgentStore();
 
-  const fetchItems = async (query, selectedWallet, currentPage) => {
-    setLoading(true);
+  const fetchItems = async (
+    query,
+    selectedWallet,
+    currentPage,
+    isLoadMore = false
+  ) => {
+    if (isLoadMore) {
+      setIsLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     try {
@@ -53,16 +63,22 @@ export default function SearchBarForm({ onItemClick }) {
               return item;
             })
           );
-          setItems((prev) =>
-            currentPage === 1 ? updatedData : [...prev, ...updatedData]
-          );
+          setItems((prev) => {
+            if (currentPage === 1) {
+              return updatedData;
+            } else {
+              return [...prev, ...updatedData];
+            }
+          });
           setNoResults(false);
 
           setTotalPages(data.totalPages);
           setHasMore(currentPage < data.totalPages);
-        } else if (currentPage === 1) {
-          setItems([]);
-          setNoResults(true);
+        } else {
+          if (currentPage === 1) {
+            setItems([]);
+            setNoResults(true);
+          }
           setHasMore(false);
         }
       }
@@ -73,7 +89,11 @@ export default function SearchBarForm({ onItemClick }) {
       setNoResults(true);
       setHasMore(false);
     } finally {
-      setLoading(false);
+      if (isLoadMore) {
+        setIsLoadingMore(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -93,10 +113,10 @@ export default function SearchBarForm({ onItemClick }) {
     fetchItems(searchQuery, selectedWallet, 1);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = async () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    fetchItems(searchQuery, wallet, nextPage);
+    await fetchItems(searchQuery, wallet, nextPage, true);
   };
 
   useEffect(() => {
@@ -148,6 +168,7 @@ export default function SearchBarForm({ onItemClick }) {
           onLoadMore={handleLoadMore}
           onItemClick={(HopeFuelID) => onItemClick(HopeFuelID)}
           hasMore={hasMore}
+          isLoadingMore={isLoadingMore}
         />
       )}
     </Box>
