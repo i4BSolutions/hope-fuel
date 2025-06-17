@@ -19,7 +19,7 @@ export async function POST(request) {
   let userNameURL = encodeURIComponent(name);
   let emailURL = encodeURIComponent(email);
   let response = await fetch(
-    `https://api.airtable.com/v0/appp80DDZ7FHxqCc1/tblZeEt4ay83MpLcL?filterByFormula=IF(AND(%22${userNameURL}%22+%3D+trim_name%2C+%22${emailURL}%22+%3D+trim_email)%2CTRUE()%2CFALSE())`,
+    `https://api.airtable.com/v0/${process.env.AIRTABLE_APP_ID}/${process.env.CUSTOMER_TABLE}?filterByFormula=IF(AND(%22${userNameURL}%22+%3D+trim_name%2C+%22${emailURL}%22+%3D+trim_email)%2CTRUE()%2CFALSE())`,
     requestOptions
   );
 
