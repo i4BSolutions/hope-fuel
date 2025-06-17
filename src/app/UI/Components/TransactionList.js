@@ -11,7 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import moment from "moment-timezone";
+import dayjs from "dayjs";
 
 const TransactionList = ({ transactions }) => {
   return (
@@ -65,7 +65,7 @@ const TransactionList = ({ transactions }) => {
                       variant="h1"
                       sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
                     >
-                      {moment(row.TransactionDate).format("YYYY-MM-DD")}
+                      {dayjs(row.TransactionDate).format("YYYY-MM-DD")}
                     </Typography>
                   </Box>
                 </TableCell>

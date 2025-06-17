@@ -23,13 +23,13 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import moment from "moment-timezone";
 import CustomButton from "../../../components/Button";
 import TransactionList from "../../../UI/Components/TransactionList";
 import TransactionHistoryList from "../../../UI/Components/TransactionsHistoryList";
 import csvHandler from "../../../utilites/exportCSV/csvHandler";
 
 import { useAgentStore } from "../../../../stores/agentStore";
+import dayjs from "dayjs";
 
 const ExportCSVPage = () => {
   const { agent } = useAgentStore();
@@ -49,30 +49,19 @@ const ExportCSVPage = () => {
   const [openExportHistoryModal, setOpenExportHistoryModal] = useState(false);
   const [page, setPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
 
   const bothDateSelected = date && date[0] && date[1];
 
-  const paginatedTransactions = useMemo(() => {
-    if (!allTransactions.length) return [];
-
-    const startIndex = (page - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return allTransactions.slice(startIndex, endIndex);
-  }, [allTransactions, page, itemsPerPage]);
-
   const totalPages = useMemo(() => {
-    return Math.ceil(allTransactions.length / itemsPerPage);
-  }, [allTransactions, itemsPerPage]);
+    return Math.ceil(totalCount / itemsPerPage);
+  }, [totalCount, itemsPerPage]);
 
   useEffect(() => {
     if (bothDateSelected) {
       getCardIssuedTransactions();
     }
-  }, [date]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [allTransactions]);
+  }, [date, page]);
 
   useEffect(() => {
     getTransactionsLogsHistoryLists();
@@ -80,9 +69,11 @@ const ExportCSVPage = () => {
 
   const handleDateChange = useCallback((newDate) => {
     setDate(newDate);
+    setPage(1);
   }, []);
 
   const getCardIssuedTransactions = async () => {
+    console.log("Page:", page);
     if (loading) return;
     if (!date || !date[0] || !date[1]) return;
 
@@ -90,8 +81,8 @@ const ExportCSVPage = () => {
     try {
       let startDateFormatted, endDateFormatted;
       try {
-        startDateFormatted = moment(date[0].$d).format("YYYY-MM-DD");
-        endDateFormatted = moment(date[1].$d).format("YYYY-MM-DD");
+        startDateFormatted = dayjs(date[0].$d).format("YYYY-MM-DD");
+        endDateFormatted = dayjs(date[1].$d).format("YYYY-MM-DD");
       } catch (dateError) {
         console.error("Date formatting error:", dateError);
         setError("Invalid date format. Please try again.");
@@ -100,7 +91,7 @@ const ExportCSVPage = () => {
         return;
       }
 
-      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked`;
+      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked&page=${page}&limit=${itemsPerPage}`;
 
       const response = await fetch(url);
 
@@ -117,7 +108,8 @@ const ExportCSVPage = () => {
         throw new Error("Invalid data format received from server");
       }
 
-      setAllTransactions(result.data);
+      setAllTransactions(result.data || []);
+      setTotalCount(result.totalCount || 0);
     } catch (error) {
       console.error("Error fetching transactions:", error);
       setError(error.message || "Failed to fetch transactions");
@@ -125,6 +117,43 @@ const ExportCSVPage = () => {
       setAllTransactions([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getAllTransactionsForExport = async () => {
+    if (!date || !date[0] || !date[1]) return [];
+
+    try {
+      let startDateFormatted, endDateFormatted;
+      try {
+        startDateFormatted = dayjs(date[0].$d).format("YYYY-MM-DD");
+        endDateFormatted = dayjs(date[1].$d).format("YYYY-MM-DD");
+      } catch (dateError) {
+        console.error("Date formatting error:", dateError);
+        throw new Error("Invalid date format");
+      }
+
+      const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked&limit=${totalCount}`;
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Failed to fetch data (${response.status})`
+        );
+      }
+
+      const result = await response.json();
+
+      if (!result.data || !Array.isArray(result.data)) {
+        throw new Error("Invalid data format received from server");
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error("Error fetching all transactions:", error);
+      throw error;
     }
   };
 
@@ -178,7 +207,10 @@ const ExportCSVPage = () => {
   const handleExportCSV = useCallback(async () => {
     try {
       setLoading(true);
-      if (!allTransactions || allTransactions.length === 0) {
+
+      const allTransactionsForExport = await getAllTransactionsForExport();
+
+      if (!allTransactionsForExport || allTransactionsForExport.length === 0) {
         throw new Error("No data available to export");
       }
 
@@ -198,7 +230,7 @@ const ExportCSVPage = () => {
 
       let csvContent = headers.join(",") + "\n";
 
-      allTransactions.forEach((transaction) => {
+      allTransactionsForExport.forEach((transaction) => {
         const row = [
           transaction.Name || "",
           transaction.Email || "",
@@ -209,8 +241,8 @@ const ExportCSVPage = () => {
           transaction.Month + " " + "Month" || "",
           transaction.Region || "",
           transaction.HopeFuelID || "",
-          moment(transaction.TransactionDate).format("YYYY-MM-DD") || "",
-          moment(transaction.PaymentCheckTime).format("YYYY-MM-DD") || "",
+          dayjs(transaction.TransactionDate).format("YYYY-MM-DD") || "",
+          dayjs(transaction.PaymentCheckTime).format("YYYY-MM-DD") || "",
         ];
         const escapedRow = row.map((field) => {
           if (/[",\n\r]/.test(field)) {
@@ -225,8 +257,8 @@ const ExportCSVPage = () => {
       const url = URL.createObjectURL(blob);
 
       const link = document.createElement("a");
-      const startDate = moment(date[0].$d).format("YYYY-MM-DD hh:mm");
-      const endDate = moment(date[1].$d).format("YYYY-MM-DD hh:mm");
+      const startDate = dayjs(date[0].$d).format("YYYY-MM-DD hh:mm");
+      const endDate = dayjs(date[1].$d).format("YYYY-MM-DD hh:mm");
       link.href = url;
       link.download = `ConfirmedPayment_Export_${startDate}_to_${endDate}.csv`;
       document.body.appendChild(link);
@@ -252,7 +284,7 @@ const ExportCSVPage = () => {
         CSVExportTransactionFileName: key,
         StartDate: startDate,
         EndDate: endDate,
-        TransactionIDs: allTransactions.map(
+        TransactionIDs: allTransactionsForExport.map(
           (transaction) => transaction.TransactionID
         ),
       };
@@ -276,7 +308,7 @@ const ExportCSVPage = () => {
       setAllTransactions([]);
       setLoading(false);
     }
-  }, [allTransactions, date, handleCloseCSVExportModal]);
+  }, [date, totalCount, handleCloseCSVExportModal]);
 
   const handleOpenExportHistoryModal = useCallback(() => {
     setOpenExportHistoryModal((prev) => !prev);
@@ -330,7 +362,7 @@ const ExportCSVPage = () => {
             {allTransactions.length > 0 ? (
               <>
                 <Box sx={{ width: "100%", mt: 4, overflowX: "auto" }}>
-                  <TransactionList transactions={paginatedTransactions} />
+                  <TransactionList transactions={allTransactions} />
                 </Box>
 
                 {totalPages > 1 && (
@@ -362,8 +394,8 @@ const ExportCSVPage = () => {
                     color="text.secondary"
                     align="center"
                   >
-                    Showing {paginatedTransactions.length} of{" "}
-                    {allTransactions.length} transactions
+                    Showing {allTransactions.length} of {totalCount}{" "}
+                    transactions
                   </Typography>
                 </Box>
               </>

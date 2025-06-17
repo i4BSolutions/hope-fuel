@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
 import moment from "moment-timezone";
+import dayjs from "dayjs";
 
-async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
+async function retrieveHopeFuelList(
+  startDate,
+  endDate,
+  transactionStatus,
+  page = 1,
+  limit = 10
+) {
   const where = {
     TransactionDate: {},
   };
@@ -55,6 +62,22 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
     };
   }
 
+  // Calculate pagination values
+  const skip = (page - 1) * limit;
+
+  // Get total count
+  const totalCount = await prisma.Transactions.count({
+    where: {
+      FormStatus: {
+        some: {
+          TransactionStatus: {
+            TransactionStatusID: 2,
+          },
+        },
+      },
+    },
+  });
+
   const transactions = await prisma.Transactions.findMany({
     where: {
       FormStatus: {
@@ -68,6 +91,8 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
     orderBy: {
       HopeFuelID: "desc",
     },
+    skip: skip,
+    take: limit,
     include: {
       Customer: {
         include: {
@@ -99,7 +124,7 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
   });
   console.log("transactions", JSON.stringify(transactions, null, 2));
 
-  return transactions.map((t) => ({
+  const mappedTransactions = transactions.map((t) => ({
     HopeFuelID: t.HopeFuelID,
     TransactionID: t.TransactionID,
     Name: t.Customer?.Name || null,
@@ -120,6 +145,11 @@ async function retrieveHopeFuelList(startDate, endDate, transactionStatus) {
       t.FormStatus[0]?.TransactionStatus?.TransactionStatus || null,
     Note: t.Note?.Note || null,
   }));
+
+  return {
+    data: mappedTransactions,
+    totalCount: totalCount,
+  };
 }
 
 export async function GET(req) {
@@ -129,28 +159,43 @@ export async function GET(req) {
   let endDate = null;
   const startDateParam = params.get("startDate");
   if (startDateParam) {
-    startDate = moment(startDateParam).isValid() ? startDateParam : null;
+    startDate = dayjs(startDateParam).isValid() ? startDateParam : null;
   }
   const endDateParam = params.get("endDate");
   if (endDateParam) {
-    endDate = moment(endDateParam).isValid() ? endDateParam : null;
+    endDate = dayjs(endDateParam).isValid() ? endDateParam : null;
   }
   const transactionStatus = params.get("transactionStatus") || null;
+
+  // Parse pagination parameters
+  const pageParam = params.get("page");
+  const limitParam = params.get("limit");
+
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
+  const limit = limitParam
+    ? Math.max(1, Math.min(100, parseInt(limitParam, 10)))
+    : 10; // Max limit of 100
+
   console.log(transactionStatus);
   try {
     const result = await retrieveHopeFuelList(
       startDate,
       endDate,
-      transactionStatus
+      transactionStatus,
+      page,
+      limit
     );
     console.log("Result:", JSON.stringify(result, null, 2));
     return NextResponse.json({
       status: 200,
       message: "Hopefuel list retrieve successfully.",
-      startDate: startDate ? moment(startDate).format("YYYY-MM-DD") : null,
-      endDate: endDate ? moment(endDate).format("YYYY-MM-DD") : null,
+      startDate: startDate ? dayjs(startDate).format("YYYY-MM-DD") : null,
+      endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : null,
       transactionStatus,
-      data: result,
+      totalCount: result.totalCount,
+      data: result.data,
+      page,
+      limit,
     });
   } catch (error) {
     return NextResponse.json({ status: 500, error: error.message });
