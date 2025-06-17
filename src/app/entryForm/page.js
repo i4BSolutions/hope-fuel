@@ -103,7 +103,7 @@ export default function EntryForm() {
           setNote={setNote}
           clearHopeFuelID={() => {
             setHopeFuelID(null);
-            router.replace(`/entryForm?walletId=${walletId}`);
+            location.reload();
           }}
         />
       </Box>
