@@ -1,16 +1,20 @@
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
-import moment from "moment-timezone";
 import { v4 as uuidv4 } from "uuid";
 import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
   const getStatusByColor = (status) => {
     switch (status) {
-      case "ငွေစစ်ဆေးပြီး":
+      case "Payment Checked":
         return "#03fc73";
-      case "ကတ်ထုတ်ပေးပြီး":
+      case "Card Issued":
         return "#6183E4";
       default:
         return "#FBBF24";
@@ -101,7 +105,10 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                     fontWeight: 500,
                   }}
                 >
-                  {dayjs(item.TransactionDate).format("DD-MM-YYYY HH:mm A")}
+                  {dayjs
+                    .utc(item.TransactionDate)
+                    .tz("Asia/Bangkok")
+                    .format("MMMM D, YYYY HH:mm A")}
                 </Typography>
               </Box>
               <Box sx={{ minWidth: "60px" }}>

@@ -11,6 +11,11 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 import ImageCarouselModal from "./ImageCarousel";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const InfoRow = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -187,7 +192,10 @@ const HopeFuelIDListDetails = ({ data }) => {
                   fontWeight: 600,
                 }}
               >
-                {dayjs(data.CreateTime).format("DD-MM-YYYY HH:mm A")}
+                {dayjs
+                  .utc(data.CreateTime)
+                  .tz("Asia/Bangkok")
+                  .format("MMMM D, YYYY HH:mm A")}
               </Value>
             </InfoRow>
             <InfoRow>

@@ -9,7 +9,7 @@ const restrictedRoutes = {
   3: ["/createForm", "/extendForm", "/fundraisers", "/admin-panel"],
 };
 
-const publicApiRoutes = ["/checkAgent"];
+const publicApiRoutes = ["/checkAgent", "/checkUser"];
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(request) {
