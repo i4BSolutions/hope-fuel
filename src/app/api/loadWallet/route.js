@@ -21,7 +21,7 @@ export async function GET(request) {
   };
 
   const response = await fetch(
-    "https://api.airtable.com/v0/${process.env.AIRTABLE_APP_ID}/tblzSjCNMeKe3OleA",
+    `https://api.airtable.com/v0/${process.env.AIRTABLE_APP_ID}/${process.env.WALLET_TABLE}`,
     requestOptions
   );
   const json = await response.json();
