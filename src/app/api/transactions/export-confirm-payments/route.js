@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
-import moment from "moment-timezone";
 import dayjs from "dayjs";
 
 async function retrieveHopeFuelList(
@@ -29,17 +28,14 @@ async function retrieveHopeFuelList(
   }
 
   if (!startDate && !endDate) {
-    const firstDay = moment().startOf("month").toDate();
-    const firstDayNextMonth = moment()
-      .add(1, "month")
-      .startOf("month")
-      .toDate();
+    const firstDay = dayjs().startOf("month").toDate();
+    const firstDayNextMonth = dayjs().add(1, "month").startOf("month").toDate();
     where.TransactionDate.gte = firstDay;
     where.TransactionDate.lt = firstDayNextMonth;
   }
 
   if (transactionStatus) {
-    const transactionStatusId = await prisma.TransactionStatus.findFirst({
+    const status = await prisma.TransactionStatus.findFirst({
       where: {
         TransactionStatus: transactionStatus,
       },
@@ -48,46 +44,35 @@ async function retrieveHopeFuelList(
       },
     });
 
-    if (!transactionStatusId) {
+    if (!status) {
       throw new Error("Transaction status not found.");
     }
 
-    whereTransactionStatus.TransactionStatus.TransactionStatusID.equals =
-      transactionStatusId.TransactionStatusID;
-  }
-
-  if (transactionStatus) {
     where.FormStatus = {
-      some: whereTransactionStatus,
+      some: {
+        TransactionStatus: {
+          TransactionStatusID: status.TransactionStatusID,
+        },
+      },
+    };
+  } else {
+    where.FormStatus = {
+      some: {
+        TransactionStatus: {
+          TransactionStatusID: 2,
+        },
+      },
     };
   }
 
-  // Calculate pagination values
   const skip = (page - 1) * limit;
 
-  // Get total count
   const totalCount = await prisma.Transactions.count({
-    where: {
-      FormStatus: {
-        some: {
-          TransactionStatus: {
-            TransactionStatusID: 2,
-          },
-        },
-      },
-    },
+    where,
   });
 
   const transactions = await prisma.Transactions.findMany({
-    where: {
-      FormStatus: {
-        some: {
-          TransactionStatus: {
-            TransactionStatusID: 2,
-          },
-        },
-      },
-    },
+    where,
     orderBy: {
       HopeFuelID: "desc",
     },
@@ -122,7 +107,6 @@ async function retrieveHopeFuelList(
       },
     },
   });
-  console.log("transactions", JSON.stringify(transactions, null, 2));
 
   const mappedTransactions = transactions.map((t) => ({
     HopeFuelID: t.HopeFuelID,
@@ -155,8 +139,10 @@ async function retrieveHopeFuelList(
 export async function GET(req) {
   const url = new URL(req.url);
   const params = url.searchParams;
+
   let startDate = null;
   let endDate = null;
+
   const startDateParam = params.get("startDate");
   if (startDateParam) {
     startDate = dayjs(startDateParam).isValid() ? startDateParam : null;
@@ -167,16 +153,14 @@ export async function GET(req) {
   }
   const transactionStatus = params.get("transactionStatus") || null;
 
-  // Parse pagination parameters
   const pageParam = params.get("page");
   const limitParam = params.get("limit");
 
   const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
   const limit = limitParam
     ? Math.max(1, Math.min(100, parseInt(limitParam, 10)))
-    : 10; // Max limit of 100
+    : 10;
 
-  console.log(transactionStatus);
   try {
     const result = await retrieveHopeFuelList(
       startDate,
