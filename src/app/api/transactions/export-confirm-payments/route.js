@@ -26,7 +26,8 @@ async function retrieveHopeFuelList(
   }
 
   if (endDate) {
-    where.TransactionDate.lte = new Date(endDate);
+    const endOfDay = dayjs(endDate).endOf("day").toDate();
+    where.TransactionDate.lte = endOfDay;
   }
 
   if (!startDate && !endDate) {
