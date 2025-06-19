@@ -73,7 +73,6 @@ const ExportCSVPage = () => {
   }, []);
 
   const getCardIssuedTransactions = async () => {
-    console.log("Page:", page);
     if (loading) return;
     if (!date || !date[0] || !date[1]) return;
 
@@ -94,7 +93,6 @@ const ExportCSVPage = () => {
       const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked&page=${page}&limit=${itemsPerPage}`;
 
       const response = await fetch(url);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
