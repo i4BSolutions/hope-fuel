@@ -232,13 +232,13 @@ async function main() {
       Email: "customer10@example.com",
       ManyChatId: "864044484",
       ContactLink: "https://manychat.com/profile/49450",
-      ExpireDate: new Date("2025-01-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2024-12-25"),
-      EndDate: new Date("2025-01-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -250,13 +250,13 @@ async function main() {
       Email: "customer11@example.com",
       ManyChatId: "1840497169",
       ContactLink: "https://manychat.com/profile/65928",
-      ExpireDate: new Date("2025-03-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 2234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-05"),
-      EndDate: new Date("2025-03-31"),
+      StartDate: new Date("2025-06-01"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink: "/screenshots/Customer11_payment.png",
@@ -267,13 +267,13 @@ async function main() {
       Email: "customer12@example.com",
       ManyChatId: "6807810221",
       ContactLink: "https://manychat.com/profile/89308",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 3234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-15"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 3,
       ScreenShotLink:
@@ -285,13 +285,13 @@ async function main() {
       Email: "customer20@example.com",
       ManyChatId: "4315057941",
       ContactLink: "https://manychat.com/profile/24320",
-      ExpireDate: new Date("2025-02-28"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 4234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-01-25"),
-      EndDate: new Date("2025-02-28"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -303,13 +303,13 @@ async function main() {
       Email: "customer21@example.com",
       ManyChatId: "9972215262",
       ContactLink: "https://manychat.com/profile/10584",
-      ExpireDate: new Date("2025-05-30"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 5234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
-      EndDate: new Date("2025-05-30"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -321,13 +321,13 @@ async function main() {
       Email: "customer22@example.com",
       ManyChatId: "6304909841",
       ContactLink: "https://manychat.com/profile/10856",
-      ExpireDate: new Date("2025-05-30"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 6234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
-      EndDate: new Date("2025-05-30"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -339,13 +339,13 @@ async function main() {
       Email: "customer30@example.com",
       ManyChatId: "3883120514",
       ContactLink: "https://manychat.com/profile/54838",
-      ExpireDate: new Date("2025-01-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 7234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2024-12-02"),
-      EndDate: new Date("2025-01-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -357,13 +357,13 @@ async function main() {
       Email: "customer31@example.com",
       ManyChatId: "9048788580",
       ContactLink: "https://manychat.com/profile/11875",
-      ExpireDate: new Date("2025-03-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 8234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-21"),
-      EndDate: new Date("2025-03-31"),
+      StartDate: new Date("2025-06-14"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -375,13 +375,13 @@ async function main() {
       Email: "customer32@example.com",
       ManyChatId: "5466333158",
       ContactLink: "https://manychat.com/profile/48744",
-      ExpireDate: new Date("2025-03-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 9234567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-25"),
-      EndDate: new Date("2025-03-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -393,13 +393,13 @@ async function main() {
       Email: "customer40@example.com",
       ManyChatId: "5393685617",
       ContactLink: "https://manychat.com/profile/82834",
-      ExpireDate: new Date("2025-03-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1334567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-20"),
-      EndDate: new Date("2025-03-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -411,13 +411,13 @@ async function main() {
       Email: "customer41@example.com",
       ManyChatId: "8658888190",
       ContactLink: "https://manychat.com/profile/46387",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1434567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-12"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -434,7 +434,7 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
+      StartDate: new Date("2025-06-15"),
       EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 2,
@@ -447,13 +447,13 @@ async function main() {
       Email: "customer50@example.com",
       ManyChatId: "6016816124",
       ContactLink: "https://manychat.com/profile/25702",
-      ExpireDate: new Date("2025-04-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1634567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-03-27"),
-      EndDate: new Date("2025-04-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -465,13 +465,13 @@ async function main() {
       Email: "customer51@example.com",
       ManyChatId: "7418908216",
       ContactLink: "https://manychat.com/profile/81868",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1734567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -483,12 +483,12 @@ async function main() {
       Email: "customer52@example.com",
       ManyChatId: "4695428623",
       ContactLink: "https://manychat.com/profile/59636",
-      ExpireDate: new Date("2025-04-30"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1834567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-03-11"),
+      StartDate: new Date("2025-06-15"),
       EndDate: new Date("2025-04-30"),
       Amount: 100,
       Month: 1,
@@ -501,13 +501,13 @@ async function main() {
       Email: "customer60@example.com",
       ManyChatId: "1116868784",
       ContactLink: "https://manychat.com/profile/48245",
-      ExpireDate: new Date("2025-04-30"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1934567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-02-20"),
-      EndDate: new Date("2025-04-30"),
+      StartDate: new Date("2025-06-15"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 2,
       ScreenShotLink:
@@ -519,13 +519,13 @@ async function main() {
       Email: "customer61@example.com",
       ManyChatId: "2859651193",
       ContactLink: "https://manychat.com/profile/48511",
-      ExpireDate: new Date("2025-05-30"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1244567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2024-04-25"),
-      EndDate: new Date("2025-05-30"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 12,
       ScreenShotLink:
@@ -537,13 +537,13 @@ async function main() {
       Email: "customer62@example.com",
       ManyChatId: "7776947371",
       ContactLink: "https://manychat.com/profile/73176",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1254567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -555,13 +555,13 @@ async function main() {
       Email: "customer70@example.com",
       ManyChatId: "8712882385",
       ContactLink: "https://manychat.com/profile/94312",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1264567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-12"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -578,7 +578,7 @@ async function main() {
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
+      StartDate: new Date("2025-06-17"),
       EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 2,
@@ -591,13 +591,13 @@ async function main() {
       Email: "customer72@example.com",
       ManyChatId: "2131248826",
       ContactLink: "https://manychat.com/profile/24046",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1284567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-25"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
@@ -609,13 +609,13 @@ async function main() {
       Email: "customer80@example.com",
       ManyChatId: "6788107872",
       ContactLink: "https://manychat.com/profile/27272",
-      ExpireDate: new Date("2025-05-31"),
+      ExpireDate: new Date("2025-06-30"),
       CardID: 1294567,
       UserCountry: baseCountryRecords.find(
         (c) => c.BaseCountryName === "Singapore"
       ).BaseCountryID,
-      StartDate: new Date("2025-04-15"),
-      EndDate: new Date("2025-05-31"),
+      StartDate: new Date("2025-06-17"),
+      EndDate: new Date("2025-06-30"),
       Amount: 100,
       Month: 1,
       ScreenShotLink:
