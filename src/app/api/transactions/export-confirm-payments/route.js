@@ -12,7 +12,9 @@ async function retrieveHopeFuelList(
   limit = 10
 ) {
   const where = {
-    TransactionDate: {},
+    PaymentCheckTime: {
+      not: null,
+    },
   };
 
   const whereTransactionStatus = {
@@ -22,19 +24,18 @@ async function retrieveHopeFuelList(
   };
 
   if (startDate) {
-    where.TransactionDate.gte = new Date(startDate);
+    where.PaymentCheckTime.gte = dayjs(startDate).startOf("day").toDate();
   }
 
   if (endDate) {
-    const endOfDay = dayjs(endDate).endOf("day").toDate();
-    where.TransactionDate.lte = endOfDay;
+    where.PaymentCheckTime.lte = dayjs(endDate).endOf("day").toDate();
   }
 
   if (!startDate && !endDate) {
     const firstDay = dayjs().startOf("month").toDate();
     const firstDayNextMonth = dayjs().add(1, "month").startOf("month").toDate();
-    where.TransactionDate.gte = firstDay;
-    where.TransactionDate.lt = firstDayNextMonth;
+    where.PaymentCheckTime.gte = firstDay;
+    where.PaymentCheckTime.lt = firstDayNextMonth;
   }
 
   if (transactionStatus) {
