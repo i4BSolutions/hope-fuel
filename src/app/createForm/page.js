@@ -3,7 +3,6 @@
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Box, Button, Modal, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
 import CheckUser from "./checkUser";
@@ -18,7 +17,6 @@ function CreateOrExtendPage() {
   const [showExtendForm, setShowExtendForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const router = useRouter();
 
   // Fetch the current authenticated user and their role
   const [currentUser, setCurrentUser] = useState(null);
@@ -40,6 +38,7 @@ function CreateOrExtendPage() {
   // Handle showing the form based on user check
   const handleUserCheck = (user, isExistingUser) => {
     setUserInfo(user);
+
     if (isExistingUser) {
       setShowExtendOrNot(true); // Show the confirmation step
     } else {
