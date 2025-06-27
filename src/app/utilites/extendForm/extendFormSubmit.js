@@ -23,25 +23,6 @@ export default async function extendFormSubmit(
 
   const transactionDate = new Date();
 
-  const payload = {
-    customerName: userInfo.name,
-    customerEmail: userInfo.email,
-    agentId,
-    customerId,
-    supportRegionId: supportRegion,
-    countryId: donorCountry,
-    manyChatId,
-    contactLink,
-    amount,
-    month,
-    note,
-    walletId,
-    transactionDate,
-    screenShot: files.map((f) => ({
-      key: f.key,
-    })),
-  };
-
   let cardId = userInfo["prf_no"];
 
   //if cardID exist for the extend user
@@ -95,6 +76,25 @@ export default async function extendFormSubmit(
 
     let noteResponse = await fetch("/api/insertNote/", requestOptions);
     noteResponse = await noteResponse.json();
+
+    const payload = {
+      customerName: userInfo.name,
+      customerEmail: userInfo.email,
+      agentId,
+      customerId,
+      supportRegionId: supportRegion,
+      countryId: donorCountry,
+      manyChatId,
+      contactLink,
+      amount,
+      month,
+      noteId: noteResponse.id,
+      walletId,
+      transactionDate,
+      screenShot: files.map((f) => ({
+        key: f.key,
+      })),
+    };
 
     myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -150,7 +150,7 @@ export default async function extendFormSubmit(
       contactLink: contactLink,
       amount: amount,
       month: month,
-      note: note,
+      noteId: noteResponse.id,
       walletId: walletId,
       screenShot: files.map((file) => ({ key: file.key })),
       expireDate: expireDate,
