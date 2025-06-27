@@ -1,6 +1,7 @@
+export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 import prisma from "../../utilites/prisma";
-import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
