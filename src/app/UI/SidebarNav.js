@@ -49,7 +49,7 @@ const navItems = {
     path: "/entryForm",
   },
   hopefuelidlist: {
-    text: "HOPEID List",
+    text: "PRFHQ List",
     icon: <FormatListBulletedRoundedIcon />,
     path: "/hopefuelidlist",
   },
@@ -271,7 +271,7 @@ const Sidebar = () => {
               fontWeight: "bold",
             }}
           >
-            HopeFuel
+            PRFHQ
           </Typography>
         </Toolbar>
         <Divider

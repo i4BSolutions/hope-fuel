@@ -13,7 +13,7 @@ function SearchBar({ onSearch }) {
 
   return (
     <TextField
-      placeholder="Search HopeFuelID..."
+      placeholder="Search PRFHQ..."
       variant="outlined"
       fullWidth
       value={searchTerm}
