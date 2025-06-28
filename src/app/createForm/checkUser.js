@@ -1,7 +1,5 @@
 "use client";
 
-// import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-// import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { Box, CircularProgress, Modal, Typography } from "@mui/material";
 import { useEffect, useState, useCallback } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -27,8 +25,8 @@ export default function CheckUser({ onUserCheck }) {
   // State management
   const [loading, setLoading] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(null);
-  // const [hasPermissionThisMonth, setHasPermissionThisMonth] = useState(true);
-  // const [openModal, setOpenModal] = useState(false);
+  const [hasPermissionThisMonth, setHasPermissionThisMonth] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
 
   // React Hook Form setup
   const {
@@ -80,19 +78,23 @@ export default function CheckUser({ onUserCheck }) {
 
       const user = await checkUserSubmit(trimmedName, trimmedEmail);
 
-      // let hasPermission = true;
-      // Uncomment below to enable permission check for non-admins
-      // if (agent.roleId !== AGENT_ROLE.ADMIN) {
-      //   hasPermission = await checkUserPermission(trimmedName, trimmedEmail);
-      // }
-      // setHasPermissionThisMonth(hasPermission);
-      // if (!hasPermission) {
-      //   setOpenModal(true);
-      //   setLoading(false);
-      //   return;
-      // }
       if (user) {
-        // setOpenModal(true);
+        let hasPermission = true;
+
+        // Uncomment below to enable permission check for non-admins
+        if (agent.roleId !== AGENT_ROLE.ADMIN) {
+          hasPermission = await checkUserPermission(trimmedName, trimmedEmail);
+        }
+
+        setHasPermissionThisMonth(hasPermission);
+
+        if (!hasPermission) {
+          setOpenModal(true);
+          setLoading(false);
+          return;
+        }
+
+        setOpenModal(true);
         onUserCheck(user, true);
       } else {
         onUserCheck({ name: trimmedName, email: trimmedEmail }, false);
@@ -124,60 +126,47 @@ export default function CheckUser({ onUserCheck }) {
   }
 
   // // Modal for permission denial
-  // const renderPermissionModal = () => (
-  //   <Modal open={openModal} onClose={() => setOpenModal(false)}>
-  //     <Box
-  //       sx={{
-  //         position: "absolute",
-  //         top: "50%",
-  //         left: "50%",
-  //         transform: "translate(-50%, -50%)",
-  //         width: 500,
-  //         bgcolor: "white",
-  //         borderRadius: 3,
-  //         boxShadow: 24,
-  //         p: 4,
-  //         textAlign: "center",
-  //       }}
-  //     >
-  //       <Typography sx={{ fontSize: 18, fontWeight: "bold" }}>
-  //         Customer already existed.
-  //       </Typography>
-  //       <Typography sx={{ fontSize: 16, mb: 3, fontWeight: "bold" }}>
-  //         Do you wish to extend his/her membership instead?
-  //       </Typography>
-  //       <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
-  //         <CustomButton
-  //           variant="outlined"
-  //           onClick={() => setOpenModal(false)}
-  //           text="Back"
-  //           icon={<ArrowBackIcon />}
-  //           sx={{
-  //             borderColor: "#b71c1c",
-  //             color: "#b71c1c",
-  //             borderRadius: "25px",
-  //             px: 3,
-  //             "&:hover": { backgroundColor: "#fce8e6" },
-  //             fontSize: "12px",
-  //           }}
-  //         />
-  //         <CustomButton
-  //           variant="contained"
-  //           text="Proceed to Membership Extension"
-  //           icon={<ArrowForwardIcon />}
-  //           sx={{
-  //             backgroundColor: "#b71c1c",
-  //             color: "white",
-  //             borderRadius: "25px",
-  //             px: 3,
-  //             "&:hover": { backgroundColor: "#9a0007" },
-  //             fontSize: "12px",
-  //           }}
-  //         />
-  //       </Box>
-  //     </Box>
-  //   </Modal>
-  // );
+  const renderPermissionModal = () => (
+    <Modal open={openModal} onClose={() => setOpenModal(false)}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "52%",
+          transform: "translate(-50%, -50%)",
+          width: 500,
+          bgcolor: "white",
+          borderRadius: 3,
+          boxShadow: 24,
+          p: 4,
+          textAlign: "center",
+          width: "15%",
+        }}
+      >
+        <Typography sx={{ fontSize: 18, fontWeight: "bold" }}>
+          Customer already existed.
+        </Typography>
+        <Typography sx={{ fontSize: 16, mb: 3, mt: 5 }}>
+          Please contact the admin to extend the membership.
+        </Typography>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+          <CustomButton
+            variant="outlined"
+            onClick={() => setOpenModal(false)}
+            text="Close"
+            sx={{
+              borderColor: "#b71c1c",
+              color: "#b71c1c",
+              borderRadius: "25px",
+              px: 3,
+              "&:hover": { backgroundColor: "#fce8e6" },
+              fontSize: "12px",
+            }}
+          />
+        </Box>
+      </Box>
+    </Modal>
+  );
 
   // Main render
   return (
@@ -241,7 +230,7 @@ export default function CheckUser({ onUserCheck }) {
       </Box>
 
       {/* Permission Modal */}
-      {/* {!hasPermissionThisMonth && renderPermissionModal()} */}
+      {!hasPermissionThisMonth && renderPermissionModal()}
     </>
   );
 }
