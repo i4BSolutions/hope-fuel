@@ -113,7 +113,7 @@ export default function PaymentDetails({
   return (
     <>
       <Box>
-        <Stack spacing={2} fullWidth>
+        <Stack spacing={2} sx={{ width: "100%" }}>
           <HopeFuelIdStatus data={data} />
           <Stack direction="row" spacing={4}>
             {data.ScreenShotLinks && data.ScreenShotLinks.length > 0 ? (
@@ -139,32 +139,6 @@ export default function PaymentDetails({
                 </ScrollableImageContainer>
               </Tooltip>
             ) : (
-              // <ImageList
-              //   sx={{ width: "40%", height: 620, borderRadius: "12px" }}
-              //   rowHeight={620}
-              //   cols={1}
-              // >
-              //   {screenShots.map((link, index) => (
-              //     <ImageListItem
-              //       key={index}
-              //       sx={{
-              //         width: "100%",
-              //         borderRadius: "12px",
-              //         boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
-              //         objectFit: "contain",
-              //         cursor: "pointer",
-              //       }}
-              //       onClick={() => window.open(link, "_blank")}
-              //     >
-              //       <img
-              //         src={link}
-              //         style={{ borderRadius: "12px" }}
-              //         alt={`Screenshot ${index + 1}`}
-              //         loading="lazy"
-              //       />
-              //     </ImageListItem>
-              //   ))}
-              // </ImageList>
               <Typography>No screenshots available</Typography>
             )}
             <Stack spacing={2} sx={{ flex: 1 }}>
@@ -176,6 +150,7 @@ export default function PaymentDetails({
               </Card>
 
               <AmountDetails amount={data} />
+
               <Stack direction="row" spacing={2}>
                 <Stack direction={"column"} spacing={2} sx={{ width: "100%" }}>
                   {data.Region ? (
@@ -185,6 +160,7 @@ export default function PaymentDetails({
                       No Region Data Available
                     </Typography>
                   )}
+
                   {agent.roleId !== AGENT_ROLE.SUPPORT_AGENT && (
                     <>
                       <Typography
@@ -230,6 +206,7 @@ export default function PaymentDetails({
             </Stack>
           </Stack>
         </Stack>
+
         <FormControl sx={{ width: "40%", mb: 6 }}>
           <ActionButtons
             data={{
