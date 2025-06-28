@@ -94,7 +94,7 @@ const HopeFuelIDListDetails = ({ data }) => {
                 variant="h4"
                 component="h1"
               >
-                HOPEFUELID - {data?.HopeFuelID}
+                PRFHQ - {data?.HopeFuelID}
               </Typography>
               <Box
                 sx={{
