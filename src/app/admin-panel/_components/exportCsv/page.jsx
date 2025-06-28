@@ -224,6 +224,8 @@ const ExportCSVPage = () => {
         "Hopefuel ID",
         "Transaction Date",
         "Payment Check Time",
+        "Form Filled Person",
+        "Note",
       ];
 
       let csvContent = headers.join(",") + "\n";
@@ -241,6 +243,8 @@ const ExportCSVPage = () => {
           transaction.HopeFuelID || "",
           dayjs(transaction.TransactionDate).format("YYYY-MM-DD") || "",
           dayjs(transaction.PaymentCheckTime).format("YYYY-MM-DD") || "",
+          transaction.FormFilledPerson || "",
+          transaction.Note || "N/A",
         ];
         const escapedRow = row.map((field) => {
           if (/[",\n\r]/.test(field)) {
