@@ -20,7 +20,7 @@ const CreatorInfo = ({ creator }) => {
         </Typography>
       </Stack>
       <Stack direction={"column"} spacing={1}>
-        <Typography sx={{ fontSize: 20, fontWeight: 600 }}>HOPEID</Typography>
+        <Typography sx={{ fontSize: 20, fontWeight: 600 }}>PRFHQ</Typography>
         <Typography sx={{ fontSize: 16, fontWeight: 600 }}>
           {creator.HopeFuelID}
         </Typography>

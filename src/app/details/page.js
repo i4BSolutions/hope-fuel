@@ -63,11 +63,9 @@ export default function PaymentDetails() {
           setNote(transactionData.Note || "");
           setStatus(transactionData.Status || 1);
         } else {
-          console.error("No data found");
           setData(null);
         }
       } catch (error) {
-        console.error("Error fetching payment details:", error);
         setData(null);
       }
     };
