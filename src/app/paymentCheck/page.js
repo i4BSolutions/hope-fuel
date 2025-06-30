@@ -174,7 +174,7 @@ const PaymentTeam = () => {
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
           <TableRow>
-            <TableCell>HopeFuel ID</TableCell>
+            <TableCell>PRFHQ</TableCell>
             <TableCell>Currency</TableCell>
             <TableCell align="right">Amount</TableCell>
             <TableCell align="right">Wallet</TableCell>

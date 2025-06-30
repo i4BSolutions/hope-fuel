@@ -10,7 +10,7 @@ const CardItem = ({ date, amount, currency }) => (
     <Typography sx={{ fontWeight: 600, mb: 0.5, fontSize: 18 }}>
       {date}
     </Typography>
-    <Typography sx={{ display: "flex", alignItems: "center" }}>
+    <Typography component="div" sx={{ display: "flex", alignItems: "center" }}>
       {amount}
       <Chip
         label={currency}

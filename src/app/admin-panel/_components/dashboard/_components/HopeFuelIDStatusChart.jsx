@@ -47,7 +47,7 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
             letterSpacing: "-2%",
           }}
         >
-          Total Hopefuel ID
+          Total PRFHQ
         </Typography>
         <Typography
           sx={{
@@ -240,7 +240,7 @@ const HopeFuelIDStatusChart = ({ hopeFuelStatuses }) => {
               mt: 1,
             }}
           >
-            There is no hopefuel id stats.
+            There is no PRFHQ stats.
           </Typography>
         </Box>
       )}

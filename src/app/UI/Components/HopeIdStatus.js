@@ -40,7 +40,7 @@ export default function HopeFuelIdStatus({ data }) {
         }}
       >
         <Stack spacing={1}>
-          <h1 style={{ margin: 0 }}>HOPEID - {data.HopeFuelID}</h1>
+          <h1 style={{ margin: 0 }}>PRFHQ - {data.HopeFuelID}</h1>
           <h2 style={{ m: 0, fontSize: "20px" }}>
             {formatDate(data.TransactionDate)}
           </h2>

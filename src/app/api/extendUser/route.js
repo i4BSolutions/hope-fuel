@@ -7,8 +7,6 @@ import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import prisma from "../../utilites/prisma";
 
 async function createScreenShot(screenShot, transactionsID) {
-  console.log(transactionsID + "  " + screenShot);
-
   let screenShotLink = await screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
     const key = item.key;
@@ -16,10 +14,8 @@ async function createScreenShot(screenShot, transactionsID) {
 
     try {
       const result = await db(query, values);
-      console.log("result " + result);
       return result.insertId;
     } catch (error) {
-      console.error("Error inserting ScreenShot:", error);
       return;
     }
   });
@@ -37,14 +33,11 @@ async function InsertSubscription(customerId, month) {
       },
     });
     return subscription.SubscriptionID;
-  } catch (error) {
-    console.error("Error inserting subscription:", error);
-  }
+  } catch (error) {}
 }
 
 export async function POST(request) {
   const obj = await request.json();
-  console.log("Obj from extendUserAPI: ", obj);
 
   if (!obj["screenShot"]) {
     return NextResponse.json(
@@ -57,15 +50,17 @@ export async function POST(request) {
     "Select ExpireDate from Customer where CustomerID=?",
     [obj["customerId"]]
   );
-  console.log("Result is " + result);
+
   let nextExpireDate = null;
 
   if (result["ExpireDate"]) {
     let currentExpireDate = new Date(result["ExpireDate"]);
 
     let lastDayOfthisMonth = calculateExpireDate(new Date(), 0, 0);
+
     let isEedCurrent =
       currentExpireDate.getTime() >= lastDayOfthisMonth.getTime();
+
     if (isEedCurrent) {
       nextExpireDate = calculateExpireDate(
         currentExpireDate,
@@ -80,17 +75,20 @@ export async function POST(request) {
       );
     }
   } else {
-    // return Response.error("Cannot find ExpireDate")
+    nextExpireDate = calculateExpireDate(
+      result["ExpireDate"],
+      parseInt(obj["month"]),
+      false
+    );
   }
 
   let nextHopeFuelID = await maxHopeFuelID();
-  console.log("nextHopeFuelID", nextHopeFuelID);
 
   if (nextHopeFuelID === null) {
     nextHopeFuelID = 0;
   }
   nextHopeFuelID++;
-  console.log("Incremented maxHopeFuelID:", nextHopeFuelID);
+
   let timeZone = "Asia/Bangkok";
   let transactionDateWithThailandTimeZone = moment()
     .tz(timeZone)
@@ -119,7 +117,6 @@ export async function POST(request) {
   try {
     let result = await db(query, values);
   } catch (error) {
-    console.error("Error inserting FormStatus:", error);
     return NextResponse.json(
       { error: "Failed to insert FormStatus" },
       { status: 500 }
@@ -134,16 +131,12 @@ export async function POST(request) {
     obj["countryId"],
     obj["customerId"],
   ];
-  console.log("nextExpireDate is ");
-  console.log(nextExpireDate);
 
   const sql = `UPDATE Customer 
                 SET ExpireDate = ?, ManyChatId = ? ,AgentId = ?, UserCountry = ?
                 WHERE CustomerID = ?`;
   try {
     let result = await db(sql, value);
-    // console.log("Result: ", result);
-    console.log("Transaction ID is " + transactionId);
 
     let timeZone = "Asia/Bangkok";
     let transactionDateWithThailandTimeZone = moment()
@@ -164,7 +157,6 @@ export async function POST(request) {
     );
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Error inserting customer:", error);
     return NextResponse.json(
       { error: "Failed to insert customer" },
       { status: 500 }

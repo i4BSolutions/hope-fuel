@@ -185,7 +185,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
           gap={2}
           sx={{ maxWidth: 400 }}
         >
-          <Box>
+          <Box display="flex" flexDirection="column" gap={2}>
             {/* Name Input */}
             <Box flex={1}>
               <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
@@ -298,7 +298,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
                 />
               </Box>
             </Box>
-            <Box maxWidth={300} mb={2}>
+            <Box maxWidth={300}>
               {minAmountError && <ErrorMessage message={minAmountError} />}
             </Box>
           </Box>

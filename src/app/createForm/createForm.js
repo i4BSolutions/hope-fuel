@@ -47,7 +47,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
     resolver: zodResolver(schema),
     defaultValues: {
       currency: "",
-      amount: null,
+      amount: "",
       walletId: "",
       month: 1,
       supportRegion: "",

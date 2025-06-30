@@ -8,10 +8,10 @@ export async function POST(request) {
   const { name, email } = json;
 
   try {
-    // check the user latest transaction in mysql if exist
+    // check the user latest transaction in mysql if exist and get expired date
 
     const transaction = await db(
-      `SELECT t.* 
+      `SELECT t.*, c.ExpireDate
         FROM Transactions t
         INNER JOIN Customer c ON t.CustomerID = c.CustomerID
         WHERE c.Name = ? 
@@ -22,21 +22,33 @@ export async function POST(request) {
       [name, email]
     );
 
-    console.log("thisisthero");
-    console.log(transaction);
+    // Check if user exists and get expired date
+    const customer = await db(
+      `SELECT ExpireDate FROM Customer WHERE Name = ? AND Email = ? LIMIT 1;`,
+      [name, email]
+    );
+
+    // If customer exists, check expired date
+    if (customer.length > 0 && customer[0].ExpireDate) {
+      const expiredDate = new Date(customer[0].ExpireDate);
+      const currentDate = new Date();
+
+      // If current date is before expired date, return false (user hasn't expired yet)
+      if (currentDate < expiredDate) {
+        console.log("user has not expired yet");
+        return NextResponse.json(false);
+      }
+    }
 
     // if transacation hasn't been checked yet
     if (transaction.length > 0 && transaction[0]["PaymentDenied"] == 1) {
-      console.log("hello world");
       return NextResponse.json(true);
     } else if (
       transaction.length > 0 &&
       (transaction[0]["PaymentDenied"] == null ||
         transaction[0]["PaymentDenied"] == 0)
     ) {
-      console.log("transaction this month permission is checking");
       let latestTransaction = transaction[0];
-      console.log(latestTransaction);
       let latestTransactionDate = new Date(
         latestTransaction["TransactionDate"]
       );
@@ -47,7 +59,7 @@ export async function POST(request) {
       let answer =
         latestTransactionDate.getMonth() < currentMonth ||
         latestTransactionDate.getFullYear() < currentYear;
-      console.log("answer", answer);
+
       return NextResponse.json(answer);
     }
 

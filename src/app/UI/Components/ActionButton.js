@@ -1,9 +1,10 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Button, Stack, Typography, CircularProgress } from "@mui/material";
 import React from "react";
 import { useAgentStore } from "../../../stores/agentStore";
 
 const ActionButtons = ({ data, onActionComplete }) => {
-  const [loading, setLoading] = React.useState(false);
+  const [confirmLoading, setConfirmLoading] = React.useState(false);
+  const [denyLoading, setDenyLoading] = React.useState(false);
   const [confirmDenyFlag, setConfirmDenyFlag] = React.useState(null);
   const { agent } = useAgentStore();
 
@@ -13,7 +14,7 @@ const ActionButtons = ({ data, onActionComplete }) => {
   }
 
   const handleConfirm = async () => {
-    setLoading(true);
+    setConfirmLoading(true);
     const payload = {
       transactionId: data.TransactionID,
       agentId: agent.id,
@@ -29,12 +30,12 @@ const ActionButtons = ({ data, onActionComplete }) => {
     } catch (error) {
       console.error("error updating the confirm status");
     } finally {
-      setLoading(false);
+      setConfirmLoading(false);
     }
   };
 
   const handleDenied = async () => {
-    setLoading(true);
+    setDenyLoading(true);
 
     const payload = {
       transactionId: data.TransactionID,
@@ -51,21 +52,24 @@ const ActionButtons = ({ data, onActionComplete }) => {
     } catch (error) {
       console.error("error updating the deny status");
     } finally {
-      setLoading(false);
+      setDenyLoading(false);
     }
   };
 
   return (
-    <Stack direction="row" spacing={2} sx={{ marginTop: 2 }} fullWidth>
+    <Stack direction="row" spacing={2} sx={{ marginTop: 2, width: "100%" }}>
       <Button
         variant="contained"
         fullWidth
         sx={{ borderRadius: 6, py: 1 }}
         color="error"
         onClick={handleConfirm}
-        disabled={loading}
+        disabled={confirmLoading || denyLoading}
+        startIcon={
+          confirmLoading ? <CircularProgress size={16} color="inherit" /> : null
+        }
       >
-        Confirm
+        {confirmLoading ? "Confirming..." : "Confirm"}
       </Button>
       <Button
         sx={{ borderRadius: 6, py: 1 }}
@@ -73,9 +77,12 @@ const ActionButtons = ({ data, onActionComplete }) => {
         fullWidth
         color="error"
         onClick={handleDenied}
-        disabled={loading}
+        disabled={confirmLoading || denyLoading}
+        startIcon={
+          denyLoading ? <CircularProgress size={16} color="inherit" /> : null
+        }
       >
-        Deny
+        {denyLoading ? "Denying..." : "Deny"}
       </Button>
 
       {confirmDenyFlag === "confirmed" && (
