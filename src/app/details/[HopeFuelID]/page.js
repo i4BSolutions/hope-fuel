@@ -48,11 +48,9 @@ export default function PaymentDetails() {
           setNote(transactionData.Note || "");
           setStatus(transactionData.Status || 1);
         } else {
-          console.error("No data found");
           setData(null);
         }
       } catch (error) {
-        console.error("Error fetching payment details:", error);
         setData(null);
       }
     };
@@ -121,7 +119,6 @@ export default function PaymentDetails() {
                         boxShadow: "0 0 5px rgba(0, 0, 0, 0.2)",
                       }}
                       onClick={() => {
-                        console.log("hello this is me");
                         window.open(link, "_blank");
                       }}
                     />
