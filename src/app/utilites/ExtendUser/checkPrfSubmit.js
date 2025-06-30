@@ -44,7 +44,6 @@ export default async function checkPrfSubmit(
 
   let res = await fetch("api/getCustomerFromCardID", requestOptions);
   res = await res.json();
-  console.log("res from checkprf", res);
 
   //if the data is not there
   if (!answer && !Object.hasOwn(res, "Name")) {

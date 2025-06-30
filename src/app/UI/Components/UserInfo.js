@@ -26,7 +26,9 @@ const UserInfo = ({ user }) => (
       </Stack>
       <Stack direction={"column"} spacing={0.5}>
         <Typography>Expire Date</Typography>
-        <Typography>{formatDate(user.ExpireDate)}</Typography>
+        <Typography>
+          {user.ExpireDate ? formatDate(user.ExpireDate) : "N/A"}
+        </Typography>
       </Stack>{" "}
       <Stack direction={"column"} spacing={0.5}>
         <Typography>Card No</Typography>
