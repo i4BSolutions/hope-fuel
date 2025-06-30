@@ -81,7 +81,6 @@ export default function CheckUser({ onUserCheck }) {
       if (user) {
         let hasPermission = true;
 
-        // Uncomment below to enable permission check for non-admins
         if (agent.roleId !== AGENT_ROLE.ADMIN) {
           hasPermission = await checkUserPermission(trimmedName, trimmedEmail);
         }
