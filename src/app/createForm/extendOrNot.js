@@ -59,7 +59,9 @@ const ExtendOrNot = ({ userInfo, onConfirm, onDecline }) => {
                 <TableCell>{userInfo.email || "N/A"}</TableCell>
                 <TableCell>{userInfo.prf_no || "N/A"}</TableCell>
                 <TableCell>
-                  {new Date(userInfo.expire_date).toLocaleDateString() || "N/A"}
+                  {userInfo.expire_date
+                    ? new Date(userInfo.expire_date).toLocaleDateString()
+                    : "N/A"}
                 </TableCell>
               </TableRow>
             </TableBody>

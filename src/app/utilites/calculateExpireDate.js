@@ -3,6 +3,16 @@ export default function calculateExpireDate(
   month, // The number of months to add to the current expiration date
   hasExpired // A boolean indicating whether the current expiration date has already passed
 ) {
+  // If currentExpireDate is null, set expiration to current date + month parameter - 1
+  if (currentExpireDate === null) {
+    const currentDate = new Date();
+    return new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + month,
+      0 // Set the date to the last day of the resulting month
+    );
+  }
+
   // If the current expiration date has already passed
   if (hasExpired) {
     return new Date(
