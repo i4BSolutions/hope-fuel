@@ -122,6 +122,40 @@ const TransactionList = ({ transactions }) => {
                 </TableCell>
 
                 <TableCell sx={{ borderBottom: "1px solid #eee" }}>
+                  <Box>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      Form Filled Person
+                    </Typography>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      {row.FormFilledPerson}
+                    </Typography>
+                  </Box>
+                </TableCell>
+
+                <TableCell sx={{ borderBottom: "1px solid #eee" }}>
+                  <Box>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      Note
+                    </Typography>
+                    <Typography
+                      variant="h1"
+                      sx={{ color: "#000000", fontSize: 14, fontWeight: 400 }}
+                    >
+                      {row.Note}
+                    </Typography>
+                  </Box>
+                </TableCell>
+
+                <TableCell sx={{ borderBottom: "1px solid #eee" }}>
                   <Chip
                     label={row.TransactionStatus}
                     sx={{

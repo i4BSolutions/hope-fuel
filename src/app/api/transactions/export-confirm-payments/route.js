@@ -126,9 +126,7 @@ async function retrieveHopeFuelList(
     CurrencyCode: t.Wallet?.Currency?.CurrencyCode || null,
     Month: t.Month,
     ManyChatId: t.Customer?.ManyChatId || null,
-    FormFilledPerson: t.TransactionAgent.map((ta) => ta.Agent?.AwsId).filter(
-      Boolean
-    ),
+    FormFilledPerson: t.TransactionAgent[0]?.Agent?.Username || null,
     TransactionStatus:
       t.FormStatus[0]?.TransactionStatus?.TransactionStatus || null,
     Note: t.Note?.Note || null,
@@ -171,7 +169,7 @@ export async function GET(req) {
       page,
       limit
     );
-    console.log("Result:", JSON.stringify(result, null, 2));
+
     return NextResponse.json({
       status: 200,
       message: "Hopefuel list retrieve successfully.",

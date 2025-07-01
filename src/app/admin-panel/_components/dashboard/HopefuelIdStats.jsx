@@ -55,7 +55,7 @@ export default function HopefuelIdStats({ currentMonth }) {
               letterSpacing: "-2%",
             }}
           >
-            Hopefuel IDs by status
+            PRFHQ by status
           </Typography>
           <Box sx={{ mt: 1, width: "100%" }}>
             <HopeFuelIDStatusChart hopeFuelStatuses={transactionStatuses} />

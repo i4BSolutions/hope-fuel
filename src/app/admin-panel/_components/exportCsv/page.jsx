@@ -228,6 +228,8 @@ const ExportCSVPage = () => {
         "Hopefuel ID",
         "Transaction Date",
         "Payment Check Time",
+        "Form Filled Person",
+        "Note",
       ];
 
       let csvContent = "\uFEFF" + headers.join(",") + "\n";
@@ -248,6 +250,8 @@ const ExportCSVPage = () => {
           dayjs
             .utc(transaction.PaymentCheckTime)
             .format("YYYY-MM-DD HH:mm A") || "",
+          transaction.FormFilledPerson || "",
+          transaction.Note || "N/A",
         ];
         const escapedRow = row.map((field) => {
           if (/[",\n\r]/.test(field)) {
