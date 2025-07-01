@@ -30,6 +30,11 @@ import csvHandler from "../../../utilites/exportCSV/csvHandler";
 
 import { useAgentStore } from "../../../../stores/agentStore";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const ExportCSVPage = () => {
   const { agent } = useAgentStore();
@@ -134,7 +139,6 @@ const ExportCSVPage = () => {
       const url = `api/transactions/export-confirm-payments?startDate=${startDateFormatted}&endDate=${endDateFormatted}&transactionStatus=Payment Checked&limit=${totalCount}`;
 
       const response = await fetch(url);
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
@@ -228,7 +232,7 @@ const ExportCSVPage = () => {
         "Note",
       ];
 
-      let csvContent = headers.join(",") + "\n";
+      let csvContent = "\uFEFF" + headers.join(",") + "\n";
 
       allTransactionsForExport.forEach((transaction) => {
         const row = [
@@ -238,11 +242,14 @@ const ExportCSVPage = () => {
           transaction.CardID || "",
           transaction.Amount || "",
           transaction.CurrencyCode || "",
-          transaction.Month + " " + "Month" || "",
+          transaction.Month || "",
           transaction.Region || "",
           transaction.HopeFuelID || "",
-          dayjs(transaction.TransactionDate).format("YYYY-MM-DD") || "",
-          dayjs(transaction.PaymentCheckTime).format("YYYY-MM-DD") || "",
+          dayjs.utc(transaction.TransactionDate).format("YYYY-MM-DD HH:mm A") ||
+            "",
+          dayjs
+            .utc(transaction.PaymentCheckTime)
+            .format("YYYY-MM-DD HH:mm A") || "",
           transaction.FormFilledPerson || "",
           transaction.Note || "N/A",
         ];

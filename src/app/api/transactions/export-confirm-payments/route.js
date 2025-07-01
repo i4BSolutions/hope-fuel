@@ -159,9 +159,7 @@ export async function GET(req) {
   const limitParam = params.get("limit");
 
   const page = pageParam ? Math.max(1, parseInt(pageParam, 10)) : 1;
-  const limit = limitParam
-    ? Math.max(1, Math.min(100, parseInt(limitParam, 10)))
-    : 10;
+  const limit = limitParam ? Math.max(1, parseInt(limitParam, 10)) : 10;
 
   try {
     const result = await retrieveHopeFuelList(
