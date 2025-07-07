@@ -245,11 +245,12 @@ const ExportCSVPage = () => {
           transaction.Month || "",
           transaction.Region || "",
           transaction.HopeFuelID || "",
-          dayjs.utc(transaction.TransactionDate).format("YYYY-MM-DD HH:mm A") ||
-            "",
+          dayjs
+            .utc(transaction.TransactionDate)
+            .format("YYYY-MM-DD HH:mm:ss") || "",
           dayjs
             .utc(transaction.PaymentCheckTime)
-            .format("YYYY-MM-DD HH:mm A") || "",
+            .format("YYYY-MM-DD HH:mm:ss") || "",
           transaction.FormFilledPerson || "",
           transaction.Note || "N/A",
         ];
