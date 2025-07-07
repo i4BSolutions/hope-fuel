@@ -11,7 +11,7 @@ export async function POST(request) {
     // check the user latest transaction in mysql if exist and get expired date
 
     const transaction = await db(
-      `SELECT t.*, c.ExpireDate
+      `SELECT t.*
         FROM Transactions t
         INNER JOIN Customer c ON t.CustomerID = c.CustomerID
         WHERE c.Name = ? 
@@ -21,24 +21,6 @@ export async function POST(request) {
         LIMIT 1;`,
       [name, email]
     );
-
-    // Check if user exists and get expired date
-    const customer = await db(
-      `SELECT ExpireDate FROM Customer WHERE Name = ? AND Email = ? LIMIT 1;`,
-      [name, email]
-    );
-
-    // If customer exists, check expired date
-    if (customer.length > 0 && customer[0].ExpireDate) {
-      const expiredDate = new Date(customer[0].ExpireDate);
-      const currentDate = new Date();
-
-      // If current date is before expired date, return false (user hasn't expired yet)
-      if (currentDate < expiredDate) {
-        console.log("user has not expired yet");
-        return NextResponse.json(false);
-      }
-    }
 
     // if transacation hasn't been checked yet
     if (transaction.length > 0 && transaction[0]["PaymentDenied"] == 1) {
