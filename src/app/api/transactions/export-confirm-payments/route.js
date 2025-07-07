@@ -3,6 +3,11 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 async function retrieveHopeFuelList(
   startDate,
@@ -173,8 +178,12 @@ export async function GET(req) {
     return NextResponse.json({
       status: 200,
       message: "Hopefuel list retrieve successfully.",
-      startDate: startDate ? dayjs(startDate).format("YYYY-MM-DD") : null,
-      endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : null,
+      startDate: startDate
+        ? dayjs.utc(startDate).format("YYYY-MM-DD HH:mm:ss")
+        : null,
+      endDate: endDate
+        ? dayjs.utc(endDate).format("YYYY-MM-DD HH:mm:ss")
+        : null,
       transactionStatus,
       totalCount: result.totalCount,
       data: result.data,
