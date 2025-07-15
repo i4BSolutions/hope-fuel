@@ -170,7 +170,6 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
 
           <Grid item xs={12}>
             <TextField
-              required
               label="Email"
               type="email"
               fullWidth

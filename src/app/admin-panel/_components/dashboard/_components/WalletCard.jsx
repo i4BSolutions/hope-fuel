@@ -116,7 +116,7 @@ export default function WalletCard({
           </Box>
           <Box sx={{ display: "flex" }}>
             <Typography variant="h6" fontWeight="bold">
-              {totalAmountUSD}{" "}
+              {totalAmountUSD.toLocaleString()}{" "}
               <Typography variant="caption" component="span">
                 USD
               </Typography>

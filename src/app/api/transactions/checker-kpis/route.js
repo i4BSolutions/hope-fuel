@@ -83,47 +83,59 @@ export async function GET(request) {
     });
 
     const grouped = {};
+    const walletTxMap = {};
 
     for (const tx of transactions) {
-      const agentId = latestAssignment[tx.TransactionID];
-      if (!agentId || !checkerMap.has(agentId)) continue;
+      if (!walletTxMap[tx.WalletID]) {
+        walletTxMap[tx.WalletID] = [];
+      }
+      walletTxMap[tx.WalletID].push(tx);
+    }
 
+    // Now process by checker
+    for (const checker of checkers) {
+      const agentId = checker.AgentId;
       const walletSet = agentWalletMap[agentId];
-      if (!walletSet || !walletSet.has(tx.WalletID)) continue;
+      if (!walletSet) continue;
 
-      if (!grouped[agentId]) {
-        grouped[agentId] = {
-          checkerId: agentId,
-          name: checkerMap.get(agentId),
-          checked: 0,
-          pending: 0,
-          durations: [],
-          under48h: 0,
-          over48h: 0,
-        };
-      }
+      const record = {
+        checkerId: agentId,
+        name: checker.Username,
+        checked: 0,
+        pending: 0,
+        durations: [],
+        under48h: 0,
+        over48h: 0,
+      };
 
-      const record = grouped[agentId];
+      for (const walletId of walletSet) {
+        const txList = walletTxMap[walletId] || [];
+        for (const tx of txList) {
+          if (tx.PaymentCheck === true) {
+            record.checked++;
 
-      if (tx.PaymentCheck === true && tx.PaymentCheckTime) {
-        record.checked++;
+            if (tx.PaymentCheckTime) {
+              const duration = dayjs(tx.PaymentCheckTime).diff(
+                dayjs(tx.TransactionDate),
+                "hour",
+                true
+              );
 
-        const duration = dayjs(tx.PaymentCheckTime).diff(
-          dayjs(tx.TransactionDate),
-          "hour",
-          true
-        );
+              record.durations.push(duration);
 
-        record.durations.push(duration);
-
-        if (duration <= 48) {
-          record.under48h++;
-        } else {
-          record.over48h++;
+              if (duration <= 48) {
+                record.under48h++;
+              } else {
+                record.over48h++;
+              }
+            }
+          } else {
+            record.pending++;
+          }
         }
-      } else {
-        record.pending++;
       }
+
+      grouped[agentId] = record;
     }
 
     const result = Object.values(grouped).map((checker) => {

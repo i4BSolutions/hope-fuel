@@ -86,16 +86,16 @@ export async function GET(request) {
       }
 
       summary[walletId].count += 1;
-      summary[walletId].totalAmount += amount;
 
       if (tx.PaymentCheck === true) {
         summary[walletId].checked += 1;
+        summary[walletId].totalAmount += amount;
+
+        if (rate) {
+          summary[walletId].totalAmountUSD += amount / rate;
+        }
       } else {
         summary[walletId].pending += 1;
-      }
-
-      if (rate) {
-        summary[walletId].totalAmountUSD += amount / rate;
       }
     }
 
