@@ -13,7 +13,9 @@ export const FundraisingSchema = z
     FundraiserEmail: z
       .string()
       .email("Invalid email address")
-      .nonempty("Email is required"),
+      .optional()
+      .or(z.literal(""))
+      .or(z.null()),
     FacebookLink: z
       .string()
       .url("Invalid Facebook URL")
