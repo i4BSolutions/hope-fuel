@@ -95,7 +95,6 @@ export async function POST(req) {
 
   const requiredFields = {
     FundraiserName,
-    FundraiserEmail,
     FundraiserLogo,
     FundraiserCentralID,
     BaseCountryName,
