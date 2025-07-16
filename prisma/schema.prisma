@@ -136,7 +136,7 @@ model FormVisibilityStatus {
 model Fundraiser {
   FundraiserID                  Int                             @id @default(autoincrement())
   FundraiserName                String                          @db.VarChar(255)
-  FundraiserEmail               String?                         @unique(map: "FundraiserEmail") @db.VarChar(191)
+  FundraiserEmail               String?                         @db.VarChar(191)
   FundraiserLogo                String?                         @db.VarChar(255)
   BaseCountryID                 Int?
   FundraiserCentralID           Int?
