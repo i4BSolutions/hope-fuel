@@ -1,11 +1,9 @@
 import prisma from "@/app/utilites/prisma";
 import { NextResponse } from "next/server";
 
-async function fetchFundraisers(limit, offset) {
+async function fetchFundraisers() {
   try {
     const fundraisers = await prisma.fundraiser.findMany({
-      skip: offset,
-      take: limit,
       include: {
         BaseCountry: {
           select: { BaseCountryName: true },
@@ -65,21 +63,13 @@ async function fetchFundraisers(limit, offset) {
   }
 }
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const page = Number(searchParams.get("page")) || 1;
-  const limit = Number(searchParams.get("limit")) || 10;
-  const offset = (page - 1) * limit;
-
+export async function GET() {
   try {
-    const total = await prisma.fundraiser.count();
-    const fundraisers = await fetchFundraisers(limit, offset);
+    const fundraisers = await fetchFundraisers();
 
     return NextResponse.json(
       {
-        totalRecords: total,
-        totalPages: Math.ceil(total / limit),
-        currentPage: page,
+        totalRecords: fundraisers.length,
         fundraisers,
       },
       { status: 200 }
