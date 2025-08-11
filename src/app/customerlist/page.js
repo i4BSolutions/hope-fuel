@@ -3,7 +3,6 @@
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Drawer,
   Grid,
@@ -79,14 +78,6 @@ const CustomerListPage = () => {
   }, []);
 
   useEffect(() => {
-    if (debouncedSearch) {
-      searchCustomers(debouncedSearch);
-    } else if (initialLoadRef.current) {
-      fetchCustomerData(1, true);
-    }
-  }, [debouncedSearch]);
-
-  useEffect(() => {
     if (isMobile) {
       setShowSidebar(!selectedProfileId);
     } else {
@@ -94,63 +85,8 @@ const CustomerListPage = () => {
     }
   }, [isMobile, selectedProfileId]);
 
-  const searchCustomers = useCallback(async (term) => {
-    if (!term) return;
-
-    setLoading(true);
-    setIsSearching(true);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/customers/search?term=${encodeURIComponent(term)}`
-      );
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          setCustomerData([]);
-          setSelectedProfileId(null);
-          setProfileDetailData(null);
-          setHasMore(false);
-          return;
-        }
-        throw new Error(`Search failed (${response.status})`);
-      }
-
-      const result = await response.json();
-      const searchResults = result.data || [];
-
-      const uniqueResults = [
-        ...new Map(
-          searchResults.map((item) => [item.CustomerId, item])
-        ).values(),
-      ];
-
-      setCustomerData(uniqueResults);
-      setHasMore(false);
-
-      if (uniqueResults.length > 0) {
-        const firstId = uniqueResults[0].CustomerId;
-        setSelectedProfileId(firstId);
-        setHoveredProfileId(firstId);
-        fetchProfileDetails(firstId);
-      } else {
-        setSelectedProfileId(null);
-        setProfileDetailData(null);
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-      setCustomerData([]);
-      setSelectedProfileId(null);
-      setProfileDetailData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const fetchCustomerData = useCallback(
-    async (pageNumber, isNewSearch = false) => {
+    async (pageNumber, isNewSearch = false, term = "") => {
       if (loading) return;
 
       setLoading(true);
@@ -158,9 +94,11 @@ const CustomerListPage = () => {
       setError(null);
 
       try {
-        const response = await fetch(
-          `/api/customers?page=${pageNumber}&limit=${PAGE_SIZE}`
-        );
+        const url = `/api/customers?page=${pageNumber}&limit=${PAGE_SIZE}${
+          term ? `&term=${encodeURIComponent(term)}` : ""
+        }`;
+
+        const response = await fetch(url);
         if (!response.ok)
           throw new Error(`Failed to fetch customers (${response.status})`);
 
@@ -175,7 +113,7 @@ const CustomerListPage = () => {
           setPage((prev) => prev + 1);
         }
 
-        setHasMore(newCustomers.length >= PAGE_SIZE);
+        setHasMore(!term && newCustomers.length >= PAGE_SIZE);
 
         if (newCustomers.length > 0 && isNewSearch) {
           const firstId = newCustomers[0].CustomerId;
@@ -285,8 +223,9 @@ const CustomerListPage = () => {
   }, []);
 
   const handleLoadMore = useCallback(() => {
-    if (!loading && hasMore && !isSearching) fetchCustomerData(page + 1, false);
-  }, [loading, hasMore, page, fetchCustomerData, isSearching]);
+    if (!loading && hasMore && !isSearching)
+      fetchCustomerData(page + 1, false, searchText);
+  }, [loading, hasMore, page, fetchCustomerData, isSearching, searchText]);
 
   const handleProfileSelect = (id) => {
     setSelectedProfileId(id);
@@ -331,12 +270,16 @@ const CustomerListPage = () => {
     [selectedEditId, agent.id, fetchProfileDetails, selectedProfileId]
   );
 
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
+  const handleSearchChange = (value, submit = false) => {
     setSearchText(value);
 
-    if (!value) {
+    if (!value.trim()) {
       fetchCustomerData(1, true);
+      return;
+    }
+
+    if (submit) {
+      fetchCustomerData(1, true, value);
     }
   };
 

@@ -42,7 +42,15 @@ const Sidebar = ({
           fullWidth
           variant="outlined"
           value={searchValue}
-          onChange={onSearch}
+          onChange={(e) => onSearch(e.target.value, false)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              if (searchValue.trim()) {
+                onSearch(searchValue, true);
+              }
+            }
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -95,7 +103,7 @@ const Sidebar = ({
                       {profile.Email}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {profile.ManyChatId}
+                      {profile.CardID}
                     </Typography>
                   </Box>
                 </ListItem>
