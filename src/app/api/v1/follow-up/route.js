@@ -4,6 +4,7 @@ import prisma from "../../../utilites/prisma";
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const statusId = parseInt(searchParams.get("statusId") || "0", 10);
+  const agentId = parseInt(searchParams.get("agentId") || "0", 10);
   const now = new Date();
 
   const currentYear = parseInt(searchParams.get("year"), 10);
@@ -44,23 +45,23 @@ export async function GET(req) {
       end: new Date(endDate),
     }));
 
-    const isActiveInJune = parsedSubs.some(
+    const isActiveInCurrent = parsedSubs.some(
       ({ end }) => end.getTime() >= monthStart.getTime()
     );
 
-    const endedInAprOrMay = parsedSubs.some(
+    const endInPastTwoMonths = parsedSubs.some(
       ({ end }) =>
         end.getTime() >= twoMonthsAgoStart.getTime() &&
         end.getTime() <= oneMonthAgoEnd.getTime()
     );
 
-    if (!isActiveInJune && endedInAprOrMay) {
+    if (!isActiveInCurrent && endInPastTwoMonths) {
       followUpCustomerIDs.push(customerID);
     }
   }
 
   // Fetch customer details
-  const followUpCustomers = await prisma.customer.findMany({
+  const followUpCustomers = await prisma.Customer.findMany({
     where: {
       CustomerId: { in: followUpCustomerIDs },
     },
@@ -99,6 +100,16 @@ export async function GET(req) {
           },
         },
       },
+      FollowUpComment: {
+        include: {
+          Agent: {
+            select: {
+              AgentId: true,
+              Username: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -111,6 +122,17 @@ export async function GET(req) {
 
       const status = followUp?.FollowUpStatusID ?? 1;
 
+      const comments = customer.FollowUpComment
+        .sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt)) // Sort by newest first
+        .map((c) => ({
+          id: c.Id,
+          comment: c.Comment,
+          isResolved: c.Is_Resolved,
+          agentUsername: c.Agent?.Username ?? null,
+          agentId: c.Agent?.AgentId ?? null,
+          createdAt: c.CreatedAt,
+        }));
+
       return {
         customerId: customer.CustomerId,
         name: customer.Name,
@@ -118,14 +140,21 @@ export async function GET(req) {
         cardId: customer.CardID,
         manyChatId: customer.ManyChatId,
         lastFormAgent: agent ? agent.Username : null,
+        agentId: agent ? agent.AgentId : null,
         note: transaction?.Note?.Note || null,
         followUpStatus: {
           statusId: status,
           followUpDate: followUp?.FollowUpDate ?? null,
         },
+        comments,
       };
     })
-    .filter((c) => statusId === 0 || c.followUpStatus.statusId === statusId);
+    .filter((c) => {
+      const statusMatch =
+        statusId === 0 || c.followUpStatus.statusId === statusId;
+      const agentMatch = agentId === 0 || c.agentId === agentId;
+      return statusMatch && agentMatch;
+    });
 
   return NextResponse.json({ success: true, data: result });
 }
