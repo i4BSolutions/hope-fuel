@@ -28,6 +28,7 @@ import { signOut } from "aws-amplify/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAgentStore } from "../../stores/agentStore";
+import UserCheck from "@/lib/icons/UserCheck";
 
 const drawerWidth = 250; // Full-width drawer
 const miniDrawerWidth = 80; // Mini sidebar width
@@ -63,6 +64,11 @@ const navItems = {
     icon: <FlagIcon />,
     path: "/fundraisers",
   },
+  followUpCustomers: {
+    text: "Follow Up Customers",
+    icon: <UserCheck />,
+    path: "/follow-up-customers",
+  },
   adminPanel: {
     text: "Admin Panel",
     icon: <ManageAccountsIcon />,
@@ -82,6 +88,7 @@ const roleBasedNavItems = {
     navItems.entryForm,
     navItems.hopefuelidlist,
     navItems.customerlist,
+    navItems.followUpCustomers,
     navItems.fundraisers,
   ],
   2: [
@@ -90,6 +97,7 @@ const roleBasedNavItems = {
     navItems.entryForm,
     navItems.hopefuelidlist,
     navItems.customerlist,
+    navItems.followUpCustomers,
     navItems.fundraisers,
     navItems.adminPanel,
   ],

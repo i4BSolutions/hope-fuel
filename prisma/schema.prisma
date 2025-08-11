@@ -26,6 +26,7 @@ model Agent {
   CSVExportTransactionLogs CSVExportTransactionLogs[]
   AssignedWallet           AssignedWallet[]
   AssignedAgents           AssignedAgent[]
+  FollowUpComment          FollowUpComment[]
 
   @@index([UserRoleId], map: "UserRoleId")
 }
@@ -64,6 +65,7 @@ model Customer {
   Transactions      Transactions[]
   Subscriptions     Subscription[]
   FollowUpStatus    CustomerFollowUpStatus[]
+  FollowUpComment FollowUpComment[] @relation("followUpComment_customer_fk")
 
   BaseCountry BaseCountry? @relation(fields: [UserCountry], references: [BaseCountryID], map: "BaseCountryID")
 
@@ -345,6 +347,18 @@ model CustomerFollowUpStatus {
 
   @@index([CustomerID], map: "CustomerID")
   @@index([FollowUpStatusID], map: "FollowUpStatusID")
+}
+
+model FollowUpComment {
+  Id Int @id @default(autoincrement())
+  AgentId Int
+  CustomerID Int
+  Comment String
+  Is_Resolved Boolean @default(false)
+  CreatedAt DateTime @default(now()) @db.Timestamp(0)
+
+  Agent  Agent?  @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "followUpComment_agent_fk")
+  Customer Customer @relation("followUpComment_customer_fk", fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict)
 }
 
 enum CustomerAuditLogs_FieldChanged {
