@@ -1,7 +1,7 @@
 "use client";
 
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import { Box, Button, Modal, Typography } from "@mui/material";
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
+import { Box } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect, useState } from "react";
 import getAuthCurrentUser from "../utilites/getAuthCurrentUser";
@@ -11,6 +11,7 @@ import ExtendForm from "./extendForm";
 import ExtendOrNot from "./extendOrNot";
 
 function CreateOrExtendPage() {
+  const { showSnackbar } = useSnackbar();
   const [userInfo, setUserInfo] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showExtendOrNot, setShowExtendOrNot] = useState(false);
@@ -61,7 +62,7 @@ function CreateOrExtendPage() {
 
   if (loading)
     return (
-      <Box sx={{ display: "flex", justifyContent: "center", height: "100vh" }}>
+      <Box sx={{ display: "grid", placeItems: "center", height: "500px" }}>
         <CircularProgress />
       </Box>
     );
@@ -88,55 +89,22 @@ function CreateOrExtendPage() {
           <CreateForm
             userInfo={userInfo}
             setloading={setLoading}
-            onSuccess={() => setIsSuccessModalOpen(true)}
+            onSuccess={() => {
+              showSnackbar("Form submitted successfully!", "success");
+              setShowCreateForm(false);
+            }}
           />
         ) : (
           <ExtendForm
             userInfo={userInfo}
             setLoading={setLoading}
-            onSuccess={() => setIsSuccessModalOpen(true)}
+            onSuccess={() => {
+              showSnackbar("Form submitted successfully!", "success");
+              setShowExtendForm(false);
+            }}
           />
         )}
       </Box>
-
-      <Modal
-        open={isSuccessModalOpen}
-        onClose={() => setIsSuccessModalOpen(false)}
-        aria-labelledby="success-modal"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 300,
-            bgcolor: "white",
-            borderRadius: "12px",
-            boxShadow: 24,
-            p: 4,
-            textAlign: "center",
-          }}
-        >
-          <LockOutlinedIcon sx={{ fontSize: "50px", color: "green" }} />
-          <Typography
-            sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}
-          >
-            Membership Registration Successful.
-          </Typography>
-
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => {
-              setIsSuccessModalOpen(false);
-              location.reload();
-            }}
-          >
-            OK
-          </Button>
-        </Box>
-      </Modal>
     </>
   );
 }
