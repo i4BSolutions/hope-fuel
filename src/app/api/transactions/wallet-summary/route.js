@@ -24,6 +24,7 @@ export async function GET(request) {
         WalletID: true,
         Amount: true,
         PaymentCheck: true,
+        PaymentDenied: true,
         Wallet: {
           select: {
             WalletId: true,
@@ -87,7 +88,7 @@ export async function GET(request) {
 
       summary[walletId].count += 1;
 
-      if (tx.PaymentCheck === true) {
+      if (tx.PaymentCheck === true && !tx.PaymentDenied) {
         summary[walletId].checked += 1;
         summary[walletId].totalAmount += amount;
 
