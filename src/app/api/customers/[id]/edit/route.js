@@ -94,13 +94,15 @@ export async function POST(req, { params }) {
 
       const oldValue = currentCustomer[field];
 
-      if (field === "Email" && newValue && newValue !== oldValue) {
-        const isDuplicate = await checkDuplicateCustomer("Email", newValue, id);
+      if (
+        (field === "Email" || field === "Name") &&
+        newValue &&
+        newValue !== oldValue
+      ) {
+        const isDuplicate = await checkDuplicateCustomer(field, newValue, id);
         if (isDuplicate) {
           return NextResponse.json(
-            {
-              message: "This email is already associated with another customer",
-            },
+            { message: `${field} is already associated with another customer` },
             { status: 409 }
           );
         }
