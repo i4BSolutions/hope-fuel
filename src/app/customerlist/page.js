@@ -253,7 +253,10 @@ const CustomerListPage = () => {
           }),
         });
 
-        if (!res.ok) throw new Error("Failed to update customer");
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || "Failed to update customer");
+        }
 
         const resData = await res.json();
         setSnackbarMessage(resData.message);
