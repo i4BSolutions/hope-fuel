@@ -45,6 +45,21 @@ async function UpdateCustomerField(customerId, field, newValue) {
   }
 }
 
+async function checkDuplicateCustomer(field, value, excludeCustomerId) {
+  const query = `
+    SELECT CustomerId FROM Customer 
+    WHERE ${field} = ? AND CustomerId <> ?
+  `;
+  const values = [value, excludeCustomerId];
+  try {
+    const rows = await db(query, values);
+    return rows.length > 0;
+  } catch (error) {
+    console.error(`[DB] Error checking duplicate ${field}:`, error);
+    throw new Error(`Failed to check duplicate ${field}`);
+  }
+}
+
 export async function POST(req, { params }) {
   const { id } = params;
   const { agentId, updates } = await req.json();
@@ -78,6 +93,18 @@ export async function POST(req, { params }) {
       }
 
       const oldValue = currentCustomer[field];
+
+      if (field === "Email" && newValue && newValue !== oldValue) {
+        const isDuplicate = await checkDuplicateCustomer("Email", newValue, id);
+        if (isDuplicate) {
+          return NextResponse.json(
+            {
+              message: "This email is already associated with another customer",
+            },
+            { status: 409 }
+          );
+        }
+      }
 
       if (oldValue !== newValue) {
         updateQueries.push({ field, newValue });
