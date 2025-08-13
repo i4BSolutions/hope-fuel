@@ -211,7 +211,7 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
             {/* Currency Input */}
             <Box flex={1} sx={{ maxWidth: 120 }}>
               <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
-                Amount <span style={{ color: "red" }}>*</span>
+                Currency <span style={{ color: "red" }}>*</span>
               </Typography>
               <Controller
                 name="currency"

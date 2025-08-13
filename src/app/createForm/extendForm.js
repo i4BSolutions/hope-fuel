@@ -249,7 +249,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
               {/* Currency Selection */}
               <Box flex={1}>
                 <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
-                  Amount<span style={{ color: "red" }}>*</span>
+                  Currency<span style={{ color: "red" }}>*</span>
                 </Typography>
                 <Controller
                   name="currency"
