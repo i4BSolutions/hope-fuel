@@ -53,9 +53,7 @@ const CopyableText = ({
       >
         <Typography
           component="span"
-          onClick={handleCopy}
           sx={{
-            cursor: "pointer",
             color: "#000000",
             fontSize: fontSize,
             lineHeight: "22px",
