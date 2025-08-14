@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import prisma from "@/app/utilites/prisma";
 import { NextResponse } from "next/server";
 
@@ -237,18 +238,17 @@ export async function POST(req) {
       OtherLink2,
     } = await req.json();
 
-    // Validate required fields
-    const requiredFields = {
+    // Minimal validation
+    const required = {
       FundraiserName,
       FundraiserLogo,
       FundraiserCentralID,
       BaseCountryName,
       AcceptedCurrencies,
     };
-    const missing = Object.keys(requiredFields).filter(
-      (key) =>
-        !requiredFields[key] ||
-        (Array.isArray(requiredFields[key]) && requiredFields[key].length === 0)
+    const missing = Object.keys(required).filter(
+      (k) =>
+        !required[k] || (Array.isArray(required[k]) && required[k].length === 0)
     );
     if (missing.length) {
       return NextResponse.json(
@@ -260,8 +260,24 @@ export async function POST(req) {
       );
     }
 
-    const fundraiser = await prisma.$transaction(async (tx) => {
-      // Find or create base country
+    // Email uniqueness check — only if provided
+    if (FundraiserEmail?.trim()) {
+      const exists = await prisma.fundraiser.findUnique({
+        where: { FundraiserEmail },
+      });
+      if (exists) {
+        return NextResponse.json(
+          {
+            status: 409,
+            message: `A fundraiser with email "${FundraiserEmail}" already exists.`,
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    const created = await prisma.$transaction(async (tx) => {
+      // 1) BaseCountry (find or create)
       let baseCountry = await tx.baseCountry.findUnique({
         where: { BaseCountryName },
       });
@@ -271,77 +287,119 @@ export async function POST(req) {
         });
       }
 
-      // Create fundraiser
-      const createdFundraiser = await tx.fundraiser.create({
+      // 2) Create fundraiser
+      const fundraiser = await tx.fundraiser.create({
         data: {
           FundraiserName,
-          FundraiserEmail,
+          FundraiserEmail: FundraiserEmail?.trim() || null,
           FundraiserLogo,
           FundraiserCentralID,
           BaseCountryID: baseCountry.BaseCountryID,
         },
       });
 
-      // Contact links
-      const links = [];
+      // 3) Contact links
+      const contactLinks = [];
       if (FacebookLink)
-        links.push({
-          FundraiserID: createdFundraiser.FundraiserID,
+        contactLinks.push({
+          FundraiserID: fundraiser.FundraiserID,
           PlatformID: 1,
           ContactURL: FacebookLink,
         });
       if (TelegramLink)
-        links.push({
-          FundraiserID: createdFundraiser.FundraiserID,
+        contactLinks.push({
+          FundraiserID: fundraiser.FundraiserID,
           PlatformID: 2,
           ContactURL: TelegramLink,
         });
       if (OtherLink1)
-        links.push({
-          FundraiserID: createdFundraiser.FundraiserID,
+        contactLinks.push({
+          FundraiserID: fundraiser.FundraiserID,
           PlatformID: 3,
           ContactURL: OtherLink1,
         });
       if (OtherLink2)
-        links.push({
-          FundraiserID: createdFundraiser.FundraiserID,
+        contactLinks.push({
+          FundraiserID: fundraiser.FundraiserID,
           PlatformID: 3,
           ContactURL: OtherLink2,
         });
 
-      if (links.length) {
-        await tx.fundraiser_ContactLinks.createMany({ data: links });
+      if (contactLinks.length) {
+        await tx.fundraiser_ContactLinks.createMany({ data: contactLinks });
       }
 
-      // Accepted currencies
-      if (AcceptedCurrencies?.length) {
+      // 4) Accepted currencies
+      if (Array.isArray(AcceptedCurrencies) && AcceptedCurrencies.length) {
         const currencies = await tx.currency.findMany({
           where: { CurrencyCode: { in: AcceptedCurrencies } },
           select: { CurrencyId: true, CurrencyCode: true },
         });
 
-        const currencyMap = new Map(
+        const map = new Map(
           currencies.map((c) => [c.CurrencyCode, c.CurrencyId])
         );
-        const fundraiserCurrencies = AcceptedCurrencies.map((code) => {
-          const cid = currencyMap.get(code);
+        const rows = AcceptedCurrencies.map((code) => {
+          const cid = map.get(code);
           return cid
-            ? { FundraiserID: createdFundraiser.FundraiserID, CurrencyID: cid }
+            ? { FundraiserID: fundraiser.FundraiserID, CurrencyID: cid }
             : null;
         }).filter(Boolean);
 
-        if (fundraiserCurrencies.length) {
-          await tx.fundraiser_AcceptedCurrencies.createMany({
-            data: fundraiserCurrencies,
-          });
+        if (rows.length) {
+          await tx.fundraiser_AcceptedCurrencies.createMany({ data: rows });
         }
       }
 
-      return createdFundraiser;
+      // 5) Re-read with includes to match GET shape
+      const fresh = await tx.fundraiser.findUnique({
+        where: { FundraiserID: fundraiser.FundraiserID },
+        include: {
+          BaseCountry: { select: { BaseCountryName: true } },
+          Fundraiser_AcceptedCurrencies: {
+            include: { Currency: { select: { CurrencyCode: true } } },
+          },
+          fundraiser_contactlinks: {
+            select: {
+              ContactID: true,
+              ContactURL: true,
+              Platform: { select: { PlatformName: true } },
+            },
+          },
+        },
+      });
+
+      const contactLinksObj = (fresh?.fundraiser_contactlinks ?? []).reduce(
+        (acc, cl) => {
+          const platform = cl.Platform?.PlatformName;
+          if (platform === "Facebook") acc.FacebookLink = cl.ContactURL;
+          else if (platform === "Telegram") acc.TelegramLink = cl.ContactURL;
+          return acc;
+        },
+        { FacebookLink: null }
+      );
+
+      return {
+        FundraiserID: fresh.FundraiserID,
+        FundraiserName: fresh.FundraiserName,
+        FundraiserEmail: fresh.FundraiserEmail,
+        FundraiserLogo: fresh.FundraiserLogo,
+        FundraiserCentralID: fresh.FundraiserCentralID,
+        BaseCountryID: fresh.BaseCountryID,
+        BaseCountryName: fresh.BaseCountry?.BaseCountryName ?? null,
+        AcceptedCurrencies: (fresh.Fundraiser_AcceptedCurrencies ?? [])
+          .map((ac) => ac.Currency?.CurrencyCode)
+          .filter(Boolean),
+        ContactLinks: contactLinksObj,
+      };
     });
 
     return NextResponse.json(
-      { status: 201, message: "Fundraiser created successfully", fundraiser },
+      {
+        status: 201,
+        message: "Fundraiser created successfully",
+        fundraiser: created,
+      },
       { status: 201 }
     );
   } catch (error) {
@@ -350,7 +408,7 @@ export async function POST(req) {
       {
         status: 500,
         message: "Internal Server Error in post request",
-        error: error.message,
+        error: error?.message ?? "Unknown error",
       },
       { status: 500 }
     );
