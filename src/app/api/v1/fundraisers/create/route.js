@@ -1,5 +1,5 @@
+import prisma from "@/app/utilites/prisma";
 import { NextResponse } from "next/server";
-import db from "../../../../utilites/db";
 
 // async function CreateFundraiserContactLink(
 //   FundraiserID,
@@ -79,6 +79,149 @@ import db from "../../../../utilites/db";
 //   }
 // }
 
+// export async function POST(req) {
+//   try {
+//     const {
+//       FundraiserName,
+//       FundraiserEmail,
+//       FundraiserLogo,
+//       FundraiserCentralID,
+//       BaseCountryName,
+//       AcceptedCurrencies,
+//       FacebookLink,
+//       TelegramLink,
+//       OtherLink1,
+//       OtherLink2,
+//     } = await req.json();
+
+//     // Validation
+//     const requiredFields = {
+//       FundraiserName,
+//       FundraiserLogo,
+//       FundraiserCentralID,
+//       BaseCountryName,
+//       AcceptedCurrencies,
+//     };
+//     const missingFields = Object.keys(requiredFields).filter(
+//       (field) =>
+//         !requiredFields[field] ||
+//         (Array.isArray(requiredFields[field]) &&
+//           requiredFields[field].length === 0)
+//     );
+//     if (missingFields.length > 0) {
+//       return NextResponse.json(
+//         {
+//           status: 400,
+//           message: `Missing required fields: ${missingFields.join(", ")}`,
+//         },
+//         { status: 400 }
+//       );
+//     }
+
+//     const createdData = await prisma.$transaction(async (tx) => {
+//       // 1. BaseCountry (find or create)
+//       let baseCountry = await tx.baseCountry.findUnique({
+//         where: { BaseCountryName },
+//       });
+//       if (!baseCountry) {
+//         baseCountry = await tx.baseCountry.create({
+//           data: { BaseCountryName },
+//         });
+//       }
+
+//       // 2. Create fundraiser
+//       const fundraiser = await tx.fundraiser.create({
+//         data: {
+//           FundraiserName,
+//           FundraiserEmail,
+//           FundraiserLogo,
+//           FundraiserCentralID,
+//           BaseCountryID: baseCountry.BaseCountryID,
+//         },
+//       });
+
+//       // 3. Contact links
+//       const contactLinksData = [];
+//       if (FacebookLink)
+//         contactLinksData.push({
+//           FundraiserID: fundraiser.FundraiserID,
+//           PlatformID: 1,
+//           ContactURL: FacebookLink,
+//         });
+//       if (TelegramLink)
+//         contactLinksData.push({
+//           FundraiserID: fundraiser.FundraiserID,
+//           PlatformID: 2,
+//           ContactURL: TelegramLink,
+//         });
+//       if (OtherLink1)
+//         contactLinksData.push({
+//           FundraiserID: fundraiser.FundraiserID,
+//           PlatformID: 3,
+//           ContactURL: OtherLink1,
+//         });
+//       if (OtherLink2)
+//         contactLinksData.push({
+//           FundraiserID: fundraiser.FundraiserID,
+//           PlatformID: 3,
+//           ContactURL: OtherLink2,
+//         });
+
+//       if (contactLinksData.length > 0) {
+//         await tx.fundraiser_ContactLinks.createMany({
+//           data: contactLinksData,
+//         });
+//       }
+
+//       // 4. Accepted currencies
+//       if (AcceptedCurrencies.length > 0) {
+//         const currencies = await tx.currency.findMany({
+//           where: { CurrencyCode: { in: AcceptedCurrencies } },
+//           select: { CurrencyId: true, CurrencyCode: true },
+//         });
+
+//         const currencyMap = new Map(
+//           currencies.map((c) => [c.CurrencyCode, c.CurrencyId])
+//         );
+
+//         const fundraiserCurrencies = AcceptedCurrencies.map((code) => {
+//           const currencyID = currencyMap.get(code);
+//           return currencyID
+//             ? { FundraiserID: fundraiser.FundraiserID, CurrencyID: currencyID }
+//             : null;
+//         }).filter(Boolean);
+
+//         if (fundraiserCurrencies.length > 0) {
+//           await tx.fundraiser_AcceptedCurrencies.createMany({
+//             data: fundraiserCurrencies,
+//           });
+//         }
+//       }
+
+//       return fundraiser;
+//     });
+
+//     return NextResponse.json(
+//       {
+//         status: 201,
+//         message: "Fundraiser created successfully",
+//         fundraiser: createdData,
+//       },
+//       { status: 201 }
+//     );
+//   } catch (error) {
+//     console.error("Error creating fundraiser:", error);
+//     return NextResponse.json(
+//       {
+//         status: 500,
+//         message: "Internal Server Error in post request",
+//         error: error.message,
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
 export async function POST(req) {
   try {
     const {
@@ -94,7 +237,7 @@ export async function POST(req) {
       OtherLink2,
     } = await req.json();
 
-    // Validation
+    // Validate required fields
     const requiredFields = {
       FundraiserName,
       FundraiserLogo,
@@ -102,24 +245,23 @@ export async function POST(req) {
       BaseCountryName,
       AcceptedCurrencies,
     };
-    const missingFields = Object.keys(requiredFields).filter(
-      (field) =>
-        !requiredFields[field] ||
-        (Array.isArray(requiredFields[field]) &&
-          requiredFields[field].length === 0)
+    const missing = Object.keys(requiredFields).filter(
+      (key) =>
+        !requiredFields[key] ||
+        (Array.isArray(requiredFields[key]) && requiredFields[key].length === 0)
     );
-    if (missingFields.length > 0) {
+    if (missing.length) {
       return NextResponse.json(
         {
           status: 400,
-          message: `Missing required fields: ${missingFields.join(", ")}`,
+          message: `Missing required fields: ${missing.join(", ")}`,
         },
         { status: 400 }
       );
     }
 
-    const createdData = await prisma.$transaction(async (tx) => {
-      // 1. BaseCountry (find or create)
+    const fundraiser = await prisma.$transaction(async (tx) => {
+      // Find or create base country
       let baseCountry = await tx.baseCountry.findUnique({
         where: { BaseCountryName },
       });
@@ -129,8 +271,8 @@ export async function POST(req) {
         });
       }
 
-      // 2. Create fundraiser
-      const fundraiser = await tx.fundraiser.create({
+      // Create fundraiser
+      const createdFundraiser = await tx.fundraiser.create({
         data: {
           FundraiserName,
           FundraiserEmail,
@@ -140,41 +282,39 @@ export async function POST(req) {
         },
       });
 
-      // 3. Contact links
-      const contactLinksData = [];
+      // Contact links
+      const links = [];
       if (FacebookLink)
-        contactLinksData.push({
-          FundraiserID: fundraiser.FundraiserID,
+        links.push({
+          FundraiserID: createdFundraiser.FundraiserID,
           PlatformID: 1,
           ContactURL: FacebookLink,
         });
       if (TelegramLink)
-        contactLinksData.push({
-          FundraiserID: fundraiser.FundraiserID,
+        links.push({
+          FundraiserID: createdFundraiser.FundraiserID,
           PlatformID: 2,
           ContactURL: TelegramLink,
         });
       if (OtherLink1)
-        contactLinksData.push({
-          FundraiserID: fundraiser.FundraiserID,
+        links.push({
+          FundraiserID: createdFundraiser.FundraiserID,
           PlatformID: 3,
           ContactURL: OtherLink1,
         });
       if (OtherLink2)
-        contactLinksData.push({
-          FundraiserID: fundraiser.FundraiserID,
+        links.push({
+          FundraiserID: createdFundraiser.FundraiserID,
           PlatformID: 3,
           ContactURL: OtherLink2,
         });
 
-      if (contactLinksData.length > 0) {
-        await tx.fundraiser_ContactLinks.createMany({
-          data: contactLinksData,
-        });
+      if (links.length) {
+        await tx.fundraiser_ContactLinks.createMany({ data: links });
       }
 
-      // 4. Accepted currencies
-      if (AcceptedCurrencies.length > 0) {
+      // Accepted currencies
+      if (AcceptedCurrencies?.length) {
         const currencies = await tx.currency.findMany({
           where: { CurrencyCode: { in: AcceptedCurrencies } },
           select: { CurrencyId: true, CurrencyCode: true },
@@ -183,30 +323,25 @@ export async function POST(req) {
         const currencyMap = new Map(
           currencies.map((c) => [c.CurrencyCode, c.CurrencyId])
         );
-
         const fundraiserCurrencies = AcceptedCurrencies.map((code) => {
-          const currencyID = currencyMap.get(code);
-          return currencyID
-            ? { FundraiserID: fundraiser.FundraiserID, CurrencyID: currencyID }
+          const cid = currencyMap.get(code);
+          return cid
+            ? { FundraiserID: createdFundraiser.FundraiserID, CurrencyID: cid }
             : null;
         }).filter(Boolean);
 
-        if (fundraiserCurrencies.length > 0) {
+        if (fundraiserCurrencies.length) {
           await tx.fundraiser_AcceptedCurrencies.createMany({
             data: fundraiserCurrencies,
           });
         }
       }
 
-      return fundraiser;
+      return createdFundraiser;
     });
 
     return NextResponse.json(
-      {
-        status: 201,
-        message: "Fundraiser created successfully",
-        fundraiser: createdData,
-      },
+      { status: 201, message: "Fundraiser created successfully", fundraiser },
       { status: 201 }
     );
   } catch (error) {
