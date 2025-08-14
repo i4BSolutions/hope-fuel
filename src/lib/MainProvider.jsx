@@ -1,5 +1,6 @@
 "use client";
 
+import { SnackbarProvider } from "@/components/shared/SnackbarProvider";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { Box } from "@mui/material";
@@ -16,13 +17,15 @@ export default function MainProvider({ children }) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AuthGuard>
-          <Sidebar />
-          <Box
-            component="main"
-            sx={{ flexGrow: 1, marginLeft: "80px", padding: 2.5 }}
-          >
-            {children}
-          </Box>
+          <SnackbarProvider>
+            <Sidebar />
+            <Box
+              component="main"
+              sx={{ flexGrow: 1, marginLeft: "80px", padding: 2.5 }}
+            >
+              {children}
+            </Box>
+          </SnackbarProvider>
         </AuthGuard>
       </ThemeProvider>
     </Authenticator>
