@@ -41,6 +41,10 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [userCountry, setUserCountry] = useState(null);
 
+  if (agent.id === null) {
+    return <Typography>Please log in to continue.</Typography>;
+  }
+
   const {
     control,
     handleSubmit,

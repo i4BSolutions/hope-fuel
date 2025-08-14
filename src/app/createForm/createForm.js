@@ -37,6 +37,10 @@ const CreateForm = ({ userInfo, setloading, onSuccess }) => {
   const [minAmountError, setMinAmountError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
+  if (agent.id === null) {
+    return <Typography>Please log in to continue.</Typography>;
+  }
+
   const {
     control,
     handleSubmit,
