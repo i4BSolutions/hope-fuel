@@ -1,5 +1,6 @@
 "use client";
 
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
@@ -32,6 +33,8 @@ import ImageCarouselModal from "./_components/ImageCarousel";
 const PAGE_SIZE = 10;
 
 const HopeFuelIdListPage = () => {
+  const { showSnackbar } = useSnackbar();
+  const searchRef = useRef("");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -44,17 +47,40 @@ const HopeFuelIdListPage = () => {
   const [openScreenshotModal, setOpenScreenshotModal] = useState(false);
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
-  const searchRef = useRef("");
   const [formStatusDialog, setFormStatusDialog] = useState(false);
   const [formStatusValues, setFormStatusValues] = useState({
-    status: null,
-    transactionId: null,
+    statusId: null,
+    formStatusId: null,
+    hopeFuelId: null,
   });
+  const [formStatusLoading, setFormStatusLoading] = useState(false);
 
-  const formStatusDialogHandler = (values) => {
+  const formStatusDialogHandler = async (values) => {
     console.log(values);
     if (values) {
-      // Handle form submission with values
+      try {
+        setFormStatusLoading(true);
+        const response = await fetch("/api/hopeFuelList/form-status", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        });
+        if (!response.ok) {
+          showSnackbar("Failed to update form status", "error");
+          setFormStatusDialog(false);
+          return;
+        }
+        showSnackbar("Form status updated successfully", "success");
+        if (values.hopeFuelId) {
+          await fetchDetails(values.hopeFuelId);
+        }
+      } catch (error) {
+        console.error("Error updating form status:", error);
+      } finally {
+        setFormStatusLoading(false);
+      }
     }
     setFormStatusDialog((prev) => !prev);
   };
@@ -79,7 +105,7 @@ const HopeFuelIdListPage = () => {
       };
       fetchData();
     }
-  }, [page]);
+  }, [page, formStatusDialog]);
 
   const handleScroll = useCallback(() => {
     if (
@@ -109,6 +135,10 @@ const HopeFuelIdListPage = () => {
       const result = await response.json();
 
       setDetails(result.data);
+      setFormStatusValues({
+        statusId: result.data.TransactionStatusID,
+        formStatusId: result.data.FormStatusID,
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -186,12 +216,8 @@ const HopeFuelIdListPage = () => {
     }
   };
 
-  const handleOpen = (hopeFuelId, TransactionID) => {
+  const handleOpen = (hopeFuelId) => {
     fetchDetails(hopeFuelId);
-    setFormStatusValues({
-      status: null,
-      transactionId: TransactionID,
-    });
     fetchSubscriptionByHopeFuelID(hopeFuelId);
     setOpenModal((prev) => !prev);
   };
@@ -314,6 +340,7 @@ const HopeFuelIdListPage = () => {
             <HopeFuelIDListDetails
               data={details}
               formStatusDialogHandler={formStatusDialogHandler}
+              setFormStatusValues={setFormStatusValues}
             />
           )}
           <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
@@ -347,11 +374,11 @@ const HopeFuelIdListPage = () => {
                 labelId="form-status-dialog-select-label"
                 id="form-status-dialog-select"
                 input={<OutlinedInput label="Form Status" />}
-                value={formStatusValues.status}
+                value={formStatusValues.statusId}
                 onChange={(e) =>
                   setFormStatusValues((prev) => ({
                     ...prev,
-                    status: e.target.value,
+                    statusId: e.target.value,
                   }))
                 }
               >
@@ -375,6 +402,7 @@ const HopeFuelIdListPage = () => {
             onClick={() => {
               formStatusDialogHandler(formStatusValues);
             }}
+            loading={formStatusLoading}
           >
             Confirm
           </Button>

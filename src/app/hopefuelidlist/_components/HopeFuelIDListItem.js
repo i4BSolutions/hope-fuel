@@ -36,9 +36,7 @@ const HopeFuelIDListItem = ({
       {Array.isArray(data) &&
         data.map((item) => (
           <Card
-            onClick={() =>
-              onClick && onClick(item.HopeFuelID, item.TransactionID)
-            }
+            onClick={() => onClick && onClick(item.HopeFuelID)}
             key={uuidv4()}
             sx={{
               backgroundColor: "#FFFFFF",
@@ -221,8 +219,8 @@ const HopeFuelIDListItem = ({
                 onClick={(e) => {
                   e.stopPropagation();
                   const values = {
-                    status: item.TransactionStatusID,
-                    transactionId: item.TransactionID,
+                    statusId: item.TransactionStatusID,
+                    formStatusId: item.FormStatusID,
                   };
                   setFormStatusValues(values);
                   formStatusDialogHandler();

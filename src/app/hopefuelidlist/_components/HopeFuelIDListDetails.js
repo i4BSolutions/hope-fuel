@@ -63,7 +63,11 @@ const ImageItem = styled("img")({
   flexShrink: 0,
 });
 
-const HopeFuelIDListDetails = ({ data, formStatusDialogHandler }) => {
+const HopeFuelIDListDetails = ({
+  data,
+  formStatusDialogHandler,
+  setFormStatusValues,
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [imageUrls, setImageUrls] = useState([]);
@@ -112,8 +116,19 @@ const HopeFuelIDListDetails = ({ data, formStatusDialogHandler }) => {
                   backgroundColor: getStatusByColor(data.TransactionStatus),
                   padding: "4px 12px",
                   borderRadius: "16px",
+                  cursor: "pointer",
+                  "&:hover": {
+                    opacity: 0.9,
+                  },
                 }}
-                onClick={formStatusDialogHandler}
+                onClick={() => {
+                  formStatusDialogHandler();
+                  setFormStatusValues({
+                    statusId: data.TransactionStatusID,
+                    formStatusId: data.FormStatusID,
+                    hopeFuelId: data.HopeFuelID,
+                  });
+                }}
               >
                 <Typography
                   sx={{
