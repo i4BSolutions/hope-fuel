@@ -156,15 +156,30 @@ async function searchByHopeFuelID(HopeFuelID, agentId) {
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const HopeFuelID = searchParams.get("HopeFuelID");
+  let hopeFuelIDParam = searchParams.get("HopeFuelID");
   const page = parseInt(searchParams.get("page"), 10) || 1;
-  const selectedWallet = searchParams.get("wallet") || " ";
+  const selectedWallet = searchParams.get("wallet") || "";
   const agentId = parseInt(searchParams.get("agentId"), 10);
 
   try {
-    if (HopeFuelID) {
-      const id = parseInt(HopeFuelID, 10);
-      const found = await searchByHopeFuelID(id, agentId);
+    if (hopeFuelIDParam) {
+      if (hopeFuelIDParam.startsWith("PRFHQ-")) {
+        hopeFuelIDParam = hopeFuelIDParam.replace(/^PRFHQ-/, "");
+      }
+
+      const parsedId = Number(hopeFuelIDParam);
+
+      if (!Number.isInteger(parsedId)) {
+        return NextResponse.json({
+          items: [],
+          totalItems: 0,
+          itemsPerPage: 10,
+          currentPage: 1,
+          totalPages: 1,
+        });
+      }
+
+      const found = await searchByHopeFuelID(parsedId, agentId);
 
       if (found.length === 0) {
         return NextResponse.json({
