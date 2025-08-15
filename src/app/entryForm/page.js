@@ -1,5 +1,6 @@
 "use client";
 
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
 import { Box, CircularProgress, Typography } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import PaymentDetails from "./components/paymentDetails";
 import SearchBarForm from "./components/searchList";
 
 export default function EntryForm() {
+  const { showSnackbar } = useSnackbar();
   const searchParams = useSearchParams();
   let [hopeFuelID, setHopeFuelID] = useState(searchParams.get("HopeFuelID"));
   const [data, setData] = useState(null);
@@ -104,6 +106,7 @@ export default function EntryForm() {
           clearHopeFuelID={() => {
             setHopeFuelID(null);
             location.reload();
+            showSnackbar("Payment checked successfully", "success");
           }}
         />
       </Box>

@@ -1,15 +1,21 @@
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { v4 as uuidv4 } from "uuid";
+import CopyableText from "../../UI/Components/CopyableText";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
+const HopeFuelIDListItem = ({
+  data,
+  onClick,
+  onClickScreenShot,
+  formStatusDialogHandler,
+  setFormStatusValues,
+}) => {
   const getStatusByColor = (status) => {
     switch (status) {
       case "Payment Checked":
@@ -167,7 +173,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   minWidth: "150px",
                   fontSize: "14px",
                   "&:hover": {
-                    backgroundColor: "#B91C1C",
+                    opacity: 0.9,
                   },
                   fontWeight: 600,
                 }}
@@ -206,6 +212,18 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   alignItems: "center",
                   whiteSpace: "nowrap",
                   fontWeight: 600,
+                  "&:hover": {
+                    opacity: 0.9,
+                  },
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const values = {
+                    statusId: item.TransactionStatusID,
+                    formStatusId: item.FormStatusID,
+                  };
+                  setFormStatusValues(values);
+                  formStatusDialogHandler();
                 }}
               >
                 {item.TransactionStatus}
