@@ -6,67 +6,77 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
   const offset = (page - 1) * limit;
 
   const query = `
-   SELECT
-      t.HopeFuelID,
-      c.Name,
-      c.Email,
-      c.CardID,
-      t.TransactionDate,
-      t.Amount,
-      curr.CurrencyCode,
-      t.Month,
-      GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
-      c.ManyChatId,
-      MAX(a.Username) AS FormFilledPerson,
-      ts.TransactionStatus,
-      n.Note AS Note
-    FROM Transactions t
-    LEFT JOIN Customer c ON t.CustomerID = c.CustomerId
-    LEFT JOIN Wallet w ON t.WalletID = w.WalletId
-    LEFT JOIN Currency curr ON w.CurrencyId = curr.CurrencyId
-    LEFT JOIN Note n ON t.NoteID = n.NoteID
-    LEFT JOIN ScreenShot ss ON t.TransactionID = ss.TransactionID
-    LEFT JOIN (
-      SELECT ta1.TransactionID, ta1.AgentID
-      FROM TransactionAgent ta1
-      INNER JOIN (
-        SELECT TransactionID, MIN(TransactionAgentID) AS FirstTAID
-        FROM TransactionAgent
-        GROUP BY TransactionID
-      ) first_ta ON ta1.TransactionID = first_ta.TransactionID AND ta1.TransactionAgentID = first_ta.FirstTAID
-    ) ta ON t.TransactionID = ta.TransactionID
-    LEFT JOIN Agent a ON ta.AgentID = a.AgentID
-    LEFT JOIN (
+  SELECT
+    c.Name,
+    c.Email,
+    c.CardID,
+    c.ManyChatId,
+    t.HopeFuelID,
+    t.TransactionDate,
+    t.Amount,
+    t.Month,
+    curr.CurrencyCode,
+    GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
+    MAX(a.Username) AS FormFilledPerson,
+    ts.TransactionStatus,
+    ts.TransactionStatusID,
+    current_fs.FormStatusID,
+    n.Note AS Note
+  FROM Transactions t
+  LEFT JOIN Customer c ON t.CustomerID = c.CustomerId
+  LEFT JOIN Wallet w ON t.WalletID = w.WalletId
+  LEFT JOIN Currency curr ON w.CurrencyId = curr.CurrencyId
+  LEFT JOIN Note n ON t.NoteID = n.NoteID
+  LEFT JOIN ScreenShot ss ON t.TransactionID = ss.TransactionID
+  LEFT JOIN (
+    SELECT ta1.TransactionID, ta1.AgentID
+    FROM TransactionAgent ta1
+    INNER JOIN (
+      SELECT TransactionID, MIN(TransactionAgentID) AS FirstTAID
+      FROM TransactionAgent
+      GROUP BY TransactionID
+    ) first_ta 
+      ON ta1.TransactionID = first_ta.TransactionID 
+     AND ta1.TransactionAgentID = first_ta.FirstTAID
+  ) ta ON t.TransactionID = ta.TransactionID
+  LEFT JOIN Agent a ON ta.AgentID = a.AgentID
+  LEFT JOIN (
+    SELECT 
+      fs.TransactionID,
+      fs.TransactionStatusID,
+      fs.FormStatusID
+    FROM FormStatus fs
+    INNER JOIN (
       SELECT 
-        fs.TransactionID,
-        fs.TransactionStatusID
-      FROM FormStatus fs
-      INNER JOIN (
-        SELECT 
-          TransactionID,
-          MAX(FormStatusID) AS LatestFormStatusID
-        FROM FormStatus
-        GROUP BY TransactionID
-      ) latest_fs ON fs.FormStatusID = latest_fs.LatestFormStatusID
-    ) current_fs ON t.TransactionID = current_fs.TransactionID
-    LEFT JOIN TransactionStatus ts ON current_fs.TransactionStatusID = ts.TransactionStatusID
-    WHERE 
-      t.TransactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01') 
-      AND t.TransactionDate < DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 1 MONTH)
-    GROUP BY 
-      t.HopeFuelID, 
-      c.Name, 
-      c.Email, 
-      c.CardID, 
-      t.TransactionDate, 
-      t.Amount, 
-      curr.CurrencyCode, 
-      t.Month, 
-      c.ManyChatId, 
-      ts.TransactionStatus, 
-      n.Note
-    ORDER BY t.HopeFuelID DESC
-    LIMIT ? OFFSET ?;
+        TransactionID,
+        MAX(FormStatusID) AS LatestFormStatusID
+      FROM FormStatus
+      GROUP BY TransactionID
+    ) latest_fs 
+      ON fs.FormStatusID = latest_fs.LatestFormStatusID
+  ) current_fs ON t.TransactionID = current_fs.TransactionID
+  LEFT JOIN TransactionStatus ts 
+    ON current_fs.TransactionStatusID = ts.TransactionStatusID
+  WHERE 
+    t.TransactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01') 
+    AND t.TransactionDate < DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 1 MONTH)
+  GROUP BY 
+    t.TransactionID,
+    t.HopeFuelID, 
+    c.Name, 
+    c.Email, 
+    c.CardID, 
+    t.TransactionDate, 
+    t.Amount, 
+    curr.CurrencyCode, 
+    t.Month, 
+    c.ManyChatId, 
+    ts.TransactionStatus,
+    ts.TransactionStatusID,
+    current_fs.FormStatusID,
+    n.Note
+  ORDER BY t.HopeFuelID DESC
+  LIMIT ? OFFSET ?;
 `;
 
   try {
