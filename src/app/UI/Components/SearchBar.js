@@ -8,7 +8,13 @@ function SearchBar({ onSearch }) {
   const handleInputChange = (event) => {
     const value = event.target.value;
     setSearchTerm(value);
-    onSearch(value);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      onSearch(searchTerm.trim());
+    }
   };
 
   return (
@@ -18,6 +24,7 @@ function SearchBar({ onSearch }) {
       fullWidth
       value={searchTerm}
       onChange={handleInputChange}
+      onKeyDown={handleKeyDown}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
