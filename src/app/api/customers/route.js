@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
-async function fetchCustomers(limit, offset) {
-  const query = `
+async function fetchCustomers({ limit, offset, term, unlimited = false }) {
+  let query = `
     SELECT 
       c.CustomerId, 
       c.Name, 
       c.Email, 
-      c.ManyChatId,
+      c.CardID,
       (
         SELECT t.HopeFuelID
         FROM Transactions t
@@ -16,37 +16,63 @@ async function fetchCustomers(limit, offset) {
         LIMIT 1
       ) AS HopeFuelID
     FROM Customer c
-    LIMIT ? OFFSET ?;
   `;
-  const values = [limit, offset];
-  try {
-    const result = await db(query, values);
-    console.log("result from DB: ", result);
-    return result;
-  } catch (error) {
-    console.error("Error fetching customers:", error);
-    throw new Error("[DB] Error fetching customers:");
+
+  const values = [];
+
+  if (term) {
+    query += ` WHERE c.Name LIKE ? OR c.Email LIKE ? OR c.CardID LIKE ? `;
+    const likeTerm = `%${term}%`;
+    values.push(likeTerm, likeTerm, likeTerm);
   }
+
+  if (!unlimited) {
+    query += ` LIMIT ? OFFSET ?`;
+    values.push(limit, offset);
+  }
+
+  return db(query, values);
 }
+
+async function countCustomers(term) {
+  let query = `SELECT COUNT(*) AS total FROM Customer`;
+  const values = [];
+
+  if (term) {
+    query += ` WHERE Name LIKE ? OR Email LIKE ? OR CardID LIKE ?`;
+    const likeTerm = `%${term}%`;
+    values.push(likeTerm, likeTerm, likeTerm);
+  }
+
+  return db(query, values);
+}
+
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
 
   const page = Number(searchParams.get("page")) || 1;
   const limit = Number(searchParams.get("limit")) || 10;
   const offset = (page - 1) * limit;
+  const term = searchParams.get("term")?.trim() || null;
 
   try {
-    const [{ total }] = await db(`SELECT COUNT(*) AS total FROM Customer`);
-    // console.log("totalPages::", total);
+    const unlimited = !!term; // skip pagination if searching
+    const [{ total }] = await countCustomers(term);
+    const customers = await fetchCustomers({ limit, offset, term, unlimited });
 
-    const customers = await fetchCustomers(limit, offset);
+    if (customers.length === 0) {
+      return NextResponse.json(
+        { status: 404, message: "No customers found", data: [] },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       status: 200,
-      message: "Customer retrieved successfully.",
+      message: "Customers retrieved successfully.",
       totalRecords: total,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
+      totalPages: unlimited ? 1 : Math.ceil(total / limit),
+      currentPage: unlimited ? 1 : page,
       data: customers,
     });
   } catch (error) {

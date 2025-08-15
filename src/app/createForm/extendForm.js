@@ -41,6 +41,10 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [userCountry, setUserCountry] = useState(null);
 
+  if (agent.id === null) {
+    return <Typography>Please log in to continue.</Typography>;
+  }
+
   const {
     control,
     handleSubmit,
@@ -249,7 +253,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
               {/* Currency Selection */}
               <Box flex={1}>
                 <Typography sx={{ fontSize: "12px", fontWeight: 600 }}>
-                  Amount<span style={{ color: "red" }}>*</span>
+                  Currency<span style={{ color: "red" }}>*</span>
                 </Typography>
                 <Controller
                   name="currency"
