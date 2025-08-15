@@ -8,11 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { useEffect, useState } from "react";
 import CopyableText from "../../UI/Components/CopyableText";
 import ImageCarouselModal from "./ImageCarousel";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -63,10 +63,21 @@ const ImageItem = styled("img")({
   flexShrink: 0,
 });
 
-const HopeFuelIDListDetails = ({ data }) => {
+const HopeFuelIDListDetails = ({ data, formStatusDialogHandler }) => {
   const [showModal, setShowModal] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
   const [imageUrls, setImageUrls] = useState([]);
+
+  const getStatusByColor = (status) => {
+    switch (status) {
+      case "Payment Checked":
+        return "#03fc73";
+      case "Card Issued":
+        return "#6183E4";
+      default:
+        return "#FBBF24";
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -98,10 +109,11 @@ const HopeFuelIDListDetails = ({ data }) => {
               </Typography>
               <Box
                 sx={{
-                  backgroundColor: "#FFB800",
+                  backgroundColor: getStatusByColor(data.TransactionStatus),
                   padding: "4px 12px",
                   borderRadius: "16px",
                 }}
+                onClick={formStatusDialogHandler}
               >
                 <Typography
                   sx={{

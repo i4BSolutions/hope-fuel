@@ -3,10 +3,20 @@
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
+  Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
   Paper,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
@@ -35,6 +45,19 @@ const HopeFuelIdListPage = () => {
   const [screenshotsLists, setScreenshotsLists] = useState([]);
   const [activeImage, setActiveImage] = useState(0);
   const searchRef = useRef("");
+  const [formStatusDialog, setFormStatusDialog] = useState(false);
+  const [formStatusValues, setFormStatusValues] = useState({
+    status: null,
+    transactionId: null,
+  });
+
+  const formStatusDialogHandler = (values) => {
+    console.log(values);
+    if (values) {
+      // Handle form submission with values
+    }
+    setFormStatusDialog((prev) => !prev);
+  };
 
   useEffect(() => {
     if (searchRef.current === "") {
@@ -163,8 +186,12 @@ const HopeFuelIdListPage = () => {
     }
   };
 
-  const handleOpen = (hopeFuelId) => {
+  const handleOpen = (hopeFuelId, TransactionID) => {
     fetchDetails(hopeFuelId);
+    setFormStatusValues({
+      status: null,
+      transactionId: TransactionID,
+    });
     fetchSubscriptionByHopeFuelID(hopeFuelId);
     setOpenModal((prev) => !prev);
   };
@@ -236,7 +263,10 @@ const HopeFuelIdListPage = () => {
         data={data}
         onClick={handleOpen}
         onClickScreenShot={handleOpenScreenshots}
+        formStatusDialogHandler={formStatusDialogHandler}
+        setFormStatusValues={setFormStatusValues}
       />
+
       {loading && (
         <Box
           sx={{
@@ -281,7 +311,10 @@ const HopeFuelIdListPage = () => {
               <CircularProgress />
             </Box>
           ) : (
-            <HopeFuelIDListDetails data={details} />
+            <HopeFuelIDListDetails
+              data={details}
+              formStatusDialogHandler={formStatusDialogHandler}
+            />
           )}
           <Box sx={{ mt: theme.spacing(2), mx: theme.spacing(3) }}>
             <SubscriptionCard cards={subscriptions} />
@@ -295,6 +328,58 @@ const HopeFuelIdListPage = () => {
         activeImage={activeImage}
         activeImageHandler={setActiveImage}
       />
+
+      {/* Form Status Dialog */}
+      <Dialog
+        open={formStatusDialog}
+        onClose={() => {
+          formStatusDialogHandler();
+        }}
+      >
+        <DialogTitle>Change Form Status Manually</DialogTitle>
+        <DialogContent>
+          <Box component="form" sx={{ display: "flex", flexWrap: "wrap" }}>
+            <FormControl sx={{ m: 1 }} fullWidth>
+              <InputLabel id="form-status-dialog-select-label">
+                Form Status
+              </InputLabel>
+              <Select
+                labelId="form-status-dialog-select-label"
+                id="form-status-dialog-select"
+                input={<OutlinedInput label="Form Status" />}
+                value={formStatusValues.status}
+                onChange={(e) =>
+                  setFormStatusValues((prev) => ({
+                    ...prev,
+                    status: e.target.value,
+                  }))
+                }
+              >
+                <MenuItem value={1}>Form Entry</MenuItem>
+                <MenuItem value={2}>Payment Checked</MenuItem>
+                <MenuItem value={3}>Card Issued</MenuItem>
+                <MenuItem value={4}>Cancel</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              formStatusDialogHandler();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              formStatusDialogHandler(formStatusValues);
+            }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

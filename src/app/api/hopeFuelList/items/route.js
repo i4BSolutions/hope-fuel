@@ -7,18 +7,20 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
 
   const query = `
    SELECT
-      t.HopeFuelID,
       c.Name,
       c.Email,
       c.CardID,
+      c.ManyChatId,
+      t.HopeFuelID,
+      t.TransactionID,
       t.TransactionDate,
       t.Amount,
-      curr.CurrencyCode,
       t.Month,
+      curr.CurrencyCode,
       GROUP_CONCAT(DISTINCT ss.ScreenShotLink SEPARATOR ',') AS ScreenShot,
-      c.ManyChatId,
       MAX(a.Username) AS FormFilledPerson,
       ts.TransactionStatus,
+      ts.TransactionStatusID,
       n.Note AS Note
     FROM Transactions t
     LEFT JOIN Customer c ON t.CustomerID = c.CustomerId
@@ -54,6 +56,7 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       t.TransactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01') 
       AND t.TransactionDate < DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 1 MONTH)
     GROUP BY 
+      t.TransactionID,
       t.HopeFuelID, 
       c.Name, 
       c.Email, 
@@ -63,7 +66,8 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
       curr.CurrencyCode, 
       t.Month, 
       c.ManyChatId, 
-      ts.TransactionStatus, 
+      ts.TransactionStatus,
+      ts.TransactionStatusID, 
       n.Note
     ORDER BY t.HopeFuelID DESC
     LIMIT ? OFFSET ?;
