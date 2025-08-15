@@ -100,7 +100,7 @@ const WalletSelect = ({ onWalletSelected }) => {
         {wallets.length > 0 ? (
           wallets.map((wallet, index) => (
             <MenuItem key={index} value={wallet.WalletName}>
-              {wallet.WalletName}
+              {wallet.WalletName} ({wallet.transactionCount})
             </MenuItem>
           ))
         ) : (
