@@ -262,8 +262,9 @@ export async function POST(req) {
 
     // Email uniqueness check — only if provided
     if (FundraiserEmail?.trim()) {
-      const exists = await prisma.fundraiser.findUnique({
-        where: { FundraiserEmail },
+      const exists = await prisma.fundraiser.findFirst({
+        where: { FundraiserEmail: FundraiserEmail.trim() },
+        select: { FundraiserID: true },
       });
       if (exists) {
         return NextResponse.json(
@@ -278,7 +279,7 @@ export async function POST(req) {
 
     const created = await prisma.$transaction(async (tx) => {
       // 1) BaseCountry (find or create)
-      let baseCountry = await tx.baseCountry.findUnique({
+      let baseCountry = await tx.baseCountry.findFirst({
         where: { BaseCountryName },
       });
       if (!baseCountry) {
