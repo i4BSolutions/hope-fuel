@@ -17,10 +17,9 @@ import moment from "moment-timezone";
 
 const EditHistory = ({ historyData }) => {
   return (
-    <Paper
+    <Box
       sx={{
-        width: "90%",
-        maxWidth: "800px",
+        width: "100%",
         maxHeight: "90vh",
         borderRadius: 2,
         outline: "none",
@@ -31,6 +30,7 @@ const EditHistory = ({ historyData }) => {
     >
       <Box
         sx={{
+          width: "100%",
           py: 5,
           bgcolor: "#f9f9f9",
           borderBottom: "1px solid #e0e0e0",
@@ -87,7 +87,6 @@ const EditHistory = ({ historyData }) => {
                           width: "8px",
                           height: "60px",
                           bgcolor: "#FF9800",
-                          borderRadius: "4px",
                         },
                       }}
                     />
@@ -159,7 +158,7 @@ const EditHistory = ({ historyData }) => {
                               width: "100px",
                             }}
                           >
-                            Name:
+                            {item.FieldChanged}
                           </TableCell>
                           <TableCell
                             sx={{
@@ -172,56 +171,6 @@ const EditHistory = ({ historyData }) => {
                             {item.NewValue}
                           </TableCell>
                         </TableRow>
-                        {/* <TableRow>
-                          <TableCell
-                            component="th"
-                            sx={{
-                              pl: 0,
-                              color: "#0F172A",
-                              fontWeight: 600,
-                              borderBottom: "none",
-                              width: "100px",
-                            }}
-                          >
-                            Email:
-                          </TableCell>
-                          <TableCell
-                            sx={{
-                              color: "#0F172A",
-                              borderBottom: "none",
-                              fontWeight: 400,
-                              fontSize: 18,
-                            }}
-                          >
-                            {item.NewValue}
-                          </TableCell>
-                        </TableRow>
-                        {item.Country && (
-                          <TableRow>
-                            <TableCell
-                              component="th"
-                              sx={{
-                                pl: 0,
-                                color: "#0F172A",
-                                fontWeight: 600,
-                                borderBottom: "none",
-                                width: "100px",
-                              }}
-                            >
-                              Country:
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                color: "#0F172A",
-                                borderBottom: "none",
-                                fontWeight: 400,
-                                fontSize: 18,
-                              }}
-                            >
-                              {item.NewValue}
-                            </TableCell>
-                          </TableRow>
-                        )} */}
                       </TableBody>
                     </Table>
                   </Paper>
@@ -232,7 +181,7 @@ const EditHistory = ({ historyData }) => {
           ))}
         </List>
       </Box>
-    </Paper>
+    </Box>
   );
 };
 

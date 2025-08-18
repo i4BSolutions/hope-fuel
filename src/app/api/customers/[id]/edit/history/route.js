@@ -6,7 +6,7 @@ async function EditHistoryByCustomerId(id) {
  SELECT 
     c.LogId,
     c.ChangeDate AS timestamp,
-    a.AwsId AS editedBy,
+    a.Username AS editedBy,
     c.FieldChanged,
     c.NewValue,
     c.OldValue

@@ -44,6 +44,7 @@ const CustomerListPage = () => {
     name: "",
     email: "",
     country: "",
+    cardId: "",
   });
 
   // Mobile view controls
@@ -249,6 +250,7 @@ const CustomerListPage = () => {
               { field: "Name", newValue: data.name },
               { field: "Email", newValue: data.email },
               { field: "UserCountry", newValue: data.country },
+              { field: "CardID", newValue: data.cardId },
             ],
           }),
         });
@@ -329,6 +331,7 @@ const CustomerListPage = () => {
                 name: profileDetailData.Name || "",
                 email: profileDetailData.Email || "",
                 country: profileDetailData.UserCountry || "",
+                cardId: profileDetailData.CardID || "",
               });
               setSelectedEditId(profileDetailData.CustomerId);
               setOpenEditHistoryModal(true);
@@ -471,14 +474,13 @@ const CustomerListPage = () => {
       <Modal open={openDetailModal} onClose={() => setOpenDetailModal(false)}>
         <Box
           sx={{
-            p: 4,
             maxHeight: "80vh",
             overflowY: "auto",
             position: "absolute",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: isMobile ? "95%" : "80%",
+            width: isMobile ? "95%" : "800px",
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: 1,
