@@ -5,6 +5,14 @@ import db from "../../../utilites/db";
 async function retrieveCurrentMonthHopeFuelCards(page, limit) {
   const offset = (page - 1) * limit;
 
+  const countQuery = `
+    SELECT COUNT(DISTINCT t.TransactionID) AS total
+    FROM Transactions t
+    WHERE 
+      t.TransactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01') 
+      AND t.TransactionDate < DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 1 MONTH)
+  `;
+
   const query = `
   SELECT
     c.Name,
@@ -80,17 +88,19 @@ async function retrieveCurrentMonthHopeFuelCards(page, limit) {
 `;
 
   try {
+    const [{ total }] = await db(countQuery, []);
     const values = [limit, offset];
+    const rows = await db(query, values);
 
-    const result = await db(query, values);
-
-    return result.map((row) => ({
+    const result = rows.map((row) => ({
       ...row,
       ScreenShot:
         typeof row.ScreenShot === "string" && row.ScreenShot
           ? row.ScreenShot.split(",")
           : [],
     }));
+
+    return { result, total: Number(total) || 0 };
   } catch (error) {
     console.error("Database Error:", error);
     throw new Error("Error in retrieving data from the database.");
@@ -104,7 +114,7 @@ export async function GET(req) {
   const parsedLimit = Number(params.get("limit")) || 10;
 
   try {
-    const result = await retrieveCurrentMonthHopeFuelCards(
+    const { result, total } = await retrieveCurrentMonthHopeFuelCards(
       parsedPage,
       parsedLimit
     );
@@ -113,6 +123,7 @@ export async function GET(req) {
         page: parsedPage,
         limit: parsedLimit,
         data: result,
+        total,
       },
       { status: 200 }
     );

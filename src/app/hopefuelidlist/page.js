@@ -20,6 +20,7 @@ import {
   Select,
   TextField,
   Typography,
+  Pagination,
 } from "@mui/material";
 import { useCallback, useEffect, useRef, useState } from "react";
 import DetailModal from "../UI/Components/Modal";
@@ -39,6 +40,8 @@ const HopeFuelIdListPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [searchText, setSearchText] = useState("");
   const [hasMore, setHasMore] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [details, setDetails] = useState({});
@@ -93,9 +96,10 @@ const HopeFuelIdListPage = () => {
         try {
           const url = `api/hopeFuelList/items?page=${page}&limit=${PAGE_SIZE}`;
           const response = await fetch(url);
-          const { data } = await response.json();
+          const { data, total: totalCount } = await response.json();
           setData((prev) => (page === 1 ? data : [...prev, ...data]));
           setHasMore(data.length === PAGE_SIZE);
+          setTotal(totalCount);
         } catch (error) {
           setError(error.message);
           setHasMore(false);
@@ -106,22 +110,6 @@ const HopeFuelIdListPage = () => {
       fetchData();
     }
   }, [page, formStatusDialog]);
-
-  const handleScroll = useCallback(() => {
-    if (
-      window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 100 &&
-      !loading &&
-      hasMore
-    ) {
-      setPage((prev) => prev + 1);
-    }
-  }, [loading, hasMore, error]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll]);
 
   const fetchDetails = async (hopeId) => {
     setLoadingDetails(true);
@@ -196,17 +184,19 @@ const HopeFuelIdListPage = () => {
         const response = await fetch(
           `api/hopeFuelList/items?page=1&limit=${PAGE_SIZE}`
         );
-        const { data } = await response.json();
+        const { data, total: totalCount } = await response.json();
         setData(data);
         setHasMore(data.length === PAGE_SIZE);
+        setTotal(totalCount);
       } else {
         const url = `api/hopeFuelList/search?q=${encodeURIComponent(
           searchRef.current
-        )}`;
+        )}&page=${1}&limit=${PAGE_SIZE}`;
         const response = await fetch(url);
-        const { data } = await response.json();
+        const { data, total: totalCount } = await response.json();
         setData(data);
         setHasMore(false);
+        setTotal(totalCount);
       }
     } catch (error) {
       setError(error.message);
@@ -304,6 +294,28 @@ const HopeFuelIdListPage = () => {
           }}
         >
           <CircularProgress />
+        </Box>
+      )}
+
+      {!loading && total > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            my: 4,
+            mx: { md: "1rem", lg: "2rem", xl: "3rem" },
+          }}
+        >
+          <Pagination
+            count={Math.max(1, Math.ceil(total / PAGE_SIZE))}
+            page={page}
+            onChange={(_, value) => {
+              setPage(value);
+              setData([]);
+            }}
+            color="primary"
+            shape="rounded"
+          />
         </Box>
       )}
 
