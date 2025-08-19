@@ -191,10 +191,11 @@ export default function FollowUpCustomers() {
       const response = await fetch(
         `/api/v1/follow-up/comment?customerId=${customerId}`
       );
+
       if (response.ok) {
         const comments = await response.json();
         // Transform the comments to match the expected format for the modal
-        const transformedComments = comments.map((comment) => ({
+        const transformedComments = comments.data.map((comment) => ({
           id: comment.Id,
           text: comment.Comment,
           author: comment.Agent?.Username || "Unknown Agent",

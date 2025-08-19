@@ -12,14 +12,13 @@ export async function POST(req) {
       );
     }
 
-    // Check for the most recent status
+    // Find the most recent status for this customer
     const existingStatus = await prisma.customerFollowUpStatus.findFirst({
       where: { CustomerID: customerId },
       orderBy: { FollowUpDate: "desc" },
     });
 
     let result;
-
     if (existingStatus) {
       // Update the latest record
       result = await prisma.customerFollowUpStatus.update({
