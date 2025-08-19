@@ -671,8 +671,8 @@ const HopeFuelIdListPage = () => {
     setFiltersOpen(false);
     setAppliedFilters({
       statusId: selectedStatus || "",
-      currency: (currencyInput || "").trim().toUpperCase(),
-      formFillPerson: (formFillPersonInput || "").trim(),
+      currency: (selectedCurrency || "").trim().toUpperCase(),
+      formFillPerson: (selectedPerson || "").trim(),
     });
     setData([]);
     if (page !== 1) setPage(1);
@@ -686,6 +686,7 @@ const HopeFuelIdListPage = () => {
     setAppliedFilters({ statusId: "", currency: "", formFillPerson: "" });
     setData([]);
     resetOptionLists();
+    setFiltersOpen(false);
     if (page !== 1) setPage(1);
     else setSearchKey((k) => k + 1);
   };
