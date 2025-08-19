@@ -37,69 +37,71 @@ export async function GET(req) {
             WHERE s2.CustomerID = cls.CustomerID 
               AND s2.EndDate >= ?
           )
+      ),
+      CustomerWithLatestData AS (
+        SELECT DISTINCT
+          c.CustomerId,
+          c.Name,
+          c.Email,
+          c.CardID,
+          c.ManyChatId,
+          
+          -- Latest follow-up status
+          fuStatus.FollowUpStatusID,
+          fuStatus.FollowUpDate,
+          
+          -- Latest transaction and agent info
+          t.TransactionID,
+          n.Note,
+          ta.AgentID as LastAgentId,
+          a.Username as LastAgentUsername,
+          
+          -- Comment count for efficient loading
+          (SELECT COUNT(*) FROM FollowUpComment fc WHERE fc.CustomerID = c.CustomerId) as CommentCount
+          
+        FROM EligibleCustomers ec
+        JOIN Customer c ON c.CustomerId = ec.CustomerID
+        
+        -- Latest follow-up status (optimized)
+        LEFT JOIN (
+          SELECT 
+            CustomerID, 
+            FollowUpStatusID, 
+            FollowUpDate,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY FollowUpDate DESC) as rn
+          FROM CustomerFollowUpStatus
+        ) fuStatus ON fuStatus.CustomerID = c.CustomerId AND fuStatus.rn = 1
+        
+        -- Latest transaction (optimized)
+        LEFT JOIN (
+          SELECT 
+            CustomerID,
+            TransactionID,
+            NoteID,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY TransactionDate DESC) as rn
+          FROM Transactions
+        ) latestTx ON latestTx.CustomerID = c.CustomerId AND latestTx.rn = 1
+        
+        LEFT JOIN Transactions t ON t.TransactionID = latestTx.TransactionID
+        LEFT JOIN Note n ON n.NoteID = t.NoteID
+        
+        -- Latest agent for transaction (single agent per transaction)
+        LEFT JOIN (
+          SELECT 
+            TransactionID,
+            AgentID,
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+          FROM TransactionAgent
+        ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
+        
+        LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
+        LEFT JOIN Agent a ON a.AgentId = ta.AgentID
       )
-      SELECT 
-        c.CustomerId,
-        c.Name,
-        c.Email,
-        c.CardID,
-        c.ManyChatId,
-        
-        -- Latest follow-up status (optimized with window function)
-        fuStatus.FollowUpStatusID,
-        fuStatus.FollowUpDate,
-        
-        -- Latest transaction and agent info
-        t.TransactionID,
-        n.Note,
-        ta.AgentID as LastAgentId,
-        a.Username as LastAgentUsername,
-        
-        -- Comment count for efficient loading
-        (SELECT COUNT(*) FROM FollowUpComment fc WHERE fc.CustomerID = c.CustomerId) as CommentCount
-        
-      FROM EligibleCustomers ec
-      JOIN Customer c ON c.CustomerId = ec.CustomerID
-      
-      -- Latest follow-up status (optimized)
-      LEFT JOIN (
-        SELECT 
-          CustomerID, 
-          FollowUpStatusID, 
-          FollowUpDate,
-          ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY FollowUpDate DESC) as rn
-        FROM CustomerFollowUpStatus
-      ) fuStatus ON fuStatus.CustomerID = c.CustomerId AND fuStatus.rn = 1
-      
-      -- Latest transaction with agent (optimized)
-      LEFT JOIN (
-        SELECT 
-          CustomerID,
-          TransactionID,
-          NoteID,
-          ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY TransactionDate DESC) as rn
-        FROM Transactions
-      ) latestTx ON latestTx.CustomerID = c.CustomerId AND latestTx.rn = 1
-      
-      LEFT JOIN Transactions t ON t.TransactionID = latestTx.TransactionID
-      LEFT JOIN Note n ON n.NoteID = t.NoteID
-      
-      -- Latest agent for transaction
-      LEFT JOIN (
-        SELECT 
-          TransactionID,
-          AgentID,
-          ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
-        FROM TransactionAgent
-      ) latestAgent ON latestAgent.TransactionID = t.TransactionID AND latestAgent.rn = 1
-      
-      LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgent.AgentID
-      LEFT JOIN Agent a ON a.AgentId = ta.AgentID
-      
-      WHERE (? = 0 OR COALESCE(fuStatus.FollowUpStatusID, 1) = ?)
-        AND (? = 0 OR ta.AgentID = ?)
-      
-      ORDER BY c.Name
+      SELECT *
+      FROM CustomerWithLatestData
+      WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
+        AND (? = 0 OR LastAgentId = ?)
+      ORDER BY Name
     `;
 
     const queryParams = [
@@ -155,22 +157,33 @@ export async function GET(req) {
       });
     }
 
-    // Format the final response
-    const result = customers.map((customer) => ({
-      customerId: customer.CustomerId,
-      name: customer.Name,
-      email: customer.Email,
-      cardId: customer.CardID,
-      manyChatId: customer.ManyChatId,
-      lastFormAgent: customer.LastAgentUsername,
-      agentId: customer.LastAgentId,
-      note: customer.Note,
-      followUpStatus: {
-        statusId: customer.FollowUpStatusID ?? 1,
-        followUpDate: customer.FollowUpDate,
-      },
-      comments: commentsMap.get(customer.CustomerId) || [],
-    }));
+    // Format the final response and ensure no duplicates
+    const customerMap = new Map();
+
+    customers.forEach((customer) => {
+      const customerId = customer.CustomerId;
+
+      // Only add if not already processed (deduplication safeguard)
+      if (!customerMap.has(customerId)) {
+        customerMap.set(customerId, {
+          customerId: customer.CustomerId,
+          name: customer.Name,
+          email: customer.Email,
+          cardId: customer.CardID,
+          manyChatId: customer.ManyChatId,
+          lastFormAgent: customer.LastAgentUsername,
+          agentId: customer.LastAgentId,
+          note: customer.Note,
+          followUpStatus: {
+            statusId: customer.FollowUpStatusID ?? 1,
+            followUpDate: customer.FollowUpDate,
+          },
+          comments: commentsMap.get(customer.CustomerId) || [],
+        });
+      }
+    });
+
+    const result = Array.from(customerMap.values());
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
