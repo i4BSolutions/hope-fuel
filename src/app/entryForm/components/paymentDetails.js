@@ -184,7 +184,9 @@ export default function PaymentDetails({
                         <Button
                           variant="contained"
                           sx={{ borderRadius: 8, py: 1 }}
-                          disabled={!data.NoteID}
+                          disabled={
+                            agent.roleId !== AGENT_ROLE.PAYMENT_PROCESSOR
+                          }
                           onClick={
                             isEditing
                               ? handleNoteSave
