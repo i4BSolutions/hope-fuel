@@ -501,7 +501,7 @@ const HopeFuelIdListPage = () => {
     currency: "", // CurrencyCode
     formFillPerson: "", // AgentID
   });
-  const [currencyOptions, setCurrencyOptions] = useState([]); // ["USD","EUR",...]
+  const [currencyOptions, setCurrencyOptions] = useState([]);
   const [personOptions, setPersonOptions] = useState([]);
 
   const [searchKey, setSearchKey] = useState(0);
