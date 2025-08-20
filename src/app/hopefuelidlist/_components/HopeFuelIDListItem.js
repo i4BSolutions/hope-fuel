@@ -261,6 +261,16 @@ const HopeFuelIDListItem = ({
               >
                 Note: {item.Note ? stringTruncator(item.Note, 80) : "N/A"}
               </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  width: "50%",
+                }}
+              >
+                Region - {item.UserCountryName}
+              </Typography>
             </Box>
           </Card>
         ))}
