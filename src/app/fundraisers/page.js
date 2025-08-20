@@ -132,7 +132,9 @@ const FundraisingFormPage = () => {
     setFetchFundraiserLoading(true);
 
     try {
-      const response = await fetch("/api/v1/fundraisers");
+      const response = await fetch("/api/v1/fundraisers", {
+        cache: "no-store",
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
