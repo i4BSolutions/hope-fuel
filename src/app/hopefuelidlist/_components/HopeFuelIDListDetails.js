@@ -86,11 +86,11 @@ const HopeFuelIDListDetails = ({
   useEffect(() => {
     (async () => {
       const urls = await Promise.all(
-        data.ScreenShot.map((key) => getSignedUrl(key))
+        data ? data.ScreenShot.map((key) => getSignedUrl(key)) : []
       );
       setImageUrls(urls);
     })();
-  }, []);
+  }, [data]);
 
   if (imageUrls.length === 0) return null;
   return (
