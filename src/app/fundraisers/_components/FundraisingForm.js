@@ -78,6 +78,7 @@ const FundraisingForm = ({ defaultValues = {}, onSubmitHandler, onCancel }) => {
 
     const result = await response.json();
     if (response.ok && result) {
+      onSubmitHandler?.(result.fundraiser);
       onCancel && onCancel();
       reset();
       setLogoFile(null);
