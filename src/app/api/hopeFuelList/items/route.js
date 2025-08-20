@@ -342,7 +342,9 @@ function mapRow(t) {
     TransactionDate: t.TransactionDate,
     Amount: t.Amount ?? null,
     Month: t.Month ?? null,
+
     CurrencyCode: t.Wallet?.Currency?.CurrencyCode || null,
+    WalletName: t.Wallet?.WalletName || null,
 
     ScreenShot: screenShot,
     FormFilledPerson: formFilledPerson,
@@ -428,7 +430,10 @@ export async function GET(req) {
           },
         },
         Wallet: {
-          select: { Currency: { select: { CurrencyCode: true } } },
+          select: {
+            WalletName: true,
+            Currency: { select: { CurrencyCode: true } },
+          },
         },
         Note: { select: { Note: true } },
         Screenshot: { select: { ScreenShotLink: true } },
