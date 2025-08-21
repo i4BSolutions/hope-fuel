@@ -14,8 +14,10 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 
+import UserCheck from "@/lib/icons/UserCheck";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import FactCheckIcon from "@mui/icons-material/FactCheck";
 import FlagIcon from "@mui/icons-material/Flag";
 import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -28,7 +30,6 @@ import { signOut } from "aws-amplify/auth";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAgentStore } from "../../stores/agentStore";
-import UserCheck from "@/lib/icons/UserCheck";
 
 const drawerWidth = 250; // Full-width drawer
 const miniDrawerWidth = 80; // Mini sidebar width
@@ -53,6 +54,11 @@ const navItems = {
     text: "PRFHQ List",
     icon: <FormatListBulletedRoundedIcon />,
     path: "/hopefuelidlist",
+  },
+  "all-prfhq": {
+    text: "All PRFHQ IDs",
+    icon: <FactCheckIcon />,
+    path: "/all-prfhq",
   },
   customerlist: {
     text: "Customers List",
@@ -87,6 +93,7 @@ const roleBasedNavItems = {
     navItems.extendUser,
     navItems.entryForm,
     navItems.hopefuelidlist,
+    navItems["all-prfhq"],
     navItems.customerlist,
     navItems.followUpCustomers,
     navItems.fundraisers,
@@ -96,6 +103,7 @@ const roleBasedNavItems = {
     navItems.extendUser,
     navItems.entryForm,
     navItems.hopefuelidlist,
+    navItems["all-prfhq"],
     navItems.customerlist,
     navItems.followUpCustomers,
     navItems.fundraisers,
