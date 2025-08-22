@@ -185,7 +185,8 @@ export default function PaymentDetails({
                           variant="contained"
                           sx={{ borderRadius: 8, py: 1 }}
                           disabled={
-                            agent.roleId !== AGENT_ROLE.PAYMENT_PROCESSOR
+                            agent.roleId !== AGENT_ROLE.PAYMENT_PROCESSOR &&
+                            agent.roleId !== AGENT_ROLE.ADMIN
                           }
                           onClick={
                             isEditing
