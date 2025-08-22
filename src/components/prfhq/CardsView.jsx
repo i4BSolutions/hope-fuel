@@ -26,6 +26,7 @@ export default function CardsView({
   handleOpenScreenshots,
   formStatusDialogHandler,
   setFormStatusValues,
+  handleOpenDrawer,
 }) {
   if (loading) return <Spinner />;
 
@@ -150,6 +151,7 @@ export default function CardsView({
               variant="outlined"
               sx={{ borderRadius: "50px", margin: 0 }}
               fullWidth
+              onClick={() => handleOpenDrawer(item.HopeFuelID)}
             >
               View Cards Issued
             </Button>

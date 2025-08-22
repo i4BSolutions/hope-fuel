@@ -1,7 +1,9 @@
 "use client";
 
 import CardsView from "@/components/prfhq/CardsView";
+import SubscriptionCards from "@/components/prfhq/SubscriptionCards";
 import ImagePreviewModal from "@/components/shared/ImagePreviewModal";
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
 import Spinner from "@/components/shared/Spinner";
 import { RestartAlt } from "@mui/icons-material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -14,11 +16,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControl,
   IconButton,
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Paper,
   Select,
   TextField,
   Typography,
@@ -28,9 +32,12 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import Modal from "../UI/Components/Modal";
 import getSignedUrl from "../utilites/getSignedUrl";
 
 export default function AllHopefuelPage() {
+  const { showSnackbar } = useSnackbar();
+
   // Card Data States
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
@@ -54,6 +61,12 @@ export default function AllHopefuelPage() {
     formStatusId: null,
   });
   const [formStatusLoading, setFormStatusLoading] = useState(false);
+
+  // Subscription States
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
+  const [currentHopefuelId, setCurrentHopefuelId] = useState(null);
 
   // Fetch the card data based on filters and pagination
   const fetchCardData = async () => {
@@ -117,6 +130,31 @@ export default function AllHopefuelPage() {
     setFormStatusDialog((prev) => !prev);
   };
 
+  const fetchSubscriptionByHopeFuelID = async (hopeId) => {
+    setLoadingSubscription(true);
+    setScreenshotsLists([]);
+    setCurrentHopefuelId(hopeId);
+
+    try {
+      const response = await fetch(
+        `/api/hopeFuelList/details/${hopeId}/subscription`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch subscription for HopeFuelID ${hopeFuelId}`
+        );
+      }
+      const result = await response.json();
+      setSubscriptions(result.data);
+    } catch (error) {
+      console.error(error);
+      return [];
+    } finally {
+      setLoadingSubscription(false);
+    }
+  };
+
   const handleOpenScreenshots = async (screenshots) => {
     if (!Array.isArray(screenshots)) {
       screenshots = [screenshots];
@@ -134,6 +172,15 @@ export default function AllHopefuelPage() {
 
   const handleCloseScreenshots = () => {
     setOpenScreenshotModal((prev) => !prev);
+  };
+
+  const handleOpenDrawer = (hopeFuelId) => {
+    fetchSubscriptionByHopeFuelID(hopeFuelId);
+    setOpenDrawer((prev) => !prev);
+  };
+
+  const handleCloseDrawer = () => {
+    setOpenDrawer((prev) => !prev);
   };
 
   if (!cardData) {
@@ -249,6 +296,7 @@ export default function AllHopefuelPage() {
         handleOpenScreenshots={handleOpenScreenshots}
         formStatusDialogHandler={formStatusDialogHandler}
         setFormStatusValues={setFormStatusValues}
+        handleOpenDrawer={handleOpenDrawer}
       />
 
       {/* Pagination */}
@@ -346,7 +394,6 @@ export default function AllHopefuelPage() {
       </Dialog>
 
       {/* Screenshot Modal */}
-
       <ImagePreviewModal
         open={openScreenshotModal}
         onClose={handleCloseScreenshots}
@@ -354,6 +401,39 @@ export default function AllHopefuelPage() {
         activeImage={activeImage}
         activeImageHandler={setActiveImage}
       />
+
+      {/* List of Cards Issued */}
+      <Modal direction="left" open={openDrawer} onClose={handleCloseDrawer}>
+        <Paper
+          sx={{
+            position: "fixed",
+            right: 0,
+            top: 0,
+            width: "100%",
+            pb: 4,
+            maxWidth: "350px",
+            height: "100vh",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            overflow: "auto",
+            zIndex: 1000,
+            borderTopLeftRadius: 20,
+            borderBottomLeftRadius: 20,
+          }}
+        >
+          {loadingSubscription ? (
+            <Spinner />
+          ) : (
+            <Box>
+              <Typography variant="h4" sx={{ p: 3 }}>
+                PRFHQ - {currentHopefuelId}
+              </Typography>
+              <Divider />
+              <SubscriptionCards cards={subscriptions} />
+            </Box>
+          )}
+        </Paper>
+      </Modal>
     </div>
   );
 }
