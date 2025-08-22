@@ -56,7 +56,6 @@ const HopeFuelIdListPage = () => {
   const [formStatusLoading, setFormStatusLoading] = useState(false);
 
   const formStatusDialogHandler = async (values) => {
-    console.log(values);
     if (values) {
       try {
         setFormStatusLoading(true);

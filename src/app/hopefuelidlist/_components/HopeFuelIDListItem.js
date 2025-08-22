@@ -1,3 +1,4 @@
+import getStatusByColor from "@/lib/getStatusByColor";
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
 import dayjs from "dayjs";
@@ -16,17 +17,6 @@ const HopeFuelIDListItem = ({
   formStatusDialogHandler,
   setFormStatusValues,
 }) => {
-  const getStatusByColor = (status) => {
-    switch (status) {
-      case "Payment Checked":
-        return "#03fc73";
-      case "Card Issued":
-        return "#6183E4";
-      default:
-        return "#FBBF24";
-    }
-  };
-
   if (!Array.isArray(data)) {
     return null;
   }
