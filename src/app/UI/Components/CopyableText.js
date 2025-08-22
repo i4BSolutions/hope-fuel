@@ -46,9 +46,11 @@ const CopyableText = ({
           display: "inline-flex",
           alignItems: "center",
           gap: 1,
-          p: 1,
-          borderRadius: 1,
-          bgcolor: "grey.50",
+          pl: 1,
+          pr: 0.5,
+          py: 0.2,
+          borderRadius: 1.5,
+          bgcolor: "grey.100",
         }}
       >
         <Typography
