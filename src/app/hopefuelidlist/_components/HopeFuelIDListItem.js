@@ -103,7 +103,6 @@ const HopeFuelIDListItem = ({
                 >
                   {dayjs
                     .utc(item.TransactionDate)
-                    .tz("Asia/Bangkok")
                     .format("MMMM D, YYYY HH:mm A")}
                 </Typography>
               </Box>

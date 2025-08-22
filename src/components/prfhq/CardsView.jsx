@@ -19,6 +19,8 @@ import {
   Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 export default function CardsView({
   cardData,
@@ -59,7 +61,7 @@ export default function CardsView({
               {item.Month > 1 ? "months" : "month"}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {dayjs(item.TransactionDate).format("MMMM D, YYYY h:mm A")}
+              {dayjs.utc(item.TransactionDate).format("MMMM D, YYYY h:mm A")}
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, mt: 1 }}>
               ManyChat ID:{" "}
