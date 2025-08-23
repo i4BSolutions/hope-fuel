@@ -87,7 +87,7 @@ export default async function checkPrfSubmit(
         setUserInfo({
           name: res["Name"],
           email: res["Email"],
-          prf_no: res["CardID"],
+          prf_no: res["CardID"] ?? prfno,
           expire_date: res["ExpireDate"],
         });
       }
@@ -101,7 +101,7 @@ export default async function checkPrfSubmit(
     setUserInfo({
       name: res["Name"],
       email: res["Email"],
-      prf_no: res["CardID"],
+      prf_no: res["CardID"] ?? prfno,
       expire_date: res["ExpireDate"],
     });
 
@@ -132,7 +132,7 @@ export default async function checkPrfSubmit(
         setUserInfo({
           name: json.name,
           email: json.email,
-          prf_no: json.prf_no,
+          prf_no: json.prf_no ?? prfno,
           expire_date: json.expire_date,
         });
       }
@@ -144,7 +144,7 @@ export default async function checkPrfSubmit(
     setUserInfo({
       name: json.name,
       email: json.email,
-      prf_no: json.prf_no,
+      prf_no: json.prf_no ?? prfno,
       expire_date: json.expire_date,
     });
 

@@ -88,7 +88,9 @@ export async function GET(request) {
 
       summary[walletId].count += 1;
 
-      if (tx.PaymentCheck === true && !tx.PaymentDenied) {
+      if (tx.PaymentCheck === true && tx.PaymentDenied === true) {
+        summary[walletId].checked += 1;
+      } else if (tx.PaymentCheck === true && !tx.PaymentDenied) {
         summary[walletId].checked += 1;
         summary[walletId].totalAmount += amount;
 
