@@ -115,7 +115,7 @@ const ExtendUserForm = () => {
       {userExist && checkInputComplete && !isChecking && (
         <>
           {!hasPermissionThisMonth && agent.roleId !== AGENT_ROLE.ADMIN ? (
-            <Typography>
+            <Typography sx={{ mt: 5 }}>
               ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက် စာရင်းသွင်းထားပြီးပါပြီ။
               ထူးခြားဖြစ်စဥ် ဖြစ်ပါက Admin ကိုဆက်သွယ်ပါ
             </Typography>
