@@ -81,13 +81,19 @@ const CustomerInfoEdit = ({
   onSave,
   onCancel,
 }) => {
-  const [errors, setErrors] = useState({ name: "", email: "", country: "" });
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    country: "",
+    cardId: "",
+  });
 
   const validateForm = useCallback(() => {
     const newErrors = {
       name: "",
       email: "",
       country: "",
+      cardId: "",
     };
     let isValid = true;
 
@@ -195,6 +201,24 @@ const CustomerInfoEdit = ({
             error={!!errors.email}
             helperText={errors.email}
             sx={inputStyles}
+          />
+        </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <Typography variant="subtitle1" component="label" sx={labelStyles}>
+            Card ID
+          </Typography>
+          <TextField
+            name="cardId"
+            value={customerInfo.cardId}
+            onChange={handleChange}
+            fullWidth
+            variant="outlined"
+            size="medium"
+            error={!!errors.cardId}
+            helperText={errors.cardId}
+            sx={inputStyles}
+            placeholder="Enter Card ID (optional)"
           />
         </Box>
 

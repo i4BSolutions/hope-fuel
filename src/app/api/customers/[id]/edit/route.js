@@ -84,7 +84,7 @@ export async function POST(req, { params }) {
     let auditLogs = [];
 
     for (const { field, newValue } of updates) {
-      const allowedFields = ["Name", "Email", "UserCountry"]; //allowed fields to be updated
+      const allowedFields = ["Name", "Email", "UserCountry", "CardID"]; //allowed fields to be updated
       if (!allowedFields.includes(field)) {
         return NextResponse.json(
           { message: `Field not allowed to be updated for ${field}` },

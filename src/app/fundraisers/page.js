@@ -129,12 +129,12 @@ const FundraisingFormPage = () => {
   }, [searchQuery, fundraisers, selectedCountry, selectedCurrency]);
 
   const getAllFundraisers = useCallback(async () => {
-    if (fetchFundraiserLoading) return;
-
     setFetchFundraiserLoading(true);
 
     try {
-      const response = await fetch("/api/v1/fundraisers");
+      const response = await fetch("/api/v1/fundraisers", {
+        cache: "no-store",
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -190,8 +190,8 @@ const FundraisingFormPage = () => {
 
       setFundraiserDetails(details);
     } catch (error) {
-      console.error("Error fetching fundraiser details:", err);
-      setError(`Failed to load fundraiser details: ${err.message}`);
+      console.error("Error fetching fundraiser details:", error);
+      setError(`Failed to load fundraiser details: ${error.message}`);
 
       setFundraiserDetails(null);
     } finally {

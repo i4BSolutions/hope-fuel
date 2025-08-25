@@ -1,26 +1,22 @@
+import getStatusByColor from "@/lib/getStatusByColor";
 import stringTruncator from "@/lib/stringTruncator";
 import { Box, Button, Card, Divider, Typography } from "@mui/material";
-import { v4 as uuidv4 } from "uuid";
-import CopyableText from "../../UI/Components/CopyableText";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { v4 as uuidv4 } from "uuid";
+import CopyableText from "../../UI/Components/CopyableText";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
-  const getStatusByColor = (status) => {
-    switch (status) {
-      case "Payment Checked":
-        return "#03fc73";
-      case "Card Issued":
-        return "#6183E4";
-      default:
-        return "#FBBF24";
-    }
-  };
-
+const HopeFuelIDListItem = ({
+  data,
+  onClick,
+  onClickScreenShot,
+  formStatusDialogHandler,
+  setFormStatusValues,
+}) => {
   if (!Array.isArray(data)) {
     return null;
   }
@@ -107,7 +103,6 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                 >
                   {dayjs
                     .utc(item.TransactionDate)
-                    .tz("Asia/Bangkok")
                     .format("MMMM D, YYYY HH:mm A")}
                 </Typography>
               </Box>
@@ -167,7 +162,7 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   minWidth: "150px",
                   fontSize: "14px",
                   "&:hover": {
-                    backgroundColor: "#B91C1C",
+                    opacity: 0.9,
                   },
                   fontWeight: 600,
                 }}
@@ -206,6 +201,18 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                   alignItems: "center",
                   whiteSpace: "nowrap",
                   fontWeight: 600,
+                  "&:hover": {
+                    opacity: 0.9,
+                  },
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const values = {
+                    statusId: item.TransactionStatusID,
+                    formStatusId: item.FormStatusID,
+                  };
+                  setFormStatusValues(values);
+                  formStatusDialogHandler();
                 }}
               >
                 {item.TransactionStatus}
@@ -242,6 +249,26 @@ const HopeFuelIDListItem = ({ data, onClick, onClickScreenShot }) => {
                 }}
               >
                 Note: {item.Note ? stringTruncator(item.Note, 80) : "N/A"}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  width: "50%",
+                }}
+              >
+                Region - {item.UserCountryName}
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#000000",
+                  fontSize: "14px",
+                  fontWeight: 400,
+                  width: "50%",
+                }}
+              >
+                Wallet - {item.WalletName}
               </Typography>
             </Box>
           </Card>

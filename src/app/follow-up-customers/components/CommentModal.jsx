@@ -41,10 +41,12 @@ export default function CommentModal({
   };
 
   // Separate comments into resolved and unresolved
-  const unresolvedComments = data?.filter(comment => !comment.isResolved) || [];
-  const resolvedComments = data?.filter(comment => comment.isResolved) || [];
-  
-  const displayComments = activeTab === 0 ? unresolvedComments : resolvedComments;
+  const unresolvedComments =
+    data?.filter((comment) => !comment.isResolved) || [];
+  const resolvedComments = data?.filter((comment) => comment.isResolved) || [];
+
+  const displayComments =
+    activeTab === 0 ? unresolvedComments : resolvedComments;
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -63,7 +65,12 @@ export default function CommentModal({
         }}
       >
         {/* Header */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Box display="flex" alignItems="center" gap={1}>
             <Typography fontWeight="bold">Comments</Typography>
             {unresolvedComments.length > 0 && (
@@ -81,15 +88,19 @@ export default function CommentModal({
         </Box>
 
         {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} aria-label="comment tabs">
-            <Tab 
-              label={`Open (${unresolvedComments.length})`} 
-              sx={{ textTransform: 'none', fontWeight: 600 }}
+        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="comment tabs"
+          >
+            <Tab
+              label={`Open (${unresolvedComments.length})`}
+              sx={{ textTransform: "none", fontWeight: 600 }}
             />
-            <Tab 
-              label={`Resolved (${resolvedComments.length})`} 
-              sx={{ textTransform: 'none', fontWeight: 600 }}
+            <Tab
+              label={`Resolved (${resolvedComments.length})`}
+              sx={{ textTransform: "none", fontWeight: 600 }}
             />
           </Tabs>
         </Box>
@@ -98,14 +109,16 @@ export default function CommentModal({
         <Box mt={2} flex={1} overflow="auto" sx={{ maxHeight: 300, pr: 1 }}>
           {displayComments && displayComments.length > 0 ? (
             displayComments.map((comment, index) => (
-              <Box 
-                key={index} 
-                display="flex" 
-                alignItems="flex-start" 
+              <Box
+                key={index}
+                display="flex"
+                alignItems="flex-start"
                 mb={3}
                 sx={{
                   opacity: comment.isResolved ? 0.6 : 1,
-                  backgroundColor: comment.isResolved ? "#F8F9FA" : "transparent",
+                  backgroundColor: comment.isResolved
+                    ? "#F8F9FA"
+                    : "transparent",
                   borderRadius: 2,
                   p: 1,
                 }}
@@ -144,32 +157,50 @@ export default function CommentModal({
                       }}
                     />
                   </Box>
-                  <Typography 
-                    fontSize={14} 
-                    sx={{ 
-                      textDecoration: comment.isResolved ? "line-through" : "none",
-                      mb: 1
+                  <Typography
+                    fontSize={14}
+                    sx={{
+                      textDecoration: comment.isResolved
+                        ? "line-through"
+                        : "none",
+                      mb: 1,
                     }}
                   >
                     {comment.text}
                   </Typography>
                   <Box display="flex" gap={1}>
-                    <Tooltip title={comment.isResolved ? "Mark as unresolved" : "Mark as resolved"}>
+                    <Tooltip
+                      title={
+                        comment.isResolved
+                          ? "Mark as unresolved"
+                          : "Mark as resolved"
+                      }
+                    >
                       <Button
                         size="small"
                         variant="outlined"
-                        startIcon={comment.isResolved ? <UndoIcon /> : <CheckIcon />}
-                        onClick={() => onToggleResolve(comment.id, comment.isResolved)}
+                        startIcon={
+                          comment.isResolved ? <UndoIcon /> : <CheckIcon />
+                        }
+                        onClick={() =>
+                          onToggleResolve(comment.id, comment.isResolved)
+                        }
                         sx={{
                           fontSize: 10,
                           height: 24,
                           minWidth: "auto",
                           px: 1,
-                          borderColor: comment.isResolved ? "#6B7280" : "#10B981",
+                          borderColor: comment.isResolved
+                            ? "#6B7280"
+                            : "#10B981",
                           color: comment.isResolved ? "#6B7280" : "#10B981",
                           "&:hover": {
-                            borderColor: comment.isResolved ? "#4B5563" : "#059669",
-                            backgroundColor: comment.isResolved ? "#F3F4F6" : "#ECFDF5",
+                            borderColor: comment.isResolved
+                              ? "#4B5563"
+                              : "#059669",
+                            backgroundColor: comment.isResolved
+                              ? "#F3F4F6"
+                              : "#ECFDF5",
                           },
                         }}
                       >
@@ -188,7 +219,9 @@ export default function CommentModal({
               height={100}
             >
               <Typography color="text.secondary" textAlign="center">
-                {activeTab === 0 ? "No open comments." : "No resolved comments."}
+                {activeTab === 0
+                  ? "No open comments."
+                  : "No resolved comments."}
               </Typography>
             </Box>
           )}

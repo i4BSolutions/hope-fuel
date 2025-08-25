@@ -1,19 +1,15 @@
 "use client";
 
 import getSignedUrl from "@/app/utilites/getSignedUrl";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import {
   Box,
   Button,
   Card,
   FormControl,
-  styled,
-  Tooltip,
-  ImageList,
-  ImageListItem,
-  Modal,
   Stack,
+  styled,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -188,7 +184,10 @@ export default function PaymentDetails({
                         <Button
                           variant="contained"
                           sx={{ borderRadius: 8, py: 1 }}
-                          disabled={!data.NoteID}
+                          disabled={
+                            agent.roleId !== AGENT_ROLE.PAYMENT_PROCESSOR &&
+                            agent.roleId !== AGENT_ROLE.ADMIN
+                          }
                           onClick={
                             isEditing
                               ? handleNoteSave
@@ -216,7 +215,7 @@ export default function PaymentDetails({
               AgentId: data.AgentId,
               TransactionID: data.TransactionID,
             }}
-            onActionComplete={() => setIsSuccessModalOpen(true)}
+            onActionComplete={() => clearHopeFuelID()}
           />
         </FormControl>
         <CardsIssuedList data={data} />
@@ -229,45 +228,6 @@ export default function PaymentDetails({
         activeImage={activeImage}
         activeImageHandler={setActiveImage}
       />
-
-      <Modal
-        open={isSuccessModalOpen}
-        onClose={() => setIsSuccessModalOpen(false)}
-        aria-labelledby="success-modal"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 300,
-            bgcolor: "white",
-            borderRadius: "12px",
-            boxShadow: 24,
-            p: 4,
-            textAlign: "center",
-          }}
-        >
-          <CheckCircleIcon color="success" sx={{ fontSize: "50px" }} />
-          <Typography
-            sx={{ fontSize: "18px", fontWeight: "bold", mt: 2, mb: 2 }}
-          >
-            Payment Status Updated Successfully.
-          </Typography>
-
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => {
-              setIsSuccessModalOpen(false);
-              clearHopeFuelID();
-            }}
-          >
-            OK
-          </Button>
-        </Box>
-      </Modal>
     </>
   );
 }

@@ -5,7 +5,6 @@ export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const statusId = parseInt(searchParams.get("statusId") || "0", 10);
   const agentId = parseInt(searchParams.get("agentId") || "0", 10);
-  const now = new Date();
 
   const currentYear = parseInt(searchParams.get("year"), 10);
   const currentMonth = parseInt(searchParams.get("month"), 10);
@@ -17,90 +16,120 @@ export async function GET(req) {
   );
   const oneMonthAgoEnd = new Date(Date.UTC(currentYear, currentMonth, 0));
 
-  // Fetch all subscriptions
-  const allSubscriptions = await prisma.subscription.findMany({
-    select: {
-      CustomerID: true,
-      StartDate: true,
-      EndDate: true,
-    },
-    orderBy: { StartDate: "asc" },
-  });
+  try {
+    // Optimized query: Find customers who need follow-up using a single database query
+    const followUpCustomersQuery = `
+      WITH CustomerLastSubscription AS (
+        SELECT 
+          CustomerID,
+          MAX(EndDate) as LastEndDate,
+          COUNT(*) as SubscriptionCount
+        FROM Subscription 
+        GROUP BY CustomerID
+      ),
+      EligibleCustomers AS (
+        SELECT DISTINCT cls.CustomerID
+        FROM CustomerLastSubscription cls
+        WHERE cls.LastEndDate >= ? 
+          AND cls.LastEndDate <= ?
+          AND NOT EXISTS (
+            SELECT 1 FROM Subscription s2 
+            WHERE s2.CustomerID = cls.CustomerID 
+              AND s2.EndDate >= ?
+          )
+      ),
+      CustomerWithLatestData AS (
+        SELECT DISTINCT
+          c.CustomerId,
+          c.Name,
+          c.Email,
+          c.CardID,
+          c.ManyChatId,
+          
+          -- Latest follow-up status
+          fuStatus.FollowUpStatusID,
+          fuStatus.FollowUpDate,
+          
+          -- Latest transaction and agent info
+          t.TransactionID,
+          n.Note,
+          ta.AgentID as LastAgentId,
+          a.Username as LastAgentUsername,
+          
+          -- Comment count for efficient loading
+          (SELECT COUNT(*) FROM FollowUpComment fc WHERE fc.CustomerID = c.CustomerId) as CommentCount
+          
+        FROM EligibleCustomers ec
+        JOIN Customer c ON c.CustomerId = ec.CustomerID
+        
+        -- Latest follow-up status (optimized)
+        LEFT JOIN (
+          SELECT 
+            CustomerID, 
+            FollowUpStatusID, 
+            FollowUpDate,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY FollowUpDate DESC) as rn
+          FROM CustomerFollowUpStatus
+        ) fuStatus ON fuStatus.CustomerID = c.CustomerId AND fuStatus.rn = 1
+        
+        -- Latest transaction (optimized)
+        LEFT JOIN (
+          SELECT 
+            CustomerID,
+            TransactionID,
+            NoteID,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY TransactionDate DESC) as rn
+          FROM Transactions
+        ) latestTx ON latestTx.CustomerID = c.CustomerId AND latestTx.rn = 1
+        
+        LEFT JOIN Transactions t ON t.TransactionID = latestTx.TransactionID
+        LEFT JOIN Note n ON n.NoteID = t.NoteID
+        
+        -- Latest agent for transaction (single agent per transaction)
+        LEFT JOIN (
+          SELECT 
+            TransactionID,
+            AgentID,
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+          FROM TransactionAgent
+        ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
+        
+        LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
+        LEFT JOIN Agent a ON a.AgentId = ta.AgentID
+      )
+      SELECT *
+      FROM CustomerWithLatestData
+      WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
+        AND (? = 0 OR LastAgentId = ?)
+      ORDER BY Name
+    `;
 
-  // Group subscriptions by customer
-  const customerSubs = new Map();
-  for (const { CustomerID, StartDate, EndDate } of allSubscriptions) {
-    if (!customerSubs.has(CustomerID)) customerSubs.set(CustomerID, []);
-    customerSubs.get(CustomerID).push({
-      startDate: new Date(StartDate),
-      endDate: new Date(EndDate),
-    });
-  }
+    const queryParams = [
+      twoMonthsAgoStart,
+      oneMonthAgoEnd,
+      monthStart,
+      statusId,
+      statusId,
+      agentId,
+      agentId,
+    ];
 
-  const followUpCustomerIDs = [];
-
-  for (const [customerID, subs] of customerSubs.entries()) {
-    const parsedSubs = subs.map(({ startDate, endDate }) => ({
-      start: new Date(startDate),
-      end: new Date(endDate),
-    }));
-
-    const isActiveInCurrent = parsedSubs.some(
-      ({ end }) => end.getTime() >= monthStart.getTime()
+    // Execute the optimized query
+    const customers = await prisma.$queryRawUnsafe(
+      followUpCustomersQuery,
+      ...queryParams
     );
 
-    const endInPastTwoMonths = parsedSubs.some(
-      ({ end }) =>
-        end.getTime() >= twoMonthsAgoStart.getTime() &&
-        end.getTime() <= oneMonthAgoEnd.getTime()
-    );
+    // Batch fetch comments only for customers that have them
+    const customersWithComments = customers.filter((c) => c.CommentCount > 0);
+    const customerIds = customersWithComments.map((c) => c.CustomerId);
 
-    if (!isActiveInCurrent && endInPastTwoMonths) {
-      followUpCustomerIDs.push(customerID);
-    }
-  }
-
-  // Fetch customer details
-  const followUpCustomers = await prisma.Customer.findMany({
-    where: {
-      CustomerId: { in: followUpCustomerIDs },
-    },
-    select: {
-      CustomerId: true,
-      Name: true,
-      Email: true,
-      CardID: true,
-      ManyChatId: true,
-      FollowUpStatus: {
-        orderBy: { FollowUpDate: "desc" },
-        take: 1,
-        select: {
-          FollowUpStatusID: true,
-          FollowUpDate: true,
+    let commentsMap = new Map();
+    if (customerIds.length > 0) {
+      const allComments = await prisma.followUpComment.findMany({
+        where: {
+          CustomerID: { in: customerIds },
         },
-      },
-      Transactions: {
-        orderBy: { TransactionDate: "desc" },
-        take: 1,
-        select: {
-          Note: {
-            select: { Note: true },
-          },
-          TransactionAgent: {
-            orderBy: { LogDate: "desc" },
-            take: 1,
-            select: {
-              Agent: {
-                select: {
-                  AgentId: true,
-                  Username: true,
-                },
-              },
-            },
-          },
-        },
-      },
-      FollowUpComment: {
         include: {
           Agent: {
             select: {
@@ -109,52 +138,59 @@ export async function GET(req) {
             },
           },
         },
-      },
-    },
-  });
+        orderBy: { CreatedAt: "desc" },
+      });
 
-  // Format response
-  const result = followUpCustomers
-    .map((customer) => {
-      const transaction = customer.Transactions[0];
-      const agent = transaction?.TransactionAgent?.[0]?.Agent;
-      const followUp = customer.FollowUpStatus?.[0];
+      // Group comments by customer
+      allComments.forEach((comment) => {
+        if (!commentsMap.has(comment.CustomerID)) {
+          commentsMap.set(comment.CustomerID, []);
+        }
+        commentsMap.get(comment.CustomerID).push({
+          id: comment.Id,
+          comment: comment.Comment,
+          isResolved: comment.Is_Resolved,
+          agentUsername: comment.Agent?.Username ?? null,
+          agentId: comment.Agent?.AgentId ?? null,
+          createdAt: comment.CreatedAt,
+        });
+      });
+    }
 
-      const status = followUp?.FollowUpStatusID ?? 1;
+    // Format the final response and ensure no duplicates
+    const customerMap = new Map();
 
-      const comments = customer.FollowUpComment
-        .sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt)) // Sort by newest first
-        .map((c) => ({
-          id: c.Id,
-          comment: c.Comment,
-          isResolved: c.Is_Resolved,
-          agentUsername: c.Agent?.Username ?? null,
-          agentId: c.Agent?.AgentId ?? null,
-          createdAt: c.CreatedAt,
-        }));
+    customers.forEach((customer) => {
+      const customerId = customer.CustomerId;
 
-      return {
-        customerId: customer.CustomerId,
-        name: customer.Name,
-        email: customer.Email,
-        cardId: customer.CardID,
-        manyChatId: customer.ManyChatId,
-        lastFormAgent: agent ? agent.Username : null,
-        agentId: agent ? agent.AgentId : null,
-        note: transaction?.Note?.Note || null,
-        followUpStatus: {
-          statusId: status,
-          followUpDate: followUp?.FollowUpDate ?? null,
-        },
-        comments,
-      };
-    })
-    .filter((c) => {
-      const statusMatch =
-        statusId === 0 || c.followUpStatus.statusId === statusId;
-      const agentMatch = agentId === 0 || c.agentId === agentId;
-      return statusMatch && agentMatch;
+      // Only add if not already processed (deduplication safeguard)
+      if (!customerMap.has(customerId)) {
+        customerMap.set(customerId, {
+          customerId: customer.CustomerId,
+          name: customer.Name,
+          email: customer.Email,
+          cardId: customer.CardID,
+          manyChatId: customer.ManyChatId,
+          lastFormAgent: customer.LastAgentUsername,
+          agentId: customer.LastAgentId,
+          note: customer.Note,
+          followUpStatus: {
+            statusId: customer.FollowUpStatusID ?? 1,
+            followUpDate: customer.FollowUpDate,
+          },
+          comments: commentsMap.get(customer.CustomerId) || [],
+        });
+      }
     });
 
-  return NextResponse.json({ success: true, data: result });
+    const result = Array.from(customerMap.values());
+
+    return NextResponse.json({ success: true, data: result });
+  } catch (error) {
+    console.error("Follow-up API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }

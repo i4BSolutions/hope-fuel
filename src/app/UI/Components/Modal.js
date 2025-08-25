@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Backdrop, Slide } from "@mui/material";
 
 const Modal = ({

@@ -29,6 +29,7 @@ model Agent {
   FollowUpComment          FollowUpComment[]
 
   @@index([UserRoleId], map: "UserRoleId")
+  @@index([AgentId], map: "idx_agent_id")
 }
 
 model BaseCountry {
@@ -71,6 +72,9 @@ model Customer {
 
   @@index([AgentId], map: "AgentId")
   @@index([UserCountry], map: "BaseCountryID")
+
+  @@index([CustomerId], map: "idx_customer_id")
+  @@index([Name], map: "idx_customer_name")
 }
 
 model Subscription {
@@ -83,6 +87,10 @@ model Subscription {
   Customer       Customer @relation(fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict, map: "subscription_ibfk_1")
 
   @@index([CustomerID], map: "CustomerID")
+
+  @@index([CustomerID, EndDate(sort: Desc)], map: "idx_subscription_customer_enddate")
+  @@index([EndDate], map: "idx_subscription_enddate_range")
+  @@index([CustomerID, StartDate, EndDate], map: "idx_subscription_customer_dates")
 }
 
 model CustomerAuditLogs {
@@ -236,6 +244,9 @@ model TransactionAgent {
 
   @@index([AgentID], map: "AgentID")
   @@index([TransactionID], map: "TransactionID")
+
+  @@index([TransactionID, LogDate(sort: Desc)], map: "idx_transaction_agent_transaction_date")
+  @@index([AgentID], map: "idx_transaction_agent_agent")
 }
 
 model Transactions {
@@ -263,6 +274,10 @@ model Transactions {
   @@index([NoteID], map: "NoteID")
   @@index([SupportRegionID], map: "SupportRegionID")
   @@index([WalletID], map: "WalletID")
+
+  @@index([CustomerID, TransactionDate(sort: Desc)], map: "idx_transactions_customer_date")
+  @@index([TransactionDate(sort: Desc)], map: "idx_transactions_date")
+  @@index([CustomerID, TransactionDate(sort: Desc)], map: "idx_transaction_customer_agent")
 }
 
 model TransactionStatus {
@@ -347,6 +362,10 @@ model CustomerFollowUpStatus {
 
   @@index([CustomerID], map: "CustomerID")
   @@index([FollowUpStatusID], map: "FollowUpStatusID")
+
+  @@index([CustomerID, FollowUpDate(sort: Desc)], map: "idx_customer_followup_status_customer_date")
+  @@index([FollowUpDate(sort: Desc)], map: "idx_customer_followup_status_date")
+  @@unique([CustomerID], map: "unique_customer_latest_status")
 }
 
 model FollowUpComment {
@@ -359,10 +378,14 @@ model FollowUpComment {
 
   Agent  Agent?  @relation(fields: [AgentId], references: [AgentId], onDelete: Cascade, onUpdate: Restrict, map: "followUpComment_agent_fk")
   Customer Customer @relation("followUpComment_customer_fk", fields: [CustomerID], references: [CustomerId], onDelete: Cascade, onUpdate: Restrict)
+
+  @@index([CustomerID, CreatedAt(sort: Desc)], map: "idx_followup_comment_customer_date")
+  @@index([CreatedAt(sort: Desc)], map: "idx_followup_comment_date")
 }
 
 enum CustomerAuditLogs_FieldChanged {
   Name
   Email
   UserCountry
+  CardID
 }

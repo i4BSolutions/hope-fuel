@@ -308,10 +308,10 @@ export async function POST(req) {
     }
 
     let noteId = null;
-    if (note && note !== "") {
-      noteId = await createNote(note, agentId);
-      console.log("noteId: ", noteId);
-    }
+    noteId = await createNote(note, agentId);
+
+    // if (note && note !== "") {
+    // }
 
     const customerId = await InsertCustomer(
       customerName,
