@@ -57,7 +57,6 @@ export default async function checkPrfSubmit(
   /**
    * Permission for the user
    * */
-
   if (Object.hasOwn(res, "Name")) {
     // if mysql has the user
     // check to see if the user has permission
@@ -128,7 +127,7 @@ export default async function checkPrfSubmit(
       setisChecking(false);
       setHasPermissonThisMonth(bool);
       setuserExist(true);
-      if (userRole == "Admin") {
+      if (userRole == "ADMIN") {
         setUserInfo({
           name: json.name,
           email: json.email,
