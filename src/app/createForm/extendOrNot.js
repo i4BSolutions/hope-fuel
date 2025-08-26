@@ -17,10 +17,10 @@ import {
 const ExtendOrNot = ({ userInfo, onConfirm, onDecline }) => {
   return (
     <>
-      {/* <Typography sx={{ mt: 3 }}>
+      <Typography sx={{ mt: 3 }}>
         ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက် စာရင်းသွင်းထားပြီးပါပြီ။
         ထူးခြားဖြစ်စဥ် ဖြစ်ပါက Admin ကိုဆက်သွယ်ပါ
-      </Typography> */}
+      </Typography>
       <Typography
         component="h1"
         sx={{ fontSize: "23px", marginTop: 4 }}
