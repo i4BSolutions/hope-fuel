@@ -73,6 +73,7 @@ const ExtendUserForm = () => {
         onChange={setOtp}
       />
 
+      {/* User does not exist */}
       {!userExist && checkInputComplete && !isChecking && (
         <Box sx={{ mt: 5 }}>
           <Alert severity="error">
@@ -105,6 +106,7 @@ const ExtendUserForm = () => {
         </Box>
       )}
 
+      {/* Loading state */}
       {isChecking && (
         <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
           <CircularProgress />
@@ -112,25 +114,44 @@ const ExtendUserForm = () => {
         </Box>
       )}
 
+      {/* User exists and input complete */}
       {userExist && checkInputComplete && !isChecking && (
         <>
-          {!hasPermissionThisMonth && agent.roleId !== AGENT_ROLE.ADMIN ? (
-            <Typography sx={{ mt: 5 }}>
-              ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက် စာရင်းသွင်းထားပြီးပါပြီ။
-              ထူးခြားဖြစ်စဥ် ဖြစ်ပါက Admin ကိုဆက်သွယ်ပါ
-            </Typography>
-          ) : !hasContinue ? (
-            <ExtendOrNot
-              userInfo={userInfo}
-              onConfirm={() => setHasContinue(true)}
-              onDecline={handleDecline}
-            />
-          ) : (
+          {/* If user has permission for this month, go straight to ExtendForm */}
+          {hasPermissionThisMonth ? (
             <ExtendForm
               userInfo={userInfo}
               setLoading={setLoading}
               onSuccess={() => setIsSuccessModalOpen(true)}
             />
+          ) : agent.roleId === AGENT_ROLE.ADMIN ? (
+            // If user doesn't have permission and admin is logged in, show warning and let admin choose
+            !hasContinue ? (
+              <>
+                <Typography sx={{ mt: 5, mb: 2 }} color="warning.main">
+                  ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက်
+                  စာရင်းသွင်းထားပြီးပါပြီ။ ထူးခြားဖြစ်စဥ် ဖြစ်ပါက
+                  ဆက်လက်လုပ်ဆောင်နိုင်ပါသည်။
+                </Typography>
+                <ExtendOrNot
+                  userInfo={userInfo}
+                  onConfirm={() => setHasContinue(true)}
+                  onDecline={handleDecline}
+                />
+              </>
+            ) : (
+              <ExtendForm
+                userInfo={userInfo}
+                setLoading={setLoading}
+                onSuccess={() => setIsSuccessModalOpen(true)}
+              />
+            )
+          ) : (
+            // If not admin, show warning and do not allow to continue
+            <Typography sx={{ mt: 5 }} color="error.main">
+              ယခုလအတွင်း ဖော်ပြပါထောက်ပို့တပ်သားအတွက် စာရင်းသွင်းထားပြီးပါပြီ။
+              ထူးခြားဖြစ်စဥ် ဖြစ်ပါက Admin ကိုဆက်သွယ်ပါ
+            </Typography>
           )}
         </>
       )}
