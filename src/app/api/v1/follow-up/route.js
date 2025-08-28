@@ -14,6 +14,10 @@ export async function GET(req) {
   const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
   const offset = (page - 1) * pageSize;
 
+  // Search
+  const rawQ = (searchParams.get("q") || "").trim();
+  const likeQ = `%${rawQ}%`;
+
   const monthStart = new Date(Date.UTC(currentYear, currentMonth, 1));
   const monthEnd = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
   const twoMonthsAgoStart = new Date(
@@ -22,7 +26,7 @@ export async function GET(req) {
   const oneMonthAgoEnd = new Date(Date.UTC(currentYear, currentMonth, 0));
 
   try {
-    // 1. Get all eligible customer IDs (with filters)
+    // 1) Get all eligible customer IDs (with filters + SEARCH)
     const eligibleCustomerIdsQuery = `
       WITH CustomerLastSubscription AS (
         SELECT 
@@ -91,6 +95,14 @@ export async function GET(req) {
       FROM CustomerWithLatestData
       WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
         AND (? = 0 OR LastAgentId = ?)
+        -- SEARCH:
+        AND (? = '' OR (
+          Name       LIKE ?
+          OR Email   LIKE ?
+          OR CardID  LIKE ?
+          OR ManyChatId LIKE ?
+          OR Note    LIKE ?
+        ))
       ORDER BY Name
     `;
 
@@ -98,10 +110,20 @@ export async function GET(req) {
       twoMonthsAgoStart,
       oneMonthAgoEnd,
       monthStart,
+
+      // status / agent filters
       statusId,
       statusId,
       agentId,
       agentId,
+
+      // search params
+      rawQ, // for (? = '')
+      likeQ,
+      likeQ,
+      likeQ,
+      likeQ,
+      likeQ,
     ];
 
     const allEligibleIds = await prisma.$queryRawUnsafe(
@@ -110,7 +132,7 @@ export async function GET(req) {
     );
     const total = allEligibleIds.length;
 
-    // 2. Get paginated customer IDs
+    // 2) Paginate
     const paginatedIds = allEligibleIds
       .slice(offset, offset + pageSize)
       .map((row) => row.CustomerId);
@@ -128,7 +150,8 @@ export async function GET(req) {
       });
     }
 
-    // 3. Fetch all data for paginated customer IDs
+    // 3) Fetch all data for paginated customer IDs (no need to re-apply search here)
+    const placeholders = paginatedIds.map(() => "?").join(",");
     const followUpCustomersQuery = `
       WITH CustomerWithLatestData AS (
         SELECT DISTINCT
@@ -175,7 +198,7 @@ export async function GET(req) {
       )
       SELECT *
       FROM CustomerWithLatestData
-      WHERE CustomerId IN (${paginatedIds.map(() => "?").join(",")})
+      WHERE CustomerId IN (${placeholders})
       ORDER BY Name
     `;
 
@@ -205,7 +228,6 @@ export async function GET(req) {
         orderBy: { CreatedAt: "desc" },
       });
 
-      // Group comments by customer
       allComments.forEach((comment) => {
         if (!commentsMap.has(comment.CustomerID)) {
           commentsMap.set(comment.CustomerID, []);
@@ -223,7 +245,6 @@ export async function GET(req) {
 
     // Format the final response and ensure no duplicates
     const customerMap = new Map();
-
     customers.forEach((customer) => {
       const customerId = customer.CustomerId;
       if (!customerMap.has(customerId)) {

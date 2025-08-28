@@ -36,6 +36,7 @@ export default function FollowUpCustomers() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedStatus, setTempSelectedStatus] = useState("");
   const [tempSelectedAgent, setTempSelectedAgent] = useState("");
@@ -87,7 +88,7 @@ export default function FollowUpCustomers() {
 
   useEffect(() => {
     fetchFollowUpData();
-  }, [pagination.page, pagination.pageSize]);
+  }, [pagination.page, pagination.pageSize, searchQuery]);
 
   const fetchAllAgents = async () => {
     try {
@@ -108,6 +109,8 @@ export default function FollowUpCustomers() {
       let url = `/api/v1/follow-up?year=${year}&month=${month}`;
       if (statusId) url += `&statusId=${statusId}`;
       if (agentId) url += `&agentId=${agentId}`;
+      if (searchQuery) url += `&q=${searchQuery}`;
+      url += `&page=${pagination.page}&pageSize=${pagination.pageSize}`;
 
       const res = await fetch(url);
       const json = await res.json();
@@ -115,24 +118,14 @@ export default function FollowUpCustomers() {
       if (json.success) {
         const rawData = json.data || [];
 
-        const term = searchQuery.trim().toLowerCase();
-        const filtered = term
-          ? rawData.filter((c) => {
-              return (
-                c.name?.toLowerCase().includes(term) ||
-                c.email?.toLowerCase().includes(term) ||
-                c.manyChatId?.toLowerCase().includes(term) ||
-                (c.cardId + "").includes(term)
-              );
-            })
-          : rawData;
-
-        setFollowUpData(filtered);
+        setFollowUpData(rawData);
         setPagination({
-          page: 1,
-          pageSize: 10,
-          total: filtered.length,
-          totalPages: Math.ceil(filtered.length / 10),
+          page: json.pagination.page,
+          pageSize: json.pagination.pageSize,
+          total: json.pagination.total,
+          totalPages: Math.ceil(
+            json.pagination.total / json.pagination.pageSize
+          ),
         });
       }
     } catch (err) {
@@ -144,6 +137,20 @@ export default function FollowUpCustomers() {
 
   const handleSearchQueryChange = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const triggerSearch = () => {
+    // reset to first page when starting a new search
+    setPagination((prev) => ({ ...prev, page: 1 }));
+
+    const committed = searchInput.trim();
+
+    // If the query hasn't changed, manually refetch once
+    if (committed === (searchQuery || "").trim()) {
+      fetchFollowUpData();
+    } else {
+      setSearchQuery(committed); // useEffect will fire and fetch
+    }
   };
 
   const handleOpenFilterModal = () => {
@@ -272,20 +279,24 @@ export default function FollowUpCustomers() {
             name="search"
             placeholder="Search"
             sx={{ width: 642 }}
-            value={searchQuery}
-            onChange={handleSearchQueryChange}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                triggerSearch();
+              }
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
                   <SearchIcon />
                 </InputAdornment>
               ),
-              sx: {
-                borderRadius: 20,
-                height: 40,
-              },
+              sx: { borderRadius: 20, height: 40 },
             }}
           />
+
           <Button
             onClick={handleOpenFilterModal}
             variant="outlined"
