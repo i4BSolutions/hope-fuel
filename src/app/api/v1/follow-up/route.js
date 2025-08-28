@@ -9,6 +9,15 @@ export async function GET(req) {
   const currentYear = parseInt(searchParams.get("year"), 10);
   const currentMonth = parseInt(searchParams.get("month"), 10);
 
+  // Pagination params
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
+  const offset = (page - 1) * pageSize;
+
+  // Search
+  const rawQ = (searchParams.get("q") || "").trim();
+  const likeQ = `%${rawQ}%`;
+
   const monthStart = new Date(Date.UTC(currentYear, currentMonth, 1));
   const monthEnd = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
   const twoMonthsAgoStart = new Date(
@@ -17,8 +26,8 @@ export async function GET(req) {
   const oneMonthAgoEnd = new Date(Date.UTC(currentYear, currentMonth, 0));
 
   try {
-    // Optimized query: Find customers who need follow-up using a single database query
-    const followUpCustomersQuery = `
+    // 1) Get all eligible customer IDs (with filters + SEARCH)
+    const eligibleCustomerIdsQuery = `
       WITH CustomerLastSubscription AS (
         SELECT 
           CustomerID,
@@ -45,24 +54,15 @@ export async function GET(req) {
           c.Email,
           c.CardID,
           c.ManyChatId,
-          
-          -- Latest follow-up status
           fuStatus.FollowUpStatusID,
           fuStatus.FollowUpDate,
-          
-          -- Latest transaction and agent info
           t.TransactionID,
           n.Note,
           ta.AgentID as LastAgentId,
           a.Username as LastAgentUsername,
-          
-          -- Comment count for efficient loading
           (SELECT COUNT(*) FROM FollowUpComment fc WHERE fc.CustomerID = c.CustomerId) as CommentCount
-          
         FROM EligibleCustomers ec
         JOIN Customer c ON c.CustomerId = ec.CustomerID
-        
-        -- Latest follow-up status (optimized)
         LEFT JOIN (
           SELECT 
             CustomerID, 
@@ -71,8 +71,6 @@ export async function GET(req) {
             ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY FollowUpDate DESC) as rn
           FROM CustomerFollowUpStatus
         ) fuStatus ON fuStatus.CustomerID = c.CustomerId AND fuStatus.rn = 1
-        
-        -- Latest transaction (optimized)
         LEFT JOIN (
           SELECT 
             CustomerID,
@@ -81,11 +79,8 @@ export async function GET(req) {
             ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY TransactionDate DESC) as rn
           FROM Transactions
         ) latestTx ON latestTx.CustomerID = c.CustomerId AND latestTx.rn = 1
-        
         LEFT JOIN Transactions t ON t.TransactionID = latestTx.TransactionID
         LEFT JOIN Note n ON n.NoteID = t.NoteID
-        
-        -- Latest agent for transaction (single agent per transaction)
         LEFT JOIN (
           SELECT 
             TransactionID,
@@ -93,31 +88,123 @@ export async function GET(req) {
             ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
           FROM TransactionAgent
         ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
-        
+        LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
+        LEFT JOIN Agent a ON a.AgentId = ta.AgentID
+      )
+      SELECT CustomerId
+      FROM CustomerWithLatestData
+      WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
+        AND (? = 0 OR LastAgentId = ?)
+        -- SEARCH:
+        AND (? = '' OR (
+          Name       LIKE ?
+          OR Email   LIKE ?
+          OR CardID  LIKE ?
+          OR ManyChatId LIKE ?
+          OR Note    LIKE ?
+        ))
+      ORDER BY Name
+    `;
+
+    const eligibleIdsParams = [
+      twoMonthsAgoStart,
+      oneMonthAgoEnd,
+      monthStart,
+
+      // status / agent filters
+      statusId,
+      statusId,
+      agentId,
+      agentId,
+
+      // search params
+      rawQ, // for (? = '')
+      likeQ,
+      likeQ,
+      likeQ,
+      likeQ,
+      likeQ,
+    ];
+
+    const allEligibleIds = await prisma.$queryRawUnsafe(
+      eligibleCustomerIdsQuery,
+      ...eligibleIdsParams
+    );
+    const total = allEligibleIds.length;
+
+    // 2) Paginate
+    const paginatedIds = allEligibleIds
+      .slice(offset, offset + pageSize)
+      .map((row) => row.CustomerId);
+
+    if (paginatedIds.length === 0) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        pagination: {
+          page,
+          pageSize,
+          total,
+          totalPages: Math.ceil(total / pageSize),
+        },
+      });
+    }
+
+    // 3) Fetch all data for paginated customer IDs (no need to re-apply search here)
+    const placeholders = paginatedIds.map(() => "?").join(",");
+    const followUpCustomersQuery = `
+      WITH CustomerWithLatestData AS (
+        SELECT DISTINCT
+          c.CustomerId,
+          c.Name,
+          c.Email,
+          c.CardID,
+          c.ManyChatId,
+          fuStatus.FollowUpStatusID,
+          fuStatus.FollowUpDate,
+          t.TransactionID,
+          n.Note,
+          ta.AgentID as LastAgentId,
+          a.Username as LastAgentUsername,
+          (SELECT COUNT(*) FROM FollowUpComment fc WHERE fc.CustomerID = c.CustomerId) as CommentCount
+        FROM Customer c
+        LEFT JOIN (
+          SELECT 
+            CustomerID, 
+            FollowUpStatusID, 
+            FollowUpDate,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY FollowUpDate DESC) as rn
+          FROM CustomerFollowUpStatus
+        ) fuStatus ON fuStatus.CustomerID = c.CustomerId AND fuStatus.rn = 1
+        LEFT JOIN (
+          SELECT 
+            CustomerID,
+            TransactionID,
+            NoteID,
+            ROW_NUMBER() OVER (PARTITION BY CustomerID ORDER BY TransactionDate DESC) as rn
+          FROM Transactions
+        ) latestTx ON latestTx.CustomerID = c.CustomerId AND latestTx.rn = 1
+        LEFT JOIN Transactions t ON t.TransactionID = latestTx.TransactionID
+        LEFT JOIN Note n ON n.NoteID = t.NoteID
+        LEFT JOIN (
+          SELECT 
+            TransactionID,
+            AgentID,
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+          FROM TransactionAgent
+        ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
         LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
         LEFT JOIN Agent a ON a.AgentId = ta.AgentID
       )
       SELECT *
       FROM CustomerWithLatestData
-      WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
-        AND (? = 0 OR LastAgentId = ?)
+      WHERE CustomerId IN (${placeholders})
       ORDER BY Name
     `;
 
-    const queryParams = [
-      twoMonthsAgoStart,
-      oneMonthAgoEnd,
-      monthStart,
-      statusId,
-      statusId,
-      agentId,
-      agentId,
-    ];
-
-    // Execute the optimized query
     const customers = await prisma.$queryRawUnsafe(
       followUpCustomersQuery,
-      ...queryParams
+      ...paginatedIds
     );
 
     // Batch fetch comments only for customers that have them
@@ -141,7 +228,6 @@ export async function GET(req) {
         orderBy: { CreatedAt: "desc" },
       });
 
-      // Group comments by customer
       allComments.forEach((comment) => {
         if (!commentsMap.has(comment.CustomerID)) {
           commentsMap.set(comment.CustomerID, []);
@@ -159,11 +245,8 @@ export async function GET(req) {
 
     // Format the final response and ensure no duplicates
     const customerMap = new Map();
-
     customers.forEach((customer) => {
       const customerId = customer.CustomerId;
-
-      // Only add if not already processed (deduplication safeguard)
       if (!customerMap.has(customerId)) {
         customerMap.set(customerId, {
           customerId: customer.CustomerId,
@@ -185,7 +268,16 @@ export async function GET(req) {
 
     const result = Array.from(customerMap.values());
 
-    return NextResponse.json({ success: true, data: result });
+    return NextResponse.json({
+      success: true,
+      data: result,
+      pagination: {
+        page,
+        pageSize,
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
   } catch (error) {
     console.error("Follow-up API error:", error);
     return NextResponse.json(
