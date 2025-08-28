@@ -16,6 +16,7 @@ import {
   IconButton,
   Divider,
   Chip,
+  Pagination,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 
@@ -39,8 +40,14 @@ export default function FollowUpCustomers() {
   const [tempSelectedStatus, setTempSelectedStatus] = useState("");
   const [tempSelectedAgent, setTempSelectedAgent] = useState("");
 
-  const [followUpdData, setFollowUpData] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [followUpdData, setFollowUpData] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+    total: 0,
+    totalPages: 0,
+  });
 
   const [commentData, setCommentData] = useState([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
@@ -80,7 +87,7 @@ export default function FollowUpCustomers() {
 
   useEffect(() => {
     fetchFollowUpData();
-  }, []);
+  }, [pagination.page, pagination.pageSize]);
 
   const fetchAllAgents = async () => {
     try {
@@ -121,6 +128,12 @@ export default function FollowUpCustomers() {
           : rawData;
 
         setFollowUpData(filtered);
+        setPagination({
+          page: 1,
+          pageSize: 10,
+          total: filtered.length,
+          totalPages: Math.ceil(filtered.length / 10),
+        });
       }
     } catch (err) {
       console.error("Failed to fetch follow-up data", err);
@@ -516,6 +529,23 @@ export default function FollowUpCustomers() {
             </Box>
           ))
         )}
+      </Box>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+        }}
+      >
+        <Pagination
+          count={pagination.totalPages}
+          page={pagination.page}
+          onChange={(event, value) => {
+            setPagination((prev) => ({ ...prev, page: value }));
+          }}
+          color="primary"
+          shape="rounded"
+        />
       </Box>
 
       <Modal
