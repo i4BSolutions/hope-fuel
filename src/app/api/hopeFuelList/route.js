@@ -36,10 +36,11 @@ export async function GET(req) {
     const name = url.searchParams.get("name");
     const email = url.searchParams.get("email");
     const hopefuelID = url.searchParams.get("hopefuelID");
+    const cardID = url.searchParams.get("cardID");
 
     const dateRange = getDateRange(fromDate, toDate);
 
-    // 1) Base TransactionID list (date/name/email/hopefuel filters only), ORDERED
+    // 1) Base TransactionID list (date/name/email/hopefuel/cardID filters only), ORDERED
     const base = await prisma.transactions.findMany({
       where: {
         TransactionDate: dateRange,
@@ -55,6 +56,7 @@ export async function GET(req) {
         Customer: {
           ...(name ? { Name: { contains: name } } : {}),
           ...(email ? { Email: { contains: email } } : {}),
+          ...(cardID ? { CardID: { equals: Number(cardID) } } : {}),
         },
       },
       select: { TransactionID: true, HopeFuelID: true },
