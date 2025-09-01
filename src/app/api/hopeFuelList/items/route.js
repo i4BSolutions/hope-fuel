@@ -336,7 +336,7 @@ function mapRow(t) {
     ManyChatId: t.Customer?.ManyChatId || null,
 
     UserCountryID: t.Customer?.UserCountry ?? null,
-    UserCountryName: t.Customer?.BaseCountry?.BaseCountryName || null,
+    UserCountryName: t.SupportRegion?.Region || null,
 
     HopeFuelID: t.HopeFuelID ?? null,
     TransactionDate: t.TransactionDate,
@@ -426,8 +426,10 @@ export async function GET(req) {
             CardID: true,
             ManyChatId: true,
             UserCountry: true,
-            BaseCountry: { select: { BaseCountryName: true } },
           },
+        },
+        SupportRegion: {
+          select: { Region: true },
         },
         Wallet: {
           select: {
