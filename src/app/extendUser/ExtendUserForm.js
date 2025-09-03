@@ -1,13 +1,12 @@
 "use client";
 
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useSnackbar } from "@/components/shared/SnackbarProvider";
 import {
   Alert,
   AlertTitle,
   Box,
   Button,
   CircularProgress,
-  Modal,
   Stack,
   Typography,
 } from "@mui/material";
@@ -23,6 +22,7 @@ import checkPrfSubmit from "../utilites/ExtendUser/checkPrfSubmit";
 const ExtendUserForm = () => {
   const { agent } = useAgentStore();
   const router = useRouter();
+  const { showSnackbar } = useSnackbar();
 
   const [otp, setOtp] = useState("");
   const [userInfo, setUserInfo] = useState({});
@@ -31,7 +31,6 @@ const ExtendUserForm = () => {
   const [hasPermissionThisMonth, setHasPermissionThisMonth] = useState(true);
   const [checkInputComplete, setCheckInputComplete] = useState(false);
   const [hasContinue, setHasContinue] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleOtpComplete = async (value) => {
@@ -122,7 +121,10 @@ const ExtendUserForm = () => {
             <ExtendForm
               userInfo={userInfo}
               setLoading={setLoading}
-              onSuccess={() => setIsSuccessModalOpen(true)}
+              onSuccess={() => {
+                showSnackbar("Form submitted successfully!", "success");
+                handleDecline();
+              }}
             />
           ) : agent.roleId === AGENT_ROLE.ADMIN ? (
             // If user doesn't have permission and admin is logged in, show warning and let admin choose
@@ -143,7 +145,10 @@ const ExtendUserForm = () => {
               <ExtendForm
                 userInfo={userInfo}
                 setLoading={setLoading}
-                onSuccess={() => setIsSuccessModalOpen(true)}
+                onSuccess={() => {
+                  showSnackbar("Form submitted successfully!", "success");
+                  handleDecline();
+                }}
               />
             )
           ) : (
@@ -155,42 +160,6 @@ const ExtendUserForm = () => {
           )}
         </>
       )}
-
-      <Modal
-        open={isSuccessModalOpen}
-        onClose={() => setIsSuccessModalOpen(false)}
-        aria-labelledby="success-modal"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 300,
-            bgcolor: "white",
-            borderRadius: "12px",
-            boxShadow: 24,
-            p: 4,
-            textAlign: "center",
-          }}
-        >
-          <LockOutlinedIcon sx={{ fontSize: 50, color: "green" }} />
-          <Typography sx={{ fontSize: 18, fontWeight: "bold", mt: 2, mb: 2 }}>
-            Membership Registration Successful.
-          </Typography>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => {
-              setIsSuccessModalOpen(false);
-              window.location.reload();
-            }}
-          >
-            OK
-          </Button>
-        </Box>
-      </Modal>
     </Box>
   );
 };

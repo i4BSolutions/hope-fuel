@@ -17,7 +17,6 @@ function CreateOrExtendPage() {
   const [showExtendOrNot, setShowExtendOrNot] = useState(false);
   const [showExtendForm, setShowExtendForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   // Fetch the current authenticated user and their role
   const [currentUser, setCurrentUser] = useState(null);
