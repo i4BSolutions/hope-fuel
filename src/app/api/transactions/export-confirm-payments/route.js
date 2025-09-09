@@ -101,6 +101,10 @@ async function retrieveHopeFuelList(
       },
       Note: true,
       TransactionAgent: {
+        orderBy: {
+          TransactionAgentID: "asc",
+        },
+        take: 1,
         include: {
           Agent: true,
         },
@@ -119,7 +123,7 @@ async function retrieveHopeFuelList(
 
   console.log(
     "Retrieved transactions agent:",
-    transactions.map((t) => t.TransactionAgent)
+    transactions.map((t) => t.TransactionAgent?.[0]?.Agent?.Username)
   );
 
   const mappedTransactions = transactions.map((t) => ({
@@ -136,7 +140,7 @@ async function retrieveHopeFuelList(
     CurrencyCode: t.Wallet?.Currency?.CurrencyCode || null,
     Month: t.Month,
     ManyChatId: t.Customer?.ManyChatId || null,
-    FormFilledPerson: t.TransactionAgent[0]?.Agent?.Username || null,
+    FormFilledPerson: t.TransactionAgent?.[0]?.Agent?.Username || null,
     TransactionStatus:
       t.FormStatus[0]?.TransactionStatus?.TransactionStatus || null,
     Note: t.Note?.Note || null,
