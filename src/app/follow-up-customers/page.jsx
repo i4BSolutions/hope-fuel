@@ -568,7 +568,7 @@ export default function FollowUpCustomers() {
                 }}
                 sx={{ borderRadius: 2 }}
               >
-                {agents.map((agent) => (
+                {agents?.map((agent) => (
                   <MenuItem key={agent.AgentId} value={agent.AgentId}>
                     {agent.Username}
                   </MenuItem>
