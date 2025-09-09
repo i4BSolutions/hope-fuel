@@ -1,10 +1,3 @@
-// currency: [
-//     {
-//         id: "..",
-//         name: "..."
-//     }
-// ]
-
 export async function GET(request) {
   console.log(process.env.AIRTABLE_TOKEN);
 

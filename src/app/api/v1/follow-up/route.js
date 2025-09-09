@@ -4,12 +4,21 @@ import prisma from "../../../utilites/prisma";
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const statusId = parseInt(searchParams.get("statusId") || "0", 10);
-  const agentId = parseInt(searchParams.get("agentId") || "0", 10);
 
-  const currentYear = parseInt(searchParams.get("year"), 10);
-  const currentMonth = parseInt(searchParams.get("month"), 10);
+  // NEW: Parse multi-agent list (?agentIds=1,2,3)
+  const agentIdsRaw = (searchParams.get("agentIds") || "").trim();
+  const agentIds =
+    agentIdsRaw.length > 0
+      ? agentIdsRaw
+          .split(",")
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => !Number.isNaN(n) && n > 0)
+      : [];
 
-  // Pagination params
+  const currentYear = parseInt(searchParams.get("year") || "0", 10);
+  const currentMonth = parseInt(searchParams.get("month") || "0", 10);
+
+  // Pagination
   const page = parseInt(searchParams.get("page") || "1", 10);
   const pageSize = parseInt(searchParams.get("pageSize") || "10", 10);
   const offset = (page - 1) * pageSize;
@@ -26,7 +35,13 @@ export async function GET(req) {
   const oneMonthAgoEnd = new Date(Date.UTC(currentYear, currentMonth, 0));
 
   try {
-    // 1) Get all eligible customer IDs (with filters + SEARCH)
+    // Dynamic agent filter
+    const agentFilterSql =
+      agentIds.length > 0
+        ? `AND (LastAgentId IN (${agentIds.map(() => "?").join(",")}))`
+        : "";
+
+    // 1) Get eligible IDs
     const eligibleCustomerIdsQuery = `
       WITH CustomerLastSubscription AS (
         SELECT 
@@ -94,8 +109,7 @@ export async function GET(req) {
       SELECT CustomerId
       FROM CustomerWithLatestData
       WHERE (? = 0 OR COALESCE(FollowUpStatusID, 1) = ?)
-        AND (? = 0 OR LastAgentId = ?)
-        -- SEARCH:
+        ${agentFilterSql}
         AND (? = '' OR (
           Name       LIKE ?
           OR Email   LIKE ?
@@ -110,15 +124,13 @@ export async function GET(req) {
       twoMonthsAgoStart,
       oneMonthAgoEnd,
       monthStart,
-
-      // status / agent filters
+      // status filter
       statusId,
       statusId,
-      agentId,
-      agentId,
-
+      // dynamic agent IDs
+      ...agentIds,
       // search params
-      rawQ, // for (? = '')
+      rawQ,
       likeQ,
       likeQ,
       likeQ,
@@ -130,6 +142,7 @@ export async function GET(req) {
       eligibleCustomerIdsQuery,
       ...eligibleIdsParams
     );
+
     const total = allEligibleIds.length;
 
     // 2) Paginate
@@ -150,7 +163,7 @@ export async function GET(req) {
       });
     }
 
-    // 3) Fetch all data for paginated customer IDs (no need to re-apply search here)
+    // 3) Fetch data for paginated IDs
     const placeholders = paginatedIds.map(() => "?").join(",");
     const followUpCustomersQuery = `
       WITH CustomerWithLatestData AS (
@@ -232,7 +245,7 @@ export async function GET(req) {
         if (!commentsMap.has(comment.CustomerID)) {
           commentsMap.set(comment.CustomerID, []);
         }
-        commentsMap.get(comment.CustomerID).push({
+        commentsMap?.get(comment.CustomerID)?.push({
           id: comment.Id,
           comment: comment.Comment,
           isResolved: comment.Is_Resolved,
@@ -243,7 +256,7 @@ export async function GET(req) {
       });
     }
 
-    // Format the final response and ensure no duplicates
+    // Format final response (dedupe)
     const customerMap = new Map();
     customers.forEach((customer) => {
       const customerId = customer.CustomerId;

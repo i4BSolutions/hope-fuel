@@ -39,7 +39,7 @@ export default function FollowUpCustomers() {
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedStatus, setTempSelectedStatus] = useState("");
-  const [tempSelectedAgent, setTempSelectedAgent] = useState("");
+  const [tempSelectedAgent, setTempSelectedAgent] = useState([]);
 
   const [agents, setAgents] = useState([]);
   const [followUpdData, setFollowUpData] = useState([]);
@@ -93,23 +93,23 @@ export default function FollowUpCustomers() {
   const fetchAllAgents = async () => {
     try {
       const response = await fetch("/api/agent/get-all");
-
       const data = await response.json();
-
       setAgents(data.data);
     } catch (error) {
       alert(error);
     }
   };
 
-  const fetchFollowUpData = async (statusId = null, agentId = null) => {
+  // UPDATED: support multi-agent filter via &agentIds=1,2,3
+  const fetchFollowUpData = async (statusId = null, agentIds = []) => {
     try {
       setLoading(true);
 
       let url = `/api/v1/follow-up?year=${year}&month=${month}`;
       if (statusId) url += `&statusId=${statusId}`;
-      if (agentId) url += `&agentId=${agentId}`;
-      if (searchQuery) url += `&q=${searchQuery}`;
+      if (agentIds && agentIds.length > 0)
+        url += `&agentIds=${agentIds.join(",")}`;
+      if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
       url += `&page=${pagination.page}&pageSize=${pagination.pageSize}`;
 
       const res = await fetch(url);
@@ -135,21 +135,14 @@ export default function FollowUpCustomers() {
     }
   };
 
-  const handleSearchQueryChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
   const triggerSearch = () => {
-    // reset to first page when starting a new search
     setPagination((prev) => ({ ...prev, page: 1 }));
-
     const committed = searchInput.trim();
 
-    // If the query hasn't changed, manually refetch once
     if (committed === (searchQuery || "").trim()) {
       fetchFollowUpData();
     } else {
-      setSearchQuery(committed); // useEffect will fire and fetch
+      setSearchQuery(committed);
     }
   };
 
@@ -163,13 +156,17 @@ export default function FollowUpCustomers() {
 
   const handleClearFilter = () => {
     setTempSelectedStatus("");
-    setTempSelectedAgent("");
+    setTempSelectedAgent([]);
     fetchFollowUpData(); // fetch without filters
     handleCloseFilterModal();
   };
 
   const handleApplyFilter = () => {
-    fetchFollowUpData(tempSelectedStatus, tempSelectedAgent);
+    const statusId = tempSelectedStatus ? Number(tempSelectedStatus) : null;
+    const agentIds = (tempSelectedAgent || [])
+      .map((v) => Number(v))
+      .filter((v) => !Number.isNaN(v) && v > 0);
+    fetchFollowUpData(statusId, agentIds);
     handleCloseFilterModal();
   };
 
@@ -177,86 +174,13 @@ export default function FollowUpCustomers() {
     setTempSelectedStatus(event.target.value);
   };
 
+  // UPDATED: multiple agent selection
   const handleAgentChange = (event) => {
-    setTempSelectedAgent(event.target.value);
-  };
-
-  const handleSubmitComment = async (commentText) => {
-    try {
-      const response = await fetch("/api/v1/follow-up/comment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          comment: commentText,
-          customerId: selectedCustomerId,
-          agentId: agent.id,
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the follow-up data to show the new comment
-        fetchFollowUpData();
-        // Fetch updated comments for the modal
-        await fetchCommentsForCustomer(selectedCustomerId);
-      } else {
-        console.error("Failed to submit comment");
-      }
-    } catch (error) {
-      console.error("Error submitting comment:", error);
-    }
-  };
-
-  const fetchCommentsForCustomer = async (customerId) => {
-    try {
-      const response = await fetch(
-        `/api/v1/follow-up/comment?customerId=${customerId}`
-      );
-
-      if (response.ok) {
-        const comments = await response.json();
-        // Transform the comments to match the expected format for the modal
-        const transformedComments = comments.data.map((comment) => ({
-          id: comment.Id,
-          text: comment.Comment,
-          author: comment.Agent?.Username || "Unknown Agent",
-          timestamp: new Date(comment.CreatedAt).toLocaleDateString(),
-          isResolved: comment.Is_Resolved,
-        }));
-        setCommentData(transformedComments);
-      } else {
-        setCommentData([]);
-      }
-    } catch (error) {
-      console.error("Error fetching comments:", error);
-      setCommentData([]);
-    }
-  };
-
-  const handleToggleResolveComment = async (
-    commentId,
-    currentResolvedStatus
-  ) => {
-    try {
-      const response = await fetch("/api/v1/follow-up/comment", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          commentId: commentId,
-          isResolved: !currentResolvedStatus,
-        }),
-      });
-
-      if (response.ok) {
-        // Refresh the comments to show the updated status
-        await fetchCommentsForCustomer(selectedCustomerId);
-        // Also refresh the main data to update the comment display
-        fetchFollowUpData();
-      } else {
-        console.error("Failed to update comment status");
-      }
-    } catch (error) {
-      console.error("Error updating comment status:", error);
-    }
+    const value = event.target.value;
+    const normalized = (Array.isArray(value) ? value : [value])
+      .map((v) => Number(v))
+      .filter((v) => !Number.isNaN(v));
+    setTempSelectedAgent(normalized);
   };
 
   return (
@@ -468,7 +392,6 @@ export default function FollowUpCustomers() {
                 justifyContent="space-between"
                 alignItems="center"
                 mt={1}
-                px={2}
                 py={1}
                 sx={{
                   borderTop: "1px solid #E2E8F0",
@@ -625,13 +548,27 @@ export default function FollowUpCustomers() {
             <Typography sx={{ mb: 1 }}>Agent</Typography>
             <FormControl fullWidth>
               <Select
+                multiple
                 value={tempSelectedAgent}
                 onChange={handleAgentChange}
                 displayEmpty
-                renderValue={tempSelectedAgent ? undefined : () => "Select"}
+                renderValue={(selected) => {
+                  const ids = Array.isArray(selected) ? selected : [];
+                  if (ids.length === 0) return "Select";
+                  const names = ids
+                    .map((id) => agents.find((a) => a.AgentId === id)?.Username)
+                    .filter(Boolean);
+                  return (
+                    <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                      {names.map((name) => (
+                        <Chip key={name} label={name} size="small" />
+                      ))}
+                    </Box>
+                  );
+                }}
                 sx={{ borderRadius: 2 }}
               >
-                {agents.map((agent) => (
+                {agents?.map((agent) => (
                   <MenuItem key={agent.AgentId} value={agent.AgentId}>
                     {agent.Username}
                   </MenuItem>
@@ -684,4 +621,74 @@ export default function FollowUpCustomers() {
       />
     </Box>
   );
+
+  async function handleSubmitComment(commentText) {
+    try {
+      const response = await fetch("/api/v1/follow-up/comment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          comment: commentText,
+          customerId: selectedCustomerId,
+          agentId: agent.id,
+        }),
+      });
+
+      if (response.ok) {
+        fetchFollowUpData();
+        await fetchCommentsForCustomer(selectedCustomerId);
+      } else {
+        console.error("Failed to submit comment");
+      }
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
+  }
+
+  async function fetchCommentsForCustomer(customerId) {
+    try {
+      const response = await fetch(
+        `/api/v1/follow-up/comment?customerId=${customerId}`
+      );
+
+      if (response.ok) {
+        const comments = await response.json();
+        const transformedComments = comments.data.map((comment) => ({
+          id: comment.Id,
+          text: comment.Comment,
+          author: comment.Agent?.Username || "Unknown Agent",
+          timestamp: new Date(comment.CreatedAt).toLocaleDateString(),
+          isResolved: comment.Is_Resolved,
+        }));
+        setCommentData(transformedComments);
+      } else {
+        setCommentData([]);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      setCommentData([]);
+    }
+  }
+
+  async function handleToggleResolveComment(commentId, currentResolvedStatus) {
+    try {
+      const response = await fetch("/api/v1/follow-up/comment", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          commentId: commentId,
+          isResolved: !currentResolvedStatus,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchCommentsForCustomer(selectedCustomerId);
+        fetchFollowUpData();
+      } else {
+        console.error("Failed to update comment status");
+      }
+    } catch (error) {
+      console.error("Error updating comment status:", error);
+    }
+  }
 }

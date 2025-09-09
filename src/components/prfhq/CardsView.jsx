@@ -51,9 +51,16 @@ export default function CardsView({
           <CardHeader
             sx={{ padding: 0 }}
             title={
-              <Typography variant="h4">PRFHQ - {item.HopeFuelID}</Typography>
+              <Typography sx={{ fontWeight: 500, fontSize: 42, lineHeight: 1 }}>
+                PRFHQ - {item.HopeFuelID}
+              </Typography>
             }
-            subheader={`${item.Name} | ${item.Email}`}
+            subheader={
+              <Typography
+                color="text.secondary"
+                sx={{ fontSize: 16, mt: 0.5 }}
+              >{`${item.Name} | ${item.Email}`}</Typography>
+            }
           />
           <CardContent sx={{ padding: 0, marginTop: 1 }}>
             <Typography variant="h6">
@@ -63,7 +70,7 @@ export default function CardsView({
             <Typography variant="body2" color="text.secondary">
               {dayjs.utc(item.TransactionDate).format("MMMM D, YYYY h:mm A")}
             </Typography>
-            <Typography variant="body2" sx={{ mb: 2, mt: 1 }}>
+            <Typography variant="body2" sx={{ mb: 1.5, mt: 1 }}>
               ManyChat ID:{" "}
               <CopyableText
                 text={item.ManyChatId ? item.ManyChatId : "N/A"}
@@ -71,6 +78,21 @@ export default function CardsView({
                 fontSize="14px"
                 fontWeight={500}
               />
+            </Typography>
+            <Typography variant="body2" sx={{ mb: 1.5, mt: 1, height: 33 }}>
+              Card ID:{" "}
+              {item.CardID ? (
+                <CopyableText
+                  text={item.CardID}
+                  truncatorLimit={6}
+                  fontSize="14px"
+                  fontWeight={500}
+                />
+              ) : (
+                <Box component={"span"} sx={{ color: "text.secondary" }}>
+                  Not issued yet
+                </Box>
+              )}
             </Typography>
             <div
               style={{

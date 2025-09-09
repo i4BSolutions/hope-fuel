@@ -40,6 +40,7 @@ export default function AllHopefuelPage() {
 
   // Card Data States
   const [query, setQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [fromDate, setFromDate] = useState(dayjs().startOf("month"));
   const [toDate, setToDate] = useState(dayjs().endOf("month"));
@@ -76,8 +77,10 @@ export default function AllHopefuelPage() {
       queryString = queryString;
     } else if (query.includes("@")) {
       queryString = queryString + `&email=${query}`;
+    } else if (query.toLowerCase().replace(/\s/g, "").startsWith("prfhq-")) {
+      queryString = queryString + `&hopefuelID=${query.split("-")[1]}`;
     } else if (!isNaN(query.charAt(0))) {
-      queryString = queryString + `&hopefuelID=${query}`;
+      queryString = queryString + `&cardID=${query}`;
     } else {
       queryString = queryString + `&name=${query}`;
     }
@@ -183,6 +186,16 @@ export default function AllHopefuelPage() {
     setOpenDrawer((prev) => !prev);
   };
 
+  const onResetHandler = () => {
+    setQuery("");
+    setSearchQuery("");
+    setStatus("all");
+    setFromDate(dayjs().startOf("month"));
+    setToDate(dayjs().endOf("month"));
+    setPageSize(9);
+    setPage(1);
+  };
+
   if (!cardData) {
     return <Spinner />;
   }
@@ -206,12 +219,14 @@ export default function AllHopefuelPage() {
           padding: "1rem 2rem",
           display: "grid",
           gap: "1rem",
-          gridTemplateColumns: "1fr 1fr 1fr 1fr 0.5fr",
+          gridTemplateColumns: "1.2fr 1fr 1fr 1fr 0.5fr",
         }}
       >
         <TextField
           variant="outlined"
-          placeholder="Search by name, email, Hopefuel ID"
+          placeholder="Search by name, email, HopefuelID, CardID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               setQuery(e.target.value);
@@ -275,14 +290,7 @@ export default function AllHopefuelPage() {
           variant="outlined"
           color="inherit"
           size="small"
-          onClick={() => {
-            setQuery("");
-            setStatus("all");
-            setFromDate(dayjs().startOf("month"));
-            setToDate(dayjs().endOf("month"));
-            setPageSize(9);
-            setPage(1);
-          }}
+          onClick={onResetHandler}
         >
           Reset Filters
         </Button>
