@@ -117,6 +117,11 @@ async function retrieveHopeFuelList(
     },
   });
 
+  console.log(
+    "Retrieved transactions agent:",
+    transactions.map((t) => t.TransactionAgent)
+  );
+
   const mappedTransactions = transactions.map((t) => ({
     HopeFuelID: t.HopeFuelID,
     TransactionID: t.TransactionID,
