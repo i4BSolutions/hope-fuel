@@ -23,6 +23,10 @@ export async function POST(request) {
     requestOptions
   );
 
+  if (response.status != 200) {
+    return Response.json({ message: false });
+  }
+
   let answer = false;
   json = await response.json();
   let records = json.records;
