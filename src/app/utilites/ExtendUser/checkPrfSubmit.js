@@ -12,7 +12,7 @@ export default async function checkPrfSubmit(
 ) {
   setisChecking(true);
 
-  // Get the prfNo id (Or customer id)
+  // Get the prfNo id (Or card id)
   var myHeaders = new Headers();
   myHeaders.append("Content-Type", "application/json");
 

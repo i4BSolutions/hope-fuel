@@ -8,7 +8,23 @@ export default async function checkUserSubmit(name, email) {
   });
 
   try {
-    // 1. Check if user exists in Airtable
+    // 1. Check if user exists in MySQL
+    const mysqlResponse = await fetch(
+      "/api/InCustomerTable",
+      buildRequestOptions({ name, email })
+    );
+    const mysqlResult = await mysqlResponse.json();
+
+    if (mysqlResult.Name) {
+      return {
+        name,
+        email,
+        prf_no: mysqlResult.CardID,
+        expire_date: mysqlResult.ExpireDate,
+      };
+    }
+
+    // 2. Check if user exists in Airtable
     const airtableResponse = await fetch(
       "/api/checkUser",
       buildRequestOptions({ name, email })
@@ -23,22 +39,6 @@ export default async function checkUserSubmit(name, email) {
         expire_date: Array.isArray(airtableResult.expire_date)
           ? airtableResult.expire_date[0]
           : airtableResult.expire_date,
-      };
-    }
-
-    // 2. Check if user exists in MySQL
-    const mysqlResponse = await fetch(
-      "/api/InCustomerTable",
-      buildRequestOptions({ name, email })
-    );
-    const mysqlResult = await mysqlResponse.json();
-
-    if (mysqlResult.Name) {
-      return {
-        name,
-        email,
-        prf_no: mysqlResult.CardID,
-        expire_date: mysqlResult.ExpireDate,
       };
     }
 
