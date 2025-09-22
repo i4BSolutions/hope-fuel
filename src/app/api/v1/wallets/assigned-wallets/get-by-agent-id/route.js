@@ -48,7 +48,9 @@ export async function GET(request) {
           WalletID: {
             in: walletIds,
           },
-          PaymentCheck: null,
+          FormStatus: {
+            some: { TransactionStatusID: 1 },
+          },
           TransactionDate: {
             gte: firstDayOfMonth,
             lte: firstDayOfNextMonth,
@@ -105,6 +107,9 @@ export async function GET(request) {
           TransactionDate: {
             gte: firstDayOfMonth,
             lte: firstDayOfNextMonth,
+          },
+          FormStatus: {
+            some: { TransactionStatusID: 1 },
           },
         },
         _count: {
