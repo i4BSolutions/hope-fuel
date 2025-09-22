@@ -35,14 +35,11 @@ export async function GET(request) {
 
       // Get current month date range
       const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const firstDayOfNextMonth = new Date(
         now.getFullYear(),
         now.getMonth() + 1,
-        0,
-        23,
-        59,
-        59
+        1
       );
 
       const transactionCounts = await prisma.transactions.groupBy({
@@ -53,8 +50,8 @@ export async function GET(request) {
           },
           PaymentCheck: null,
           TransactionDate: {
-            gte: startOfMonth,
-            lte: endOfMonth,
+            gte: firstDayOfMonth,
+            lte: firstDayOfNextMonth,
           },
         },
         _count: {
@@ -91,14 +88,11 @@ export async function GET(request) {
 
       // Get current month date range
       const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(
+      const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const firstDayOfNextMonth = new Date(
         now.getFullYear(),
         now.getMonth() + 1,
-        0,
-        23,
-        59,
-        59
+        1
       );
 
       const transactionCounts = await prisma.transactions.groupBy({
@@ -109,8 +103,8 @@ export async function GET(request) {
           },
           PaymentCheck: null,
           TransactionDate: {
-            gte: startOfMonth,
-            lte: endOfMonth,
+            gte: firstDayOfMonth,
+            lte: firstDayOfNextMonth,
           },
         },
         _count: {
