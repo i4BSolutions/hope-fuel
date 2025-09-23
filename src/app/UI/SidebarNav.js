@@ -109,7 +109,12 @@ const roleBasedNavItems = {
     navItems.fundraisers,
     navItems.adminPanel,
   ],
-  3: [navItems.entryForm, navItems.customerlist, navItems.hopefuelidlist],
+  3: [
+    navItems.entryForm,
+    navItems.customerlist,
+    navItems.hopefuelidlist,
+    navItems["all-prfhq"],
+  ],
 };
 
 const Sidebar = () => {
