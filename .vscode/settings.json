@@ -8,11 +8,7 @@
     "amplify/backend/amplify-meta.json": true,
     "amplify/backend/awscloudformation": true
   },
-  "cSpell.words": [
-    "awsconfig",
-    "customerlist",
-    "HOPEFUEL"
-  ],
+  "cSpell.words": ["awsconfig", "customerlist", "HOPEFUEL", "HQID"],
   "git.ignoreLimitWarning": true,
   "postman.settings.dotenv-detection-notification-visibility": false
 }
