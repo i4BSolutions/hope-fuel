@@ -228,7 +228,7 @@ const ExportCSVPage = () => {
         "HQID",
         "TransactionDate",
         "PaymentCheckDate",
-        "FormFilledPerson",
+        "FormFillingPerson",
         "Note",
       ];
 
