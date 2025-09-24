@@ -103,7 +103,6 @@ export async function GET(request) {
           WalletID: {
             in: walletIds,
           },
-          PaymentCheck: null,
           TransactionDate: {
             gte: firstDayOfMonth,
             lte: firstDayOfNextMonth,
