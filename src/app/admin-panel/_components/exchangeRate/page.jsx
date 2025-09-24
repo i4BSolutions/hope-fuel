@@ -84,10 +84,15 @@ export default function ExchangeRates() {
     </Box>
   );
 
+  const currentDate = new Date();
+  const currentMonthName = currentDate.toLocaleString("default", {
+    month: "long",
+  });
+
   return (
     <Box sx={{ mt: "20px" }}>
       <Typography sx={{ fontSize: "23px", fontWeight: 600 }}>
-        March 2025 Exchange Rates (1 USD = )
+        {currentMonthName} 2025 Exchange Rates (1 USD = )
       </Typography>
 
       <Box sx={{ mt: 1 }}>
