@@ -118,7 +118,7 @@ export async function GET(req) {
           SELECT 
             TransactionID,
             AgentID,
-            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate ASC) as rn
           FROM TransactionAgent
         ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
         LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
@@ -220,7 +220,7 @@ export async function GET(req) {
           SELECT 
             TransactionID,
             AgentID,
-            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate ASC) as rn
           FROM TransactionAgent
         ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
         LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
