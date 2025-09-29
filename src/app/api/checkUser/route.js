@@ -28,7 +28,7 @@ export async function POST(request) {
   let answer = false;
 
   //if userExist
-  if (records.length != 0) {
+  if (records) {
     return Response.json({
       message: !answer,
       name: records[0].fields["Name"],

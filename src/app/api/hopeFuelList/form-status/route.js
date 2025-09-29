@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "../../../utilites/prisma";
 
+// TODO: if request status is payment checked or cancel, trigger the PaymentCheck, PaymentCheckTime, and Cancel
 export async function PUT(request) {
   const { statusId, formStatusId } = await request.json();
 

@@ -39,8 +39,10 @@ function CreateOrExtendPage() {
   const handleUserCheck = (user, isExistingUser) => {
     setUserInfo(user);
 
-    if (isExistingUser) {
+    if (isExistingUser && user.expire_date != null) {
       setShowExtendOrNot(true); // Show the confirmation step
+    } else if (isExistingUser && user.expire_date == null) {
+      setShowExtendForm(true);
     } else {
       setShowCreateForm(true);
     }
