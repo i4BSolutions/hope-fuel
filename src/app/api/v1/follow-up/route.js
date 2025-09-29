@@ -15,8 +15,19 @@ export async function GET(req) {
           .filter((n) => !Number.isNaN(n) && n > 0)
       : [];
 
-  const currentYear = parseInt(searchParams.get("year") || "0", 10);
-  const currentMonth = parseInt(searchParams.get("month") || "0", 10);
+  const rawMonth = parseInt(searchParams.get("month") || "", 10);
+
+  const normMonth = Number.isNaN(rawMonth)
+    ? new Date().getUTCMonth()
+    : rawMonth >= 1 && rawMonth <= 12
+    ? rawMonth - 1
+    : rawMonth;
+
+  const currentYear = parseInt(
+    searchParams.get("year") || String(new Date().getUTCFullYear()),
+    10
+  );
+  const currentMonth = normMonth;
 
   // Pagination
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -28,7 +39,7 @@ export async function GET(req) {
   const likeQ = `%${rawQ}%`;
 
   const monthStart = new Date(Date.UTC(currentYear, currentMonth, 1));
-  const monthEnd = new Date(Date.UTC(currentYear, currentMonth + 1, 0));
+  const nextMonthStart = new Date(Date.UTC(currentYear, currentMonth + 1, 1));
   const twoMonthsAgoStart = new Date(
     Date.UTC(currentYear, currentMonth - 2, 1)
   );
@@ -60,6 +71,13 @@ export async function GET(req) {
             SELECT 1 FROM Subscription s2 
             WHERE s2.CustomerID = cls.CustomerID 
               AND s2.EndDate >= ?
+          )
+          AND NOT EXISTS (
+            SELECT 1
+            FROM Transactions tx
+            WHERE tx.CustomerID = cls.CustomerID
+              AND tx.TransactionDate >= ?
+              AND tx.TransactionDate <  ?
           )
       ),
       CustomerWithLatestData AS (
@@ -100,7 +118,7 @@ export async function GET(req) {
           SELECT 
             TransactionID,
             AgentID,
-            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate ASC) as rn
           FROM TransactionAgent
         ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
         LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
@@ -124,12 +142,11 @@ export async function GET(req) {
       twoMonthsAgoStart,
       oneMonthAgoEnd,
       monthStart,
-      // status filter
+      monthStart,
+      nextMonthStart,
       statusId,
       statusId,
-      // dynamic agent IDs
       ...agentIds,
-      // search params
       rawQ,
       likeQ,
       likeQ,
@@ -203,7 +220,7 @@ export async function GET(req) {
           SELECT 
             TransactionID,
             AgentID,
-            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate DESC) as rn
+            ROW_NUMBER() OVER (PARTITION BY TransactionID ORDER BY LogDate ASC) as rn
           FROM TransactionAgent
         ) latestAgentRanked ON latestAgentRanked.TransactionID = t.TransactionID AND latestAgentRanked.rn = 1
         LEFT JOIN TransactionAgent ta ON ta.TransactionID = t.TransactionID AND ta.AgentID = latestAgentRanked.AgentID
