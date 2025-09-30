@@ -81,22 +81,22 @@ export default function CheckUser({ onUserCheck }) {
       if (user) {
         let hasPermission = true;
 
-        if (agent.roleId !== AGENT_ROLE.ADMIN) {
-          hasPermission = await checkUserPermission(trimmedName, trimmedEmail);
-        }
+        // if (agent.roleId !== AGENT_ROLE.ADMIN) {
+        hasPermission = await checkUserPermission(trimmedName, trimmedEmail);
+        // }
 
         setHasPermissionThisMonth(hasPermission);
 
-        if (!hasPermission) {
+        if (!hasPermission && agent.roleId !== AGENT_ROLE.ADMIN) {
           setOpenModal(true);
           setLoading(false);
           return;
         }
 
         setOpenModal(true);
-        onUserCheck(user, true);
+        onUserCheck(user, true, hasPermission);
       } else {
-        onUserCheck({ name: trimmedName, email: trimmedEmail }, false);
+        onUserCheck({ name: trimmedName, email: trimmedEmail }, false, true);
       }
       setLoading(false);
     },

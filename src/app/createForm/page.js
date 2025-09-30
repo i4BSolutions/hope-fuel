@@ -36,12 +36,12 @@ function CreateOrExtendPage() {
   const userRole = currentUser?.role || "user";
 
   // Handle showing the form based on user check
-  const handleUserCheck = (user, isExistingUser) => {
+  const handleUserCheck = (user, isExistingUser, hasPermission) => {
     setUserInfo(user);
 
-    if (isExistingUser && user.expire_date != null) {
+    if (isExistingUser && !hasPermission) {
       setShowExtendOrNot(true); // Show the confirmation step
-    } else if (isExistingUser && user.expire_date == null) {
+    } else if (isExistingUser && hasPermission) {
       setShowExtendForm(true);
     } else {
       setShowCreateForm(true);
