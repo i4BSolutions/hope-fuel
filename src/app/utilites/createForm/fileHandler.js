@@ -1,3 +1,5 @@
+//Update the setFile to a bunch of file
+//input is setfile functions and files
 import { fetchAuthSession } from "@aws-amplify/core";
 import { getUrl, uploadData } from "aws-amplify/storage";
 import { v4 as uuidv4 } from "uuid";
