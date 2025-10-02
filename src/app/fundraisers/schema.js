@@ -2,9 +2,13 @@ import { z } from "zod";
 export const FundraisingSchema = z
   .object({
     FundraiserName: z.string().min(3, "Name must be at least 3 characters"),
+    // FundraiserCentralID: z
+    //   .number("Fundraiser ID is required")
+    //   .min(3, "Fundraiser ID must be numeric"),
     FundraiserCentralID: z
-      .number("Fundraiser ID is required")
-      .min(3, "Fundraiser ID must be numeric"),
+      .number({ required_error: "Fundraiser ID is required" })
+      .int("Fundraiser ID must be an integer")
+      .positive("Fundraiser ID must be positive"),
 
     BaseCountryName: z.string().nonempty("Country is required"),
     AcceptedCurrencies: z
