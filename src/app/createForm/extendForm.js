@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import { remove } from "aws-amplify/storage";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -40,6 +40,8 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
   const [minAmountError, setMinAmountError] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [userCountry, setUserCountry] = useState(null);
+
+  const [formLoading, setFormLoading] = useState(false);
 
   if (agent.id === null) {
     return <Typography>Please log in to continue.</Typography>;
@@ -150,6 +152,7 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
     setHasSubmitted(true);
     if (!files.length) return;
     setLoading(true);
+    setFormLoading(true);
     try {
       await extendFormSubmit(
         formData,
@@ -164,6 +167,13 @@ const ExtendForm = ({ userInfo, setLoading, onSuccess }) => {
       console.error("Error during form submission:", error);
     }
   };
+
+  if (formLoading)
+    return (
+      <Box sx={{ display: "grid", placeItems: "center", height: "500px" }}>
+        <CircularProgress />
+      </Box>
+    );
 
   return (
     <>
