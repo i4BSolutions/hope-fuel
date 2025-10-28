@@ -25,6 +25,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import SyncAltRoundedIcon from "@mui/icons-material/SyncAltRounded";
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import Divider from "@mui/material/Divider";
 import { signOut } from "aws-amplify/auth";
 import { usePathname, useRouter } from "next/navigation";
@@ -80,6 +81,11 @@ const navItems = {
     icon: <ManageAccountsIcon />,
     path: "/admin-panel",
   },
+  faq: {
+    text: "FAQ",
+    icon: <HelpOutlineOutlinedIcon />,
+    path: "/faq",
+  },
   logout: {
     text: "Logout",
     icon: <LogoutIcon />,
@@ -97,6 +103,7 @@ const roleBasedNavItems = {
     navItems.customerlist,
     navItems.followUpCustomers,
     navItems.fundraisers,
+    navItems.faq,
   ],
   2: [
     navItems.createForm,
@@ -108,6 +115,7 @@ const roleBasedNavItems = {
     navItems.followUpCustomers,
     navItems.fundraisers,
     navItems.adminPanel,
+    navItems.faq,
   ],
   3: [
     navItems.entryForm,

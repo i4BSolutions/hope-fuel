@@ -32,7 +32,6 @@ export default function CommentModal({
     if (commentText.trim()) {
       submitComment(commentText.trim());
       setCommentText("");
-      // Don't close modal here - let parent component handle it after refreshing data
     }
   };
 
