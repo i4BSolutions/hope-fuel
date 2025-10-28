@@ -383,6 +383,35 @@ model FollowUpComment {
   @@index([CreatedAt(sort: Desc)], map: "idx_followup_comment_date")
 }
 
+model FaqCategory {
+  Id Int @id @default(autoincrement())
+  Name String
+  CreatedAt DateTime @default(now()) @db.Timestamp(0)
+
+  Faq Faq[] @relation("faqCategory_fk")
+}
+
+model Faq {
+  Id Int @id @default(autoincrement())
+  CategoryId Int
+  Question String @db.LongText
+  Explanation String @db.LongText
+  Response String @db.LongText
+
+  FaqCategory FaqCategory @relation("faqCategory_fk", fields: [CategoryId], references: [Id])
+
+  FaqImage FaqImage[] @relation("faq_fk")
+}
+
+model FaqImage {
+  Id Int @id @default(autoincrement())
+  FaqId Int
+  ImageLink String @db.LongText
+  Type String
+
+  Faq Faq @relation("faq_fk", fields: [FaqId], references: [Id])
+}
+
 enum CustomerAuditLogs_FieldChanged {
   Name
   Email
