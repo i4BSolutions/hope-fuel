@@ -1,0 +1,35 @@
+-- CreateTable
+CREATE TABLE `FaqCategory` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `Name` VARCHAR(191) NOT NULL,
+    `CreatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Faq` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `CategoryId` INTEGER NOT NULL,
+    `Question` VARCHAR(191) NOT NULL,
+    `Explanation` VARCHAR(191) NOT NULL,
+    `Response` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `FaqImage` (
+    `Id` INTEGER NOT NULL AUTO_INCREMENT,
+    `FaqId` INTEGER NOT NULL,
+    `ImageLink` VARCHAR(2048) NOT NULL,
+    `Type` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`Id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `Faq` ADD CONSTRAINT `Faq_CategoryId_fkey` FOREIGN KEY (`CategoryId`) REFERENCES `FaqCategory`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `FaqImage` ADD CONSTRAINT `FaqImage_FaqId_fkey` FOREIGN KEY (`FaqId`) REFERENCES `Faq`(`Id`) ON DELETE RESTRICT ON UPDATE CASCADE;

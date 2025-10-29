@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `Faq` MODIFY `Question` LONGTEXT NOT NULL,
+    MODIFY `Explanation` LONGTEXT NOT NULL,
+    MODIFY `Response` LONGTEXT NOT NULL;
