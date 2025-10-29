@@ -112,7 +112,15 @@ export default function FaqItem({
           },
         }}
       >
-        <Typography sx={{ fontWeight: 700, fontSize: 18, flex: 1 }}>
+        <Typography
+          sx={{
+            fontWeight: 400,
+            fontSize: "18px",
+            fontStyle: "normal",
+            lineHeight: "24px",
+            flex: 1,
+          }}
+        >
           {question}
         </Typography>
 
@@ -147,11 +155,11 @@ export default function FaqItem({
       <Divider />
 
       <AccordionDetails sx={{ p: 2 }}>
-        <Stack spacing={2.5}>
+        <Stack spacing={1.5}>
           {/* Explanation */}
           <Typography
             variant="body2"
-            sx={{ fontWeight: 700, color: "text.secondary" }}
+            sx={{ fontWeight: 400, fontSize: "14px" }}
           >
             Explanation:
           </Typography>
@@ -169,7 +177,7 @@ export default function FaqItem({
           {/* Response */}
           <Typography
             variant="body2"
-            sx={{ fontWeight: 700, color: "text.secondary" }}
+            sx={{ fontWeight: 400, fontSize: "14px" }}
           >
             Response:
           </Typography>
@@ -201,7 +209,7 @@ function ColoredNote({ bg, border, text, dataTestId }) {
         border: `1px solid ${border}`,
       }}
     >
-      <Typography variant="body2">{text}</Typography>
+      <Typography sx={{ fontSize: "16px" }}>{text}</Typography>
     </Paper>
   );
 }
