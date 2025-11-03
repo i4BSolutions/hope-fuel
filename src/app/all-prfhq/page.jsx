@@ -90,7 +90,6 @@ export default function AllHopefuelPage() {
       const data = await response.json();
       setCardData(data.data);
       setTotal(data.total);
-      console.log("Fetched card data:", data);
     } catch (error) {
       console.error(error);
     } finally {
