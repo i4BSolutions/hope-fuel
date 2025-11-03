@@ -129,6 +129,9 @@ export async function GET(req) {
           // so we can re-sort client-side after mapping (shown below).
           include: {
             Customer: true,
+            SupportRegion: {
+              select: { Region: true },
+            },
             Wallet: { include: { Currency: true } },
             Note: true,
             Screenshot: true,
@@ -150,12 +153,12 @@ export async function GET(req) {
     rows.sort((a, b) => b.HopeFuelID - a.HopeFuelID);
 
     // 6) Map to response shape (unchanged)
-    const data = rows.map((t) => {
-      const customer = t.Customer || {};
-      const currency = t.Wallet?.Currency || {};
-      const latestFs = t.FormStatus?.[0];
-      const firstAgent = t.TransactionAgent?.[0];
-      const screenshots = (t.Screenshot || [])
+    const data = rows.map((transaction) => {
+      const customer = transaction.Customer || {};
+      const currency = transaction.Wallet?.Currency || {};
+      const latestFs = transaction.FormStatus?.[0];
+      const firstAgent = transaction.TransactionAgent?.[0];
+      const screenshots = (transaction.Screenshot || [])
         .map((s) => s.ScreenShotLink)
         .filter(Boolean);
 
@@ -164,10 +167,10 @@ export async function GET(req) {
         Email: customer.Email ?? null,
         CardID: customer.CardID ?? null,
         ManyChatId: customer.ManyChatId ?? null,
-        HopeFuelID: t.HopeFuelID,
-        TransactionDate: t.TransactionDate,
-        Amount: t.Amount,
-        Month: t.Month,
+        HopeFuelID: transaction.HopeFuelID,
+        TransactionDate: transaction.TransactionDate,
+        Amount: transaction.Amount,
+        Month: transaction.Month,
         CurrencyCode: currency.CurrencyCode ?? null,
         ScreenShot: screenshots,
         FormFilledPerson: firstAgent?.Agent?.Username ?? null,
@@ -175,7 +178,8 @@ export async function GET(req) {
           latestFs?.TransactionStatus?.TransactionStatus ?? null,
         TransactionStatusID: latestFs?.TransactionStatusID ?? null,
         FormStatusID: latestFs?.FormStatusID ?? null,
-        Note: t.Note?.Note ?? null,
+        Note: transaction.Note?.Note ?? null,
+        SupportRegion: transaction.SupportRegion?.Region ?? null,
       };
     });
 

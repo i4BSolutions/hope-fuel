@@ -156,6 +156,14 @@ export default function CardsView({
               color="text.secondary"
               display="block"
               marginTop={1}
+            >
+              Support Region: {item.SupportRegion ? item.SupportRegion : "N/A"}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              display="block"
+              marginTop={1}
               marginBottom={2}
             >
               Note: {item.Note ? item.Note : "N/A"}
