@@ -23,6 +23,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy"; // 👈 NEW
 import getSignedUrl from "../../utilites/getSignedUrl";
 
 export default function FaqItem({
+  index,
   id,
   question,
   explanation,
@@ -99,6 +100,7 @@ export default function FaqItem({
         overflow: "hidden",
         border: (t) => `1px solid ${t.palette.divider}`,
         "&:before": { display: "none" },
+        "&:hover": { boxShadow: 3 },
       }}
     >
       <AccordionSummary
@@ -110,6 +112,7 @@ export default function FaqItem({
             alignItems: "center",
             gap: 1,
           },
+          transition: "all 0.3s ease",
         }}
       >
         <Typography
@@ -121,7 +124,7 @@ export default function FaqItem({
             flex: 1,
           }}
         >
-          {question}
+          {index + 1}. {question}
         </Typography>
 
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
@@ -158,8 +161,13 @@ export default function FaqItem({
         <Stack spacing={1.5}>
           {/* Explanation */}
           <Typography
-            variant="body2"
-            sx={{ fontWeight: 400, fontSize: "14px" }}
+            variant="overline"
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+              opacity: 0.7,
+              letterSpacing: 0.6,
+            }}
           >
             Explanation:
           </Typography>
@@ -176,8 +184,13 @@ export default function FaqItem({
 
           {/* Response */}
           <Typography
-            variant="body2"
-            sx={{ fontWeight: 400, fontSize: "14px" }}
+            variant="overline"
+            sx={{
+              fontWeight: 400,
+              fontSize: "14px",
+              opacity: 0.7,
+              letterSpacing: 0.6,
+            }}
           >
             Response:
           </Typography>
@@ -209,7 +222,11 @@ function ColoredNote({ bg, border, text, dataTestId }) {
         border: `1px solid ${border}`,
       }}
     >
-      <Typography sx={{ fontSize: "16px" }}>{text}</Typography>
+      <Typography
+        sx={{ fontSize: 16, whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+      >
+        {text}
+      </Typography>
     </Paper>
   );
 }
