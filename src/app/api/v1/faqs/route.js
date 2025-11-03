@@ -30,7 +30,7 @@ export async function GET(req) {
 
     const faqs = await prisma.Faq.findMany({
       where: { CategoryId: categoryId },
-      orderBy: { Id: "desc" },
+      orderBy: { Id: "asc" },
       include: {
         FaqCategory: {
           select: { Id: true, Name: true },

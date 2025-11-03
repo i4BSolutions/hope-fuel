@@ -249,8 +249,9 @@ export default function FAQ() {
             spacing={2}
             sx={{ opacity: refreshing ? 0.7 : 1, transition: "opacity 180ms" }}
           >
-            {faqs.map((f) => (
+            {faqs.map((f, index) => (
               <FaqItem
+                index={index}
                 key={f.Id}
                 id={f.Id}
                 question={f.Question}
