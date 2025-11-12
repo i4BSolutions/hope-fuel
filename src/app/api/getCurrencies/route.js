@@ -1,6 +1,7 @@
 // input : awsId
 // output: {data: {AgentID: .. , AWSID: ... ,UserRoleID: }}
 
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import db from "../../utilites/db";
 
@@ -18,7 +19,6 @@ async function getCurrencies(awsId) {
 
 export async function GET(req) {
   try {
-
     const result = await getCurrencies();
 
     return NextResponse.json(result);
