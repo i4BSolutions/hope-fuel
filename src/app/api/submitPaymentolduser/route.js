@@ -115,7 +115,7 @@ async function createNote(note, agentID) {
 async function createScreenShot(screenShot, transactionsID) {
   console.log(transactionsID + "  " + screenShot);
 
-  let screenShotLink = await screenShot.map(async (item) => {
+  const screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
     const key = item.key;
     const values = [transactionsID, key];
@@ -129,7 +129,7 @@ async function createScreenShot(screenShot, transactionsID) {
       return;
     }
   });
-  return screenShotLink;
+  return Promise.all(screenShotLink);
 }
 
 export async function POST(req) {
