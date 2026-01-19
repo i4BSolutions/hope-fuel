@@ -76,7 +76,7 @@ async function createScreenShot(screenShot, transactionsID) {
       screenShot
   );
 
-  let screenShotLink = screenShot.map(async (item) => {
+  const screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
 
     const key = item.key;
@@ -90,7 +90,7 @@ async function createScreenShot(screenShot, transactionsID) {
       throw new Error("Failed to insert screenshot");
     }
   });
-  return screenShotLink;
+  return Promise.all(screenShotLink);
 }
 
 //Insert Into TransactionAgent Table
