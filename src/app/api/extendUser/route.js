@@ -7,7 +7,7 @@ import maxHopeFuelID from "../../utilites/maxHopeFuelID.js";
 import prisma from "../../utilites/prisma";
 
 async function createScreenShot(screenShot, transactionsID) {
-  let screenShotLink = await screenShot.map(async (item) => {
+  const screenShotLink = screenShot.map(async (item) => {
     const query = `insert into ScreenShot (TransactionID , ScreenShotLink) values ( ?, ?)`;
     const key = item.key;
     const values = [transactionsID, key];
@@ -19,7 +19,7 @@ async function createScreenShot(screenShot, transactionsID) {
       return;
     }
   });
-  return screenShotLink;
+  return Promise.all(screenShotLink);
 }
 
 async function InsertSubscription(customerId, month) {
