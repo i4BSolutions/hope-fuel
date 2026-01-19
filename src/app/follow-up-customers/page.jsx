@@ -40,6 +40,8 @@ export default function FollowUpCustomers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedStatus, setTempSelectedStatus] = useState("");
   const [tempSelectedAgent, setTempSelectedAgent] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [selectedAgents, setSelectedAgents] = useState([]);
 
   const [agents, setAgents] = useState([]);
   const [followUpdData, setFollowUpData] = useState([]);
@@ -87,8 +89,14 @@ export default function FollowUpCustomers() {
   }, []);
 
   useEffect(() => {
-    fetchFollowUpData();
-  }, [pagination.page, pagination.pageSize, searchQuery]);
+    fetchFollowUpData(selectedStatus, selectedAgents);
+  }, [
+    pagination.page,
+    pagination.pageSize,
+    searchQuery,
+    selectedStatus,
+    selectedAgents,
+  ]);
 
   const fetchAllAgents = async () => {
     try {
@@ -124,7 +132,7 @@ export default function FollowUpCustomers() {
           pageSize: json.pagination.pageSize,
           total: json.pagination.total,
           totalPages: Math.ceil(
-            json.pagination.total / json.pagination.pageSize
+            json.pagination.total / json.pagination.pageSize,
           ),
         });
       }
@@ -140,7 +148,7 @@ export default function FollowUpCustomers() {
     const committed = searchInput.trim();
 
     if (committed === (searchQuery || "").trim()) {
-      fetchFollowUpData();
+      fetchFollowUpData(selectedStatus, selectedAgents);
     } else {
       setSearchQuery(committed);
     }
@@ -157,7 +165,9 @@ export default function FollowUpCustomers() {
   const handleClearFilter = () => {
     setTempSelectedStatus("");
     setTempSelectedAgent([]);
-    fetchFollowUpData(); // fetch without filters
+    setSelectedStatus(null);
+    setSelectedAgents([]);
+    setPagination((prev) => ({ ...prev, page: 1 }));
     handleCloseFilterModal();
   };
 
@@ -166,7 +176,9 @@ export default function FollowUpCustomers() {
     const agentIds = (tempSelectedAgent || [])
       .map((v) => Number(v))
       .filter((v) => !Number.isNaN(v) && v > 0);
-    fetchFollowUpData(statusId, agentIds);
+    setSelectedStatus(statusId);
+    setSelectedAgents(agentIds);
+    setPagination((prev) => ({ ...prev, page: 1 }));
     handleCloseFilterModal();
   };
 
@@ -341,7 +353,7 @@ export default function FollowUpCustomers() {
                       size="small"
                       onClick={() => {
                         navigator.clipboard.writeText(
-                          customer.manyChatId || ""
+                          customer.manyChatId || "",
                         );
                       }}
                     >
@@ -363,7 +375,7 @@ export default function FollowUpCustomers() {
                         }),
                       });
 
-                      fetchFollowUpData();
+                      fetchFollowUpData(selectedStatus, selectedAgents);
                     }}
                   />
                 </Box>
@@ -425,7 +437,7 @@ export default function FollowUpCustomers() {
                         </Typography>
                         <Typography fontSize={12} color="text.secondary">
                           {new Date(
-                            customer.comments[0].createdAt || Date.now()
+                            customer.comments[0].createdAt || Date.now(),
                           ).toLocaleString()}
                         </Typography>
                       </Box>
@@ -635,7 +647,7 @@ export default function FollowUpCustomers() {
       });
 
       if (response.ok) {
-        fetchFollowUpData();
+        fetchFollowUpData(selectedStatus, selectedAgents);
         await fetchCommentsForCustomer(selectedCustomerId);
       } else {
         console.error("Failed to submit comment");
@@ -648,7 +660,7 @@ export default function FollowUpCustomers() {
   async function fetchCommentsForCustomer(customerId) {
     try {
       const response = await fetch(
-        `/api/v1/follow-up/comment?customerId=${customerId}`
+        `/api/v1/follow-up/comment?customerId=${customerId}`,
       );
 
       if (response.ok) {
@@ -683,7 +695,7 @@ export default function FollowUpCustomers() {
 
       if (response.ok) {
         await fetchCommentsForCustomer(selectedCustomerId);
-        fetchFollowUpData();
+        fetchFollowUpData(selectedStatus, selectedAgents);
       } else {
         console.error("Failed to update comment status");
       }
